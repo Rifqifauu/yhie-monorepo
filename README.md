@@ -4,7 +4,7 @@ Selamat datang di repositori **yhie-monorepo**. Projek ini menggunakan arsitektu
 
 ## 💻 Tech Stack
 
-* **Backend:** [Laravel 12.x](https://laravel.com) (PHP 8.2+) — Sebagai core API & business logic.
+* **Backend:** [Laravel 13.x](https://laravel.com) (PHP 8.3+) — Sebagai core API & business logic.
 * **Frontend:** [Nuxt 4.x](https://nuxt.com) (Vue 3 & TypeScript) — Sebagai Web UI Utama/User Interface.
 * **LMS:** [Moodle](https://moodle.org) (PHP) — Sebagai platform manajemen pembelajaran & kursus.
 
