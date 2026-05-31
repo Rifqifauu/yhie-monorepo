@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "menu": [
+      { "name": "Beranda", "path": "/" },
+      { "name": "Tentang", "path": "/about" },
+      { "name": "Program", "path": "/program" },
+      { "name": "Galeri", "path": "/media" },
+      { "name": "Partner", "path": "/partner" },
+      { "name": "Artikel", "path": "/article" }
+    ]
+  },
+  "hero": {
+    "title": "Sertifikasi Hafiz Sambil Tadabbur Alam",
+    "subtitle": "Yayasan Hafiz Indonesia Emas",
+    "description": "Validasi hafalan Al-Qur'an Anda dalam pelukan alam yang menenangkan. Melalui pendekatan 'Stress-Free Exam', kami membantu Anda melantunkan ayat suci dengan lebih rileks dan fokus, didukung oleh sertifikasi berstandar internasional (IAO).",
+    "features": [
+      "Tadabbur Alam & Ujian Tanpa Stres",
+      "Sertifikasi Internasional (IAO)",
+      "Legalitas Resmi Kemenkumham RI",
+      "Jejaring Eksklusif Para Hafiz"
+    ],
+    "ctaPrimary": "Daftar Sekarang",
+    "ctaSecondary": "Lihat Program",
+    "linkPrimary": "/register",
+    "linkSecondary": "/program",
+    "imageAlt": "Suasana khusyuk setoran hafalan Al-Qur'an di alam terbuka bersama Yayasan Hafiz Indonesia Emas",
+    "seoTitle": "Sertifikasi Hafiz & Wisata Tadabbur Alam | Yayasan Hafiz Indonesia Emas",
+    "seoDesc": "Program sertifikasi Hafiz Al-Qur'an resmi dengan konsep wisata alam (tadabbur). Kurangi stres ujian, tingkatkan fokus, dan raih sertifikat internasional IAO.",
+    "keywords": "sertifikasi hafiz quran, wisata tahfidz, sertifikat iao, yayasan hafiz indonesia emas, ujian hafalan tanpa stres, tadabbur alam hafiz, sertifikasi tahfidz"
+  },
+  "benefits": {
+    "title": "Keunggulan Program Sertifikasi Kami",
+    "description": "Kami memadukan ujian tahfidz profesional dengan keindahan alam untuk menciptakan pengalaman spiritual yang nyaman, berkesan, dan diakui secara global.",
+    "items": [
+      {
+        "title": "Ujian Tanpa Stres (Stress-Free)",
+        "description": "Ciptakan ketenangan batin saat melantunkan ayat suci. Suasana alam terbuka dirancang khusus untuk menghilangkan ketegangan dan meningkatkan fokus hafalan Anda."
+      },
+      {
+        "title": "Pengakuan Internasional (IAO)",
+        "description": "Hafalan Anda tidak hanya tervalidasi secara nasional, tetapi juga diakui oleh lembaga akreditasi internasional (IAO) sebagai bekal profesional di masa depan."
+      },
+      {
+        "title": "Tadabbur Alam & Ukhuwah",
+        "description": "Lebih dari sekadar ujian, ini adalah perjalanan spiritual. Nikmati keindahan alam sekaligus perluas jaringan persaudaraan (ukhuwah) dengan sesama penghafal Al-Qur'an."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Siap Melangkah Menjadi Hafiz Bersertifikat Global?",
+    "description": "Jangan biarkan ketegangan menghambat kelancaran lantunan ayat suci Anda. Bergabunglah sekarang, rasakan kedamaian tadabbur alam, dan dapatkan pengakuan profesional untuk dedikasi hafalan Anda."
+  }
+}

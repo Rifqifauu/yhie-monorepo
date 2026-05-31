@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "menu": [
+      { "name": "Home", "path": "/" },
+      { "name": "About", "path": "/about" },
+      { "name": "Program", "path": "/program" },
+      { "name": "Gallery", "path": "/media" },
+      { "name": "Partners", "path": "/partner" },
+      { "name": "Articles", "path": "/article" }
+    ]
+  },
+  "hero": {
+    "title": "Hafiz Certification Amidst the Serenity of Nature",
+    "subtitle": "Yayasan Hafiz Indonesia Emas",
+    "description": "Validate your Qur'anic memorization in the calming embrace of nature. Through our 'Stress-Free Exam' approach, we help you recite the holy verses with greater relaxation and focus, backed by internationally recognized standards (IAO).",
+    "features": [
+      "Nature Retreat & Stress-Free Exam",
+      "International Certification (IAO)",
+      "Officially Registered with the Indonesian Government",
+      "Exclusive Hafiz Networking"
+    ],
+    "ctaPrimary": "Register Now",
+    "ctaSecondary": "View Program",
+    "linkPrimary": "/register",
+    "linkSecondary": "/program",
+    "imageAlt": "A serene atmosphere of Qur'an recitation outdoors with Yayasan Hafiz Indonesia Emas",
+    "seoTitle": "Hafiz Certification & Nature Retreat | Yayasan Hafiz Indonesia Emas",
+    "seoDesc": "Official Hafiz Qur'an certification program with a nature retreat concept. Reduce exam stress, enhance focus, and achieve an international IAO certificate.",
+    "keywords": "hafiz quran certification, tahfidz retreat, iao certificate, yayasan hafiz indonesia emas, stress-free memorization exam, hafiz nature retreat, tahfidz certification"
+  },
+  "benefits": {
+    "title": "Why Choose Our Certification Program?",
+    "description": "We blend professional tahfidz assessments with the beauty of nature to create a spiritual experience that is comfortable, memorable, and globally recognized.",
+    "items": [
+      {
+        "title": "Stress-Free Examination",
+        "description": "Achieve inner peace as you recite the holy verses. Our outdoor setting is specifically designed to eliminate tension and enhance your memorization focus."
+      },
+      {
+        "title": "International Recognition (IAO)",
+        "description": "Your memorization is not only validated nationally but also accredited by an international body (IAO), serving as a professional asset for your future."
+      },
+      {
+        "title": "Spiritual Retreat & Brotherhood",
+        "description": "More than just an exam, it is a spiritual journey. Enjoy the beauty of nature while expanding your brotherhood (ukhuwah) with fellow Qur'an memorizers."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Become a Globally Certified Hafiz?",
+    "description": "Don't let exam anxiety disrupt the flow of your recitation. Join us today, experience the tranquility of our nature retreat, and earn professional recognition for your dedication to the Qur'an."
+  }
+}
