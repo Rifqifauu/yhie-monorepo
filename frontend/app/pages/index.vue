@@ -2,6 +2,7 @@
     <HeroSection />
     <ProgramsSection />
     <BenefitSection />
+    <PartnersSection />
     <CTASection />
 </template>
 <script setup>
