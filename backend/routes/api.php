@@ -9,10 +9,16 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
 
-Route::post ("login", [\App\Http\Controllers\AuthController::class, "login"]);
-Route::post ("register", [\App\Http\Controllers\AuthController::class, "register"]);
-Route::post ("logout", [\App\Http\Controllers\AuthController::class, "logout"]);
-
+Route::post("login", [\App\Http\Controllers\AuthController::class, "login"]);
+Route::post("register", [\App\Http\Controllers\AuthController::class, "register"]);
+Route::post("logout", [\App\Http\Controllers\AuthController::class, "logout"]);
+Route::get("users", function () {
+    $users = \App\Models\User::all();
+    return response()->json([
+        "message" => "Users fetched successfully.",
+        "data" => $users
+    ], 200);
+});
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);
     Route::get("/{slug}", [ArticleController::class, "show"]);
@@ -48,27 +54,27 @@ Route::prefix("settings")->group(function () {
     Route::get("/{key}", [SettingController::class, "show"]);
 });
 
-    Route::apiResource("articles", ArticleController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("programs", ProgramController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("schedules", ScheduleController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("media", MediaController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("partners", PartnerController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("settings", SettingController::class)->except([
-        "show",
-        "index",
-    ]);
+Route::apiResource("articles", ArticleController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("programs", ProgramController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("schedules", ScheduleController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("media", MediaController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("partners", PartnerController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("settings", SettingController::class)->except([
+    "show",
+    "index",
+]);

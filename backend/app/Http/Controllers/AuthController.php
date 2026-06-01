@@ -17,15 +17,15 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed', // butuh password_confirmation di request
         ]);
 
         try {
             $user = User::create([
-                'name'     => $validated['name'],
-                'email'    => $validated['email'],
+                'name' => $validated['name'],
+                'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
 
@@ -34,7 +34,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => 'User registered successfully.',
-                'data'    => $user
+                'data' => $user
             ], 201);
 
         } catch (\Throwable $e) {
@@ -52,7 +52,7 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $credentials = $request->validate([
-            'email'    => 'required|string|email',
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
@@ -60,13 +60,13 @@ class AuthController extends Controller
             // Auth::attempt akan mengecek email & password. 
             // Jika benar, Laravel otomatis membuat session berbasis cookie.
             if (Auth::attempt($credentials)) {
-                
+
                 // Mencegah session fixation attack
                 $request->session()->regenerate();
 
                 return response()->json([
                     'message' => 'Logged in successfully.',
-                    'data'    => Auth::user()
+                    'data' => Auth::user()
                 ], 200);
             }
 
@@ -79,7 +79,7 @@ class AuthController extends Controller
             Log::error('Login error: ' . $e->getMessage());
 
             return response()->json([
-                'message' => 'An error occurred during login. Please try again later.'
+                'message' => 'An error occurred during login. Please try again later.' . $e->getMessage()
             ], 500);
         }
     }
