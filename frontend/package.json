@@ -15,6 +15,7 @@
     "aos": "^2.3.4",
     "nuxt": "^4.4.6",
     "nuxt-aos": "^1.2.6",
+    "nuxt-auth-sanctum": "^3.0.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
     "vue": "^3.5.34",

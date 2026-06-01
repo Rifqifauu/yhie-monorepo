@@ -2,7 +2,16 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxt/image", "@nuxtjs/i18n", "nuxt-aos"],
+  modules: [
+    "@nuxt/ui",
+    "@nuxt/image",
+    "@nuxtjs/i18n",
+    "nuxt-aos",
+    "nuxt-auth-sanctum",
+  ],
+  sanctum: {
+    baseUrl: "http://localhost:8000",
+  },
   i18n: {
     lazy: true,
     langDir: "locales/",

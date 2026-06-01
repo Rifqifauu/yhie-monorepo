@@ -1,5 +1,6 @@
 <template>
     <HeroSection />
+    <ProgramsSection />
     <BenefitSection />
     <CTASection />
 </template>
