@@ -13,39 +13,40 @@ class PartnerController extends Controller
 {
     public function index(Request $request)
     {
-    $search = $request->query('search');
-    
-    try {
-        $partners = Partner::orderBy('created_at', 'desc') // Lebih lazim mengurutkan data dari yang terbaru (desc)
-            ->when($search, function ($query, $search) {
-                return $query->where(function ($q) use ($search) {
-                    $q->where('name_id', 'like', "%{$search}%")
-                      ->orWhere('name_en', 'like', "%{$search}%");
-                });
-            })->paginate(10);
+        $search = $request->query('search');
 
-        return response()->json([
-            'message' => 'Partners fetched successfully.',
-            'data'    => $partners
-        ], 200);
+        try {
+            $partners = Partner::orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc')
+                ->when($search, function ($query, $search) {
+                    return $query->where(function ($q) use ($search) {
+                        $q->where('name_id', 'like', "%{$search}%")
+                            ->orWhere('name_en', 'like', "%{$search}%");
+                    });
+                })->paginate(10);
 
-    } catch (\Throwable $e) {
-        Log::error('Error fetching programs: ' . $e->getMessage());
-        return response()->json([
-            'message' => 'Failed to fetch programs.'
-        ], 500);
+            return response()->json([
+                'message' => 'Partners fetched successfully.',
+                'data' => $partners
+            ], 200);
+
+        } catch (\Throwable $e) {
+            Log::error('Error fetching programs: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to fetch programs.'
+            ], 500);
+        }
     }
-}
 
     public function store(Request $request)
     {
         $rules = [
-            'name_id'        => 'required|string|max:255',
+            'name_id' => 'required|string|max:255',
             'description_id' => 'required|string',
-            'name_en'        => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
             'description_en' => 'required|string',
-            'slug_id'        => 'nullable|string|max:255',
-            'slug_en'        => 'nullable|string|max:255',
+            'slug_id' => 'nullable|string|max:255',
+            'slug_en' => 'nullable|string|max:255',
         ];
 
         if ($request->hasFile('logo')) {
@@ -65,7 +66,7 @@ class PartnerController extends Controller
 
             return response()->json([
                 'message' => 'Partner created successfully.',
-                'data'    => $partner
+                'data' => $partner
             ], 201);
         } catch (\Throwable $e) {
             Log::error('Error creating partner: ' . $e->getMessage());
@@ -82,7 +83,7 @@ class PartnerController extends Controller
 
             return response()->json([
                 'message' => 'Partner fetched successfully.',
-                'data'    => $partner
+                'data' => $partner
             ], 200);
 
         } catch (ModelNotFoundException $e) {
@@ -101,12 +102,12 @@ class PartnerController extends Controller
     public function update(Request $request, $id)
     {
         $rules = [
-            'name_id'        => 'sometimes|required|string|max:255',
+            'name_id' => 'sometimes|required|string|max:255',
             'description_id' => 'sometimes|required|string',
-            'name_en'        => 'sometimes|required|string|max:255',
+            'name_en' => 'sometimes|required|string|max:255',
             'description_en' => 'sometimes|required|string',
-            'slug_id'        => 'nullable|string|max:255',
-            'slug_en'        => 'nullable|string|max:255',
+            'slug_id' => 'nullable|string|max:255',
+            'slug_en' => 'nullable|string|max:255',
         ];
 
         if ($request->hasFile('logo')) {
@@ -132,13 +133,13 @@ class PartnerController extends Controller
 
             return response()->json([
                 'message' => 'Partner updated successfully',
-                'data'    => $partner
+                'data' => $partner
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Partner not found',
-                'data'    => null
+                'data' => null
             ], 404);
 
         } catch (\Throwable $e) {
@@ -146,7 +147,7 @@ class PartnerController extends Controller
 
             return response()->json([
                 'message' => 'Failed to update partner. Please try again later.',
-                'data'    => null
+                'data' => null
             ], 500);
         }
     }
@@ -162,13 +163,13 @@ class PartnerController extends Controller
 
             return response()->json([
                 'message' => 'Partner deleted successfully',
-                'data'    => null
+                'data' => null
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Partner not found',
-                'data'    => null
+                'data' => null
             ], 404);
 
         } catch (\Throwable $e) {
@@ -176,7 +177,7 @@ class PartnerController extends Controller
 
             return response()->json([
                 'message' => 'Failed to delete partner. Please try again later.',
-                'data'    => null
+                'data' => null
             ], 500);
         }
     }
