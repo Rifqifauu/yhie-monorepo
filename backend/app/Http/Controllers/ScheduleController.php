@@ -6,7 +6,7 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Log;
 
 class ScheduleController extends Controller
 {
@@ -19,15 +19,15 @@ class ScheduleController extends Controller
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
                         $q->where('title_id', 'like', "%{$search}%")
-                          ->orWhere('title_en', 'like', "%{$search}%")
-                          ->orWhere('description_id', 'like', "%{$search}%")
-                          ->orWhere('description_en', 'like', "%{$search}%");
+                            ->orWhere('title_en', 'like', "%{$search}%")
+                            ->orWhere('description_id', 'like', "%{$search}%")
+                            ->orWhere('description_en', 'like', "%{$search}%");
                     });
                 })->paginate($request->query('per_page', 10));
 
             return response()->json([
                 'message' => 'Schedules fetched successfully.',
-                'data'    => $schedules
+                'data' => $schedules
             ], 200);
 
         } catch (\Throwable $e) {
@@ -41,12 +41,12 @@ class ScheduleController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title_id'       => 'required|string|max:255',
+            'title_id' => 'required|string|max:255',
             'description_id' => 'required|string',
-            'title_en'       => 'required|string|max:255',
+            'title_en' => 'required|string|max:255',
             'description_en' => 'required|string',
-            'start_date'     => 'required|date',
-            'end_date'       => 'required|date|after_or_equal:start_date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
         try {
@@ -54,7 +54,7 @@ class ScheduleController extends Controller
 
             return response()->json([
                 'message' => 'Schedule created successfully.',
-                'data'    => $schedule
+                'data' => $schedule
             ], 201);
 
         } catch (\Throwable $e) {
@@ -72,7 +72,7 @@ class ScheduleController extends Controller
 
             return response()->json([
                 'message' => 'Schedule fetched successfully.',
-                'data'    => $schedule
+                'data' => $schedule
             ], 200);
 
         } catch (ModelNotFoundException $e) {
@@ -91,12 +91,12 @@ class ScheduleController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'title_id'       => 'sometimes|required|string|max:255',
+            'title_id' => 'sometimes|required|string|max:255',
             'description_id' => 'sometimes|required|string',
-            'title_en'       => 'sometimes|required|string|max:255',
+            'title_en' => 'sometimes|required|string|max:255',
             'description_en' => 'sometimes|required|string',
-            'start_date'     => 'sometimes|required|date',
-            'end_date'       => 'sometimes|required|date|after_or_equal:start_date',
+            'start_date' => 'sometimes|required|date',
+            'end_date' => 'sometimes|required|date|after_or_equal:start_date',
         ]);
 
         try {
@@ -106,20 +106,20 @@ class ScheduleController extends Controller
 
             return response()->json([
                 'message' => 'Schedule updated successfully.',
-                'data'    => $schedule
+                'data' => $schedule
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Schedule not found.',
-                'data'    => null
+                'data' => null
             ], 404);
 
         } catch (\Throwable $e) {
             Log::error('Error updating schedule: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to update schedule. Please try again later.',
-                'data'    => null
+                'data' => null
             ], 500);
         }
     }
@@ -133,20 +133,20 @@ class ScheduleController extends Controller
 
             return response()->json([
                 'message' => 'Schedule deleted successfully.',
-                'data'    => null
+                'data' => null
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Schedule not found.',
-                'data'    => null
+                'data' => null
             ], 404);
 
         } catch (\Throwable $e) {
             Log::error('Error deleting schedule: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to delete schedule. Please try again later.',
-                'data'    => null
+                'data' => null
             ], 500);
         }
     }
