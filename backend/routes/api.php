@@ -9,45 +9,34 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes — YHIE (Yayasan Hafiz Indonesia Emas)
-|--------------------------------------------------------------------------
-|
-| Public routes  : dapat diakses tanpa token (untuk Nuxt SSG)
-| Admin routes   : dilindungi middleware auth:sanctum
-|
-*/
+Route::post ("login", [\App\Http\Controllers\AuthController::class, "login"]);
+Route::post ("register", [\App\Http\Controllers\AuthController::class, "register"]);
+Route::post ("logout", [\App\Http\Controllers\AuthController::class, "logout"]);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PUBLIC ROUTES
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Articles
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);
     Route::get("/{slug}", [ArticleController::class, "show"]);
 });
 
-// Programs
+
 Route::prefix("programs")->group(function () {
     Route::get("/", [ProgramController::class, "index"]);
     Route::get("/{slug}", [ProgramController::class, "show"]);
 });
 
-// Schedules
+
 Route::prefix("schedules")->group(function () {
     Route::get("/", [ScheduleController::class, "index"]);
     Route::get("/{id}", [ScheduleController::class, "show"]);
 });
 
-// Media / Galeri
+
 Route::prefix("media")->group(function () {
     Route::get("/", [MediaController::class, "index"]);
     Route::get("/{slug}", [MediaController::class, "show"]);
 });
 
-// Partners
+
 Route::prefix("partners")->group(function () {
     Route::get("/", [PartnerController::class, "index"]);
     Route::get("/{slug}", [PartnerController::class, "show"]);
@@ -58,11 +47,7 @@ Route::prefix("settings")->group(function () {
     Route::get("/", [SettingController::class, "index"]);
     Route::get("/{key}", [SettingController::class, "show"]);
 });
-// ─────────────────────────────────────────────────────────────────────────────
-// Admin Routes — auth:sanctum,  api bisa langsung pake apiResource (include semua CRUD)
-// ─────────────────────────────────────────────────────────────────────────────
 
-Route::middleware("auth:sanctum")->group(function () {
     Route::apiResource("articles", ArticleController::class)->except([
         "show",
         "index",
@@ -87,4 +72,3 @@ Route::middleware("auth:sanctum")->group(function () {
         "show",
         "index",
     ]);
-});

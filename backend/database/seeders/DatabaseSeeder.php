@@ -17,10 +17,16 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+<<<<<<< Updated upstream
         User::factory()->create([
             "name" => "Test User",
             "email" => "test@example.com",
             "password" => bcrypt("password"),
         ]);
+=======
+        $this->call(MediaSeeder::class);
+        $this->call(PartnerSeeder::class);
+        $this->call(ProgramSeeder::class);
+>>>>>>> Stashed changes
     }
 }
