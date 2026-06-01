@@ -6,5 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    //
+    protected $fillable = [
+        'key',
+        'value',
+    ];
+
+    // ── Static helper ─────────────────────────────────────────────────────────
+
+    public static function get(string $key, mixed $default = null): mixed
+    {
+        return static::where('key', $key)->value('value') ?? $default;
+    }
 }

@@ -16,8 +16,8 @@ return new class extends Migration {
             $table->string("description_id");
             $table->string("title_en");
             $table->string("description_en");
-            $table->datetime("start_date");
-            $table->datetime("end_date");
+            $table->dateTime("start_date");
+            $table->dateTime("end_date");
             $table->timestamps();
         });
     }

@@ -3,5 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // Redirect ke URL frontend (Nuxt)
+    return redirect(env('FRONTEND_URL', 'http://localhost:3000'));
 });
