@@ -17,16 +17,17 @@ class MediaController extends Controller
 
         try {
             $media = Media::orderBy('created_at', 'desc')
+                ->orderBy('id', 'desc')
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
                         $q->where('title_id', 'like', "%{$search}%")
-                          ->orWhere('title_en', 'like', "%{$search}%");
+                            ->orWhere('title_en', 'like', "%{$search}%");
                     });
                 })->paginate(10);
 
             return response()->json([
                 'message' => 'Media fetched successfully.',
-                'data'    => $media
+                'data' => $media
             ], 200);
 
         } catch (\Throwable $e) {
@@ -40,16 +41,16 @@ class MediaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title_id'       => 'required|string|max:255',
-            'title_en'       => 'required|string|max:255',
+            'title_id' => 'required|string|max:255',
+            'title_en' => 'required|string|max:255',
             'description_id' => 'required|string',
             'description_en' => 'required|string',
-            'slug_id'        => 'required|string|unique:media,slug_id',
-            'slug_en'        => 'required|string|unique:media,slug_en',
-            
+            'slug_id' => 'required|string|unique:media,slug_id',
+            'slug_en' => 'required|string|unique:media,slug_en',
+
             // Validasi untuk file upload
-            'image'          => 'required|array',
-            'image.*'        => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // Maksimal 2MB per gambar
+            'image' => 'required|array',
+            'image.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // Maksimal 2MB per gambar
         ]);
 
         try {
@@ -60,7 +61,7 @@ class MediaController extends Controller
                 foreach ($request->file('image') as $file) {
                     // Simpan file ke folder storage/app/public/media
                     $path = $file->store('media', 'public');
-                    
+
                     // Simpan path-nya dengan awalan /storage/ agar mudah diakses frontend
                     $imagePaths[] = '/storage/' . $path;
                 }
@@ -73,7 +74,7 @@ class MediaController extends Controller
 
             return response()->json([
                 'message' => 'Media created successfully.',
-                'data'    => $media
+                'data' => $media
             ], 201);
 
         } catch (\Throwable $e) {
@@ -91,7 +92,7 @@ class MediaController extends Controller
 
             return response()->json([
                 'message' => 'Media fetched successfully.',
-                'data'    => $media
+                'data' => $media
             ], 200);
 
         } catch (ModelNotFoundException $e) {
@@ -110,16 +111,16 @@ class MediaController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'title_id'       => 'sometimes|required|string|max:255',
-            'title_en'       => 'sometimes|required|string|max:255',
+            'title_id' => 'sometimes|required|string|max:255',
+            'title_en' => 'sometimes|required|string|max:255',
             'description_id' => 'sometimes|required|string',
             'description_en' => 'sometimes|required|string',
-            'slug_id'        => ['sometimes', 'string', Rule::unique('media')->ignore($id)],
-            'slug_en'        => ['sometimes', 'string', Rule::unique('media')->ignore($id)],
-            
+            'slug_id' => ['sometimes', 'string', Rule::unique('media')->ignore($id)],
+            'slug_en' => ['sometimes', 'string', Rule::unique('media')->ignore($id)],
+
             // Validasi file opsional saat update
-            'image'          => 'sometimes|required|array',
-            'image.*'        => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'sometimes|required|array',
+            'image.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         try {
@@ -151,20 +152,20 @@ class MediaController extends Controller
 
             return response()->json([
                 'message' => 'Media updated successfully.',
-                'data'    => $media
+                'data' => $media
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Media not found.',
-                'data'    => null
+                'data' => null
             ], 404);
 
         } catch (\Throwable $e) {
             Log::error('Error updating media: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to update media. Please try again later.',
-                'data'    => null
+                'data' => null
             ], 500);
         }
     }
@@ -186,20 +187,20 @@ class MediaController extends Controller
 
             return response()->json([
                 'message' => 'Media deleted successfully.',
-                'data'    => null
+                'data' => null
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Media not found.',
-                'data'    => null
+                'data' => null
             ], 404);
 
         } catch (\Throwable $e) {
             Log::error('Error deleting media: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to delete media. Please try again later.',
-                'data'    => null
+                'data' => null
             ], 500);
         }
     }

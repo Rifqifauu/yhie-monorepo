@@ -6,7 +6,9 @@ use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\QueryException;
 
 class SettingController extends Controller
 {
@@ -19,9 +21,19 @@ class SettingController extends Controller
      */
     public function index(): JsonResponse
     {
-        $settings = Setting::all()->pluck('value', 'key');
+        try {
+            $settings = Setting::all();
 
-        return response()->json($settings);
+            return response()->json([
+                'message' => 'Settings fetched successfully.',
+                'data' => $settings
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error('Error fetching settings: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to fetch settings.'
+            ], 500);
+        }
     }
 
     /**
@@ -30,9 +42,24 @@ class SettingController extends Controller
      */
     public function show(string $key): JsonResponse
     {
-        $setting = Setting::where('key', $key)->firstOrFail();
+        try {
+            $setting = Setting::where('key', $key)->firstOrFail();
 
-        return response()->json($setting);
+            return response()->json([
+                'message' => 'Setting fetched successfully.',
+                'data' => $setting
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Setting not found.',
+                'data' => null
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Error fetching setting detail: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to fetch setting detail.'
+            ], 500);
+        }
     }
 
     // ── ADMIN ─────────────────────────────────────────────────────────────────
@@ -43,38 +70,95 @@ class SettingController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $data = $request->validate([
+        // 1. Gunakan Validator::make agar kita bisa mengontrol response jika gagal
+        $validator = Validator::make($request->all(), [
             'key' => 'required|string|max:100|unique:settings,key',
             'value' => 'required|string',
         ]);
 
-        $setting = Setting::create($data);
+        // 2. Tangkap error validasi (termasuk jika key sudah ada / duplikat)
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed: ' . implode(', ', $validator->errors()->all()),
+                'errors' => $validator->errors()
+            ], 422); // 422 Unprocessable Entity
+        }
 
-        return response()->json($setting, 201);
+        try {
+            // Eksekusi query menggunakan data yang sudah tervalidasi
+            $setting = Setting::create($validator->validated());
+
+            return response()->json([
+                'message' => 'Setting created successfully.',
+                'data' => $setting
+            ], 201);
+
+        } catch (QueryException $e) {
+            // 3. (Opsional) Tangkap error di level Database jika validasi entah bagaimana tembus
+            // 1062 adalah kode error MySQL untuk "Duplicate entry"
+            if ($e->errorInfo[1] == 1062) {
+                return response()->json([
+                    'message' => 'Key setting sudah digunakan. Silakan gunakan key lain.'
+                ], 409); // 409 Conflict
+            }
+
+            Log::error('Database error creating setting: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Database error occurred while creating setting.'
+            ], 500);
+
+        } catch (\Throwable $e) {
+            Log::error('Error creating setting: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to create setting.'
+            ], 500);
+        }
     }
-
-    /**
-     * PUT /api/admin/settings/{key}
-     * Update nilai setting berdasarkan key (upsert).
-     */
     public function update(Request $request, string $key): JsonResponse
     {
         $data = $request->validate([
             'value' => 'required|string',
         ]);
 
-        $setting = Setting::updateOrCreate(['key' => $key], ['value' => $data['value']]);
+        try {
+            $setting = Setting::updateOrCreate(['key' => $key], ['value' => $data['value']]);
 
-        return response()->json($setting);
+            return response()->json([
+                'message' => 'Setting updated successfully.',
+                'data' => $setting
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error('Error updating setting: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to update setting.'
+            ], 500);
+        }
     }
 
     /**
      * DELETE /api/admin/settings/{key}
      */
-    public function destroy(string $key): JsonResponse
+    public function destroy(string $id): JsonResponse
     {
-        Setting::where('key', $key)->firstOrFail()->delete();
+        try {
+            $setting = Setting::where('id', $id)->firstOrFail();
+            $setting->delete();
 
-        return response()->json(['message' => 'Setting deleted.'], 200);
+            return response()->json([
+                'message' => 'Setting deleted successfully.',
+                'data' => null
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Setting not found.',
+                'data' => null
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Error deleting setting: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to delete setting.',
+                'data' => null
+            ], 500);
+        }
     }
 }
