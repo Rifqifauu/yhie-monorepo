@@ -35,16 +35,18 @@ class ArticleSeeder extends Seeder
                 'slug_id' => Str::slug($titleId) . '-' . $i,
                 'slug_en' => Str::slug($titleEn) . '-' . $i,
 
-                // Karena kita menggunakan DB::table()->insert(), Eloquent casting tidak berjalan.
-                // Jadi kita harus melakukan json_encode secara manual agar bisa masuk ke database.
                 'image' => json_encode([
-                    '/storage/images/articles/dummy-1.jpg',
-                    '/storage/images/articles/dummy-2.jpg'
+                    [
+                        'https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=600&auto=format&fit=crop'
+                    ][$i % 4]
                 ]),
 
                 'is_published' => $fakerId->boolean(80), // 80% kemungkinan artikel berstatus published (true)
                 'author_id' => 1, // Pastikan ada User dengan ID 1 di tabel users sebelum menjalankan seeder ini
-                'category' => $fakerId->randomElement(['news', 'announcement', 'event']),
+                'category' => $fakerId->randomElement(['news', 'announcement', 'event', 'education']),
 
                 'created_at' => $now,
                 'updated_at' => $now,

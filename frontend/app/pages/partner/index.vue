@@ -1,184 +1,121 @@
 <template>
-    <div class="flex justify-center items-center mx-8 md:my-16 my-8 md:mx-16">
-        <h1 class="text-3xl font-bold md:text-5xl font-serif">
-            {{ t("partners.title") }}
-        </h1>
-    </div>
+    <div class="bg-slate-50 dark:bg-emerald-950 text-slate-900 dark:text-white min-h-screen">
+        <PartnerHero />
 
-    <div
-        class="flex flex-col justify-center items-center mx-8 md:mb-16 mb-8 md:mx-16 gap-8"
-    >
-        <div
-            v-if="status === 'pending'"
-            class="flex flex-col items-center justify-center py-16 gap-4"
-        >
-            <UIcon
-                name="i-heroicons-arrow-path"
-                class="w-12 h-12 animate-spin text-emerald-600 dark:text-emerald-400"
-            />
-            <span
-                class="text-sm font-medium text-emerald-700 dark:text-emerald-300"
-            >
-                Memuat data program...
-            </span>
-        </div>
+        <section class="py-14 lg:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Loading -->
+                <div v-if="pending" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div v-for="n in 8" :key="n" class="flex flex-col items-center p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-white/40 dark:bg-emerald-900/5">
+                        <USkeleton class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl" />
+                        <USkeleton class="h-4 w-3/4 mt-4" />
+                        <USkeleton class="h-3 w-5/6 mt-2" />
+                        <USkeleton class="h-3 w-2/3 mt-1" />
+                    </div>
+                </div>
 
-        <div v-else-if="error" class="max-w-xl mx-auto my-6">
-            <UAlert
-                icon="i-heroicons-exclamation-triangle"
-                color="red"
-                variant="soft"
-                title="Gagal memuat data"
-                description="Terjadi kesalahan saat mengambil data partner dari server."
-                :ui="{
-                    wrapper:
-                        'backdrop-blur-md bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50',
-                }"
-            >
-                <template #actions>
-                    <UButton
-                        size="sm"
+                <!-- Error -->
+                <div v-else-if="error" class="max-w-xl mx-auto">
+                    <UAlert
+                        icon="i-heroicons-exclamation-triangle"
                         color="red"
-                        variant="solid"
-                        icon="i-heroicons-arrow-path-20-solid"
-                        @click="refresh"
+                        variant="soft"
+                        :title="locale === 'en' ? 'Failed to load partners' : 'Gagal memuat data partner'"
+                        :description="locale === 'en' ? 'Please try again later.' : 'Silakan coba lagi beberapa saat.'"
                     >
-                        Coba Lagi
-                    </UButton>
-                </template>
-            </UAlert>
-        </div>
+                        <template #actions>
+                            <UButton size="sm" color="red" @click="refresh">
+                                {{ locale === 'en' ? 'Retry' : 'Coba lagi' }}
+                            </UButton>
+                        </template>
+                    </UAlert>
+                </div>
 
-        <div v-else class="w-full">
-            <div
-                v-if="partners && partners.length > 0"
-                class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-8"
-            >
-                <UCard
-                    v-for="partner in partners"
-                    :key="partner.id"
-                    class="group transition-all duration-500 hover:-translate-y-2 overflow-hidden shadow-2xl rounded-xl"
-                    :ui="{
-                        base: 'backdrop-blur-md bg-white/40 dark:bg-gray-900/40 border border-white/40 dark:border-gray-800/50 shadow-xl hover:shadow-2xl hover:border-emerald-500/30 dark:hover:border-emerald-400/30',
-                        body: { padding: 'px-6 py-5' },
-                        header: {
-                            padding:
-                                'p-0 border-b border-gray-200/30 dark:border-gray-800/30',
-                        },
-                    }"
-                >
-                    <template #header>
-                        <div
-                            class="relative w-full h-48 overflow-hidden bg-gray-100 dark:bg-gray-800"
-                        >
-                            <NuxtImage
-                                :src="getImageUrl(partner.logo)"
-                                :alt="
-                                    locale === 'id'
-                                        ? partner.name_id
-                                        : partner.name_en
-                                "
-                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                placeholder
-                                loading="lazy"
+                <!-- Empty -->
+                <div v-else-if="!partners.length" class="text-center py-16">
+                    <div class="mx-auto w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center">
+                        <UIcon name="i-lucide-building-2" class="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <p class="mt-4 text-slate-500 dark:text-emerald-100/70">
+                        {{ locale === 'en' ? 'No partners available.' : 'Belum ada data mitra.' }}
+                    </p>
+                </div>
+
+                <!-- Multi-Column Grid of Partners -->
+                <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div
+                        v-for="partner in partners"
+                        :key="partner.id"
+                        class="flex flex-col items-center text-center p-5 rounded-2xl bg-white/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700"
+                    >
+                        <!-- Logo -->
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white dark:bg-emerald-900/20 p-2 flex items-center justify-center border border-emerald-50 dark:border-emerald-900/20 shrink-0">
+                            <NuxtImg
+                                v-if="partner.logo"
+                                :src="imageUrl(partner.logo)"
+                                :alt="nameOf(partner)"
+                                class="max-w-full max-h-full object-contain"
+                            />
+                            <UIcon
+                                v-else
+                                name="i-lucide-building-2"
+                                class="w-8 h-8 text-emerald-600 dark:text-emerald-400"
                             />
                         </div>
-                    </template>
 
-                    <div class="space-y-3">
-                        <h3
-                            class="text-xl font-bold font-serif text-gray-900 dark:text-white line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300"
-                        >
-                            {{
-                                locale === "id"
-                                    ? partner.name_id
-                                    : partner.name_en
-                            }}
+                        <!-- Name & Desc -->
+                        <h3 class="mt-4 font-serif font-bold text-sm sm:text-base text-emerald-950 dark:text-emerald-50 line-clamp-1">
+                            {{ nameOf(partner) }}
                         </h3>
-
-                        <p
-                            class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm line-clamp-4"
-                        >
-                            {{
-                                locale === "id"
-                                    ? partner.description_id
-                                    : partner.description_en
-                            }}
+                        <p class="mt-2 text-xs text-slate-500 dark:text-emerald-100/60 line-clamp-3 leading-relaxed">
+                            {{ descOf(partner) }}
                         </p>
                     </div>
-                </UCard>
-            </div>
+                </div>
 
-            <div v-else class="text-center py-12">
-                <UAlert
-                    icon="i-heroicons-information-circle"
-                    color="gray"
-                    variant="soft"
-                    title="Kosong"
-                    description="Belum ada partner yang tersedia saat ini."
-                    class="max-w-md mx-auto backdrop-blur-md bg-white/30 dark:bg-gray-900/30"
+                <!-- Pagination -->
+                <ProgramPagination
+                    v-if="totalPages > 1"
+                    :page="page"
+                    :total-pages="totalPages"
+                    :page-items="pageItems"
+                    class="mt-12"
+                    @change-page="changePage"
                 />
             </div>
-
-            <div v-if="totalItems > 0" class="flex justify-center mt-12">
-                <UPagination
-                    v-model:page="page"
-                    :page-count="perPage"
-                    :total="totalItems"
-                    active-color="primary"
-                    active-variant="subtle"
-                />
-            </div>
-        </div>
+        </section>
     </div>
 </template>
 
 <script setup lang="ts">
-const { t, locale } = useI18n();
-const client = useSanctumClient();
+import { usePartners } from "~/composables/usePartners";
 
-// Variable reactive untuk halaman aktif (Sesuai dokumentasi kamu)
-const page = ref(1);
-const perPage = ref(10);
+const { locale } = useI18n();
 
-// Mengambil data dari backend Laravel
 const {
-    data: apiResponse,
-    status,
+    page,
+    partners,
+    totalPages,
+    pending,
     error,
+    pageItems,
+    nameOf,
+    descOf,
+    imageUrl,
+    changePage,
     refresh,
-} = await useAsyncData("partners", () =>
-    client("/api/partners", {
-        params: {
-            page: page.value, // Mengirim parameter ?page= ke backend
-        },
-    }),
-);
+} = usePartners();
 
-// PENTING: Mengawasi variabel 'page'. Jika diklik, jalankan fungsi refresh() untuk mengambil data baru
-watch(page, () => {
-    refresh();
+useSeoMeta({
+    title: () => locale.value === "en" ? "Partners - YHIE" : "Partner - YHIE",
+    description: () =>
+        locale.value === "en"
+            ? "Trusted partners collaborating with Yayasan Hafiz Indonesia Emas."
+            : "Daftar mitra terpercaya yang berkolaborasi dengan Yayasan Hafiz Indonesia Emas.",
+    ogTitle: () => locale.value === "en" ? "Partners - YHIE" : "Partner - YHIE",
+    ogDescription: () =>
+        locale.value === "en"
+            ? "Discover our trusted partners in advancing Qur'anic education."
+            : "Temukan mitra terpercaya kami dalam memajukan pendidikan Al-Qur'an.",
 });
-
-// Mengolah array data partner
-const partners = computed(() => {
-    if (!apiResponse.value) return [];
-    const responsePayload = (apiResponse.value as any).data;
-    return responsePayload && Array.isArray(responsePayload.data)
-        ? responsePayload.data
-        : [];
-});
-
-// Mengambil info total data dari response API Laravel (100)
-const totalItems = computed(() => {
-    if (!apiResponse.value) return 0;
-    const responsePayload = (apiResponse.value as any).data;
-    return responsePayload?.total || 0;
-});
-
-// Helper URL Gambar
-const getImageUrl = (logoPath: string) => {
-    if (!logoPath) return "/placeholder.png";
-    return logoPath.startsWith("http") ? logoPath : `/storage/${logoPath}`;
-};
 </script>

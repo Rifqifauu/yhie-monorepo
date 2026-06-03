@@ -23,7 +23,7 @@ class PartnerController extends Controller
                         $q->where('name_id', 'like', "%{$search}%")
                             ->orWhere('name_en', 'like', "%{$search}%");
                     });
-                })->paginate(10);
+                })->paginate(8);
 
             return response()->json([
                 'message' => 'Partners fetched successfully.',

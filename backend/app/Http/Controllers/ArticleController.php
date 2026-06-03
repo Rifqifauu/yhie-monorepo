@@ -14,18 +14,21 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
+        $category = $request->query('category');
 
         try {
             $articles = Article::with('author')
                 ->orderBy('created_at', 'desc')
                 ->orderBy('id', 'desc')
+                ->when($category, function ($query, $category) {
+                    return $query->where('category', $category);
+                })
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
                         $q->where('title_id', 'like', "%{$search}%")
-                            ->orWhere('title_en', 'like', "%{$search}%")
-                            ->orWhere('category', 'like', "%{$search}%");
+                            ->orWhere('title_en', 'like', "%{$search}%");
                     });
-                })->paginate($request->query('per_page', 10));
+                })->paginate($request->query('per_page', 9));
 
             return response()->json([
                 'message' => 'Articles fetched successfully.',
@@ -101,7 +104,10 @@ class ArticleController extends Controller
     public function show($slug)
     {
         try {
-            $article = Article::where('slug_id', $slug)->orWhere('slug_en', $slug)->first();
+            $article = Article::with('author')
+                ->where('slug_id', $slug)
+                ->orWhere('slug_en', $slug)
+                ->firstOrFail();
 
             return response()->json([
                 'message' => 'Article fetched successfully.',

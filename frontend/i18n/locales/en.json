@@ -6,7 +6,7 @@
       { "name": "Program", "path": "/program" },
       { "name": "Gallery", "path": "/media" },
       { "name": "Partners", "path": "/partner" },
-      { "name": "Articles", "path": "/article" }
+      { "name": "Articles", "path": "/articles" }
     ]
   },
   "hero": {
@@ -56,5 +56,20 @@
   "cta": {
     "title": "Ready to Become a Globally Certified Hafiz?",
     "description": "Don't let exam anxiety disrupt the flow of your recitation. Join us today, experience the tranquility of our nature retreat, and earn professional recognition for your dedication to the Qur'an."
+  },
+  "about": {
+    "title": "About Us",
+    "history": "History",
+    "vision": "Vision",
+    "mission": "Mission",
+    "values": "Values",
+    "ctaPrimary": "Register Now",
+    "ctaSecondary": "View Program",
+    "linkPrimary": "/register",
+    "linkSecondary": "/program",
+    "imageAlt": "A serene atmosphere of Qur'an recitation outdoors with Yayasan Hafiz Indonesia Emas",
+    "seoTitle": "Hafiz Certification & Nature Retreat | Yayasan Hafiz Indonesia Emas",
+    "seoDesc": "Official Hafiz Qur'an certification program with a nature retreat concept. Reduce exam stress, enhance focus, and achieve an international IAO certificate.",
+    "keywords": "hafiz quran certification, tahfidz retreat, iao certificate, yayasan hafiz indonesia emas, stress-free memorization exam, hafiz nature retreat, tahfidz certification"
   }
 }

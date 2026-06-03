@@ -6,7 +6,7 @@ return [
     "allowed_methods" => ["*"],
 
     // Jalur 1: Daftarkan origin secara eksplisit (Sangat Direkomendasikan)
-    "allowed_origins" => ["http://localhost:3000"],
+    "allowed_origins" => ["http://localhost:3000", "https://sertifikasihafizh.xyz"],
 
     "allowed_origins_patterns" => [],
 

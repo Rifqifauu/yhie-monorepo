@@ -14,6 +14,7 @@ class Media extends Model
         'image',
         'slug_id',
         'slug_en',
+        'category',
     ];
 
     protected $casts = [

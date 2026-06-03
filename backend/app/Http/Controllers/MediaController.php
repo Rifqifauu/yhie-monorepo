@@ -14,16 +14,20 @@ class MediaController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
+        $category = $request->query('category');
 
         try {
             $media = Media::orderBy('created_at', 'desc')
                 ->orderBy('id', 'desc')
+                ->when($category, function ($query, $category) {
+                    return $query->where('category', $category);
+                })
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
                         $q->where('title_id', 'like', "%{$search}%")
                             ->orWhere('title_en', 'like', "%{$search}%");
                     });
-                })->paginate(10);
+                })->paginate(9);
 
             return response()->json([
                 'message' => 'Media fetched successfully.',

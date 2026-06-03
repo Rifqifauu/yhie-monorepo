@@ -6,7 +6,7 @@
       { "name": "Program", "path": "/program" },
       { "name": "Galeri", "path": "/media" },
       { "name": "Partner", "path": "/partner" },
-      { "name": "Artikel", "path": "/article" }
+      { "name": "Artikel", "path": "/articles" }
     ]
   },
   "hero": {
@@ -57,5 +57,20 @@
   "cta": {
     "title": "Siap Melangkah Menjadi Hafiz Bersertifikat Global?",
     "description": "Jangan biarkan ketegangan menghambat kelancaran lantunan ayat suci Anda. Bergabunglah sekarang, rasakan kedamaian tadabbur alam, dan dapatkan pengakuan profesional untuk dedikasi hafalan Anda."
+  },
+  "about": {
+    "title": "Tentang Kami",
+    "history": "Sejarah",
+    "vision": "Visi",
+    "mission": "Misi",
+    "values": "Nilai-nilai",
+    "ctaPrimary": "Daftar Sekarang",
+    "ctaSecondary": "Lihat Program",
+    "linkPrimary": "/register",
+    "linkSecondary": "/program",
+    "imageAlt": "Suasana khusyuk setoran hafalan Al-Qur'an di alam terbuka bersama Yayasan Hafiz Indonesia Emas",
+    "seoTitle": "Sertifikasi Hafiz & Wisata Tadabbur Alam | Yayasan Hafiz Indonesia Emas",
+    "seoDesc": "Program sertifikasi Hafiz Al-Qur'an resmi dengan konsep wisata alam (tadabbur). Kurangi stres ujian, tingkatkan fokus, dan raih sertifikat internasional IAO.",
+    "keywords": "sertifikasi hafiz quran, wisata tahfidz, sertifikat iao, yayasan hafiz indonesia emas, ujian hafalan tanpa stres, tadabbur alam hafiz, sertifikasi tahfidz"
   }
 }

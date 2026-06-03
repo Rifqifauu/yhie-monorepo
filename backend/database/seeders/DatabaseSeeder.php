@@ -15,8 +15,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        User::firstOrCreate(
+            ['id' => 1],
+            [
+                'name' => 'Admin YHIE',
+                'email' => 'admin@yhie.org',
+                'password' => bcrypt('password'),
+            ]
+        );
 
         $this->call(MediaSeeder::class);
         $this->call(PartnerSeeder::class);

@@ -1,212 +1,301 @@
 <template>
-  <div>
-
-    <!-- ─── PAGE HEADER ───────────────────────────────────────────────────── -->
-    <section class="bg-blue-900 text-white py-16">
-      <UContainer>
-        <div class="max-w-2xl">
-          <p class="text-blue-300 text-sm font-semibold uppercase tracking-widest mb-3">
-            Berita & Artikel
-          </p>
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">
-            Informasi & <span class="text-yellow-400">Kabar Terbaru</span>
-          </h1>
-          <p class="text-blue-100 text-lg leading-relaxed">
-            Liputan kegiatan yayasan, tulisan keagamaan, dan informasi wisata
-            Desa Tejasari terkini.
-          </p>
-        </div>
-      </UContainer>
-    </section>
-
-    <!-- ─── FILTER KATEGORI ───────────────────────────────────────────────── -->
-    <section class="bg-white border-b border-gray-100 sticky top-16 z-40">
-      <UContainer>
-        <div class="flex items-center gap-2 py-3 overflow-x-auto scrollbar-none">
-          <button
-            v-for="cat in categories"
-            :key="cat.value"
-            class="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
-            :class="activeCategory === cat.value
-              ? 'bg-blue-900 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-            @click="setCategory(cat.value)"
-          >
-            {{ cat.label }}
-          </button>
-        </div>
-      </UContainer>
-    </section>
-
-    <!-- ─── ARTICLE LIST ──────────────────────────────────────────────────── -->
-    <section class="py-16 bg-gray-50">
-      <UContainer>
-
-        <!-- Loading -->
-        <div v-if="pending" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <USkeleton v-for="n in 9" :key="n" class="h-72 rounded-xl" />
-        </div>
-
-        <!-- Error -->
-        <UAlert
-          v-else-if="error"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          title="Gagal memuat artikel."
-          description="Silakan coba beberapa saat lagi."
-          class="max-w-md mx-auto"
-        />
-
-        <!-- Empty -->
-        <div v-else-if="!articles.length" class="text-center py-20 text-gray-400">
-          <UIcon name="i-heroicons-newspaper" class="w-12 h-12 mx-auto mb-3" />
-          <p>Belum ada artikel di kategori ini.</p>
-        </div>
-
-        <!-- Data -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <NuxtLink
-            v-for="article in articles"
-            :key="article.id"
-            :to="`/articles/${article.slug_id}`"
-            class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-200"
-          >
-            <!-- Gambar -->
-            <div class="h-48 bg-blue-100 overflow-hidden">
-              <img
-                v-if="article.image?.url"
-                :src="article.image.url"
-                :alt="article.title_id"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <UIcon name="i-heroicons-newspaper" class="w-14 h-14 text-blue-200" />
-              </div>
-            </div>
-
-            <!-- Konten -->
-            <div class="p-5">
-              <!-- Kategori + Tanggal -->
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-semibold uppercase tracking-wide text-blue-700 bg-blue-50 px-2 py-1 rounded-full">
-                  {{ article.category }}
-                </span>
-                <span class="text-xs text-gray-400">
-                  {{ formatDate(article.created_at) }}
-                </span>
-              </div>
-
-              <h2 class="font-bold text-gray-900 text-lg leading-snug mb-2 line-clamp-2 group-hover:text-blue-800 transition-colors">
-                {{ article.title_id }}
-              </h2>
-
-              <p class="text-gray-500 text-sm leading-relaxed line-clamp-3">
-                {{ stripHtml(article.content_id) }}
-              </p>
-
-              <p class="mt-4 text-sm text-blue-700 font-medium group-hover:underline">
-                Baca selengkapnya →
-              </p>
-            </div>
-          </NuxtLink>
-        </div>
-
-        <!-- Pagination -->
-        <div v-if="totalPages > 1" class="flex justify-center mt-12">
-          <div class="flex items-center gap-2">
-            <UButton
-              icon="i-heroicons-chevron-left"
-              variant="outline"
-              :disabled="currentPage === 1"
-              class="border-gray-300"
-              @click="changePage(currentPage - 1)"
+    <div class="bg-slate-50 dark:bg-emerald-950 text-slate-900 dark:text-white min-h-screen">
+        
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-emerald-950 dark:via-emerald-950 dark:to-amber-950/40 border-b border-emerald-100/70 dark:border-emerald-800/60 pt-20 pb-24 lg:pt-28 lg:pb-32">
+            <!-- Background mosque shadow -->
+            <img
+                src="/shadow-mosque.webp"
+                class="absolute bottom-0 left-1/2 -translate-x-1/2 w-auto h-full max-h-[85%] object-contain object-bottom pointer-events-none opacity-20 dark:opacity-35 dark:invert dark:brightness-150 transition-all duration-300"
+                alt=""
             />
+            <!-- Overlay -->
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-emerald-50/75 via-white/65 to-amber-50/55 dark:from-emerald-950/70 dark:via-emerald-950/65 dark:to-amber-950/40 transition-colors duration-300"
+                aria-hidden="true"
+            ></div>
+            
+            <div class="absolute -top-24 -right-24 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-28 -left-28 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl"></div>
+
+            <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10" data-aos="fade-up">
+                <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3.5 py-1.5 rounded-full border border-amber-200/50 dark:border-amber-900/40">
+                    <UIcon name="i-lucide-newspaper" class="w-4 h-4" />
+                    {{ locale === 'en' ? 'Information Center' : 'Pusat Informasi' }}
+                </span>
+                <h1 class="mt-6 text-3xl md:text-5xl font-serif font-extrabold tracking-tight text-emerald-950 dark:text-emerald-50 leading-[1.15]">
+                    {{ locale === 'en' ? 'Articles & Latest News' : 'Artikel & Berita Terbaru' }}
+                </h1>
+                <p class="mt-4 text-base md:text-lg text-slate-600 dark:text-emerald-100/80 leading-relaxed max-w-2xl mx-auto font-light">
+                    {{ locale === 'en'
+                        ? 'Discover the latest insights, guidelines, and inspiration for Quranic memorization and heritage excellence with us.'
+                        : 'Temukan wawasan terbaru, panduan ibadah, dan inspirasi hafalan Al-Qur\'an serta sejarah keunggulan bersama kami.'
+                    }}
+                </p>
+
+                <!-- Search Bar Container -->
+                <div class="relative mt-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white/70 dark:bg-emerald-900/45 backdrop-blur-xl border border-emerald-200/60 dark:border-emerald-800/50 rounded-2xl p-3 shadow-lg">
+                        <div class="flex flex-col sm:flex-row gap-2.5">
+                            <UInput
+                                :model-value="searchInput"
+                                size="lg"
+                                :placeholder="locale === 'en' ? 'Search article title or category...' : 'Cari judul atau kategori artikel...'"
+                                class="flex-1"
+                                @update:model-value="searchInput = $event"
+                                @keyup.enter="applySearch"
+                            />
+                            <button
+                                class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold shadow-md hover:shadow-emerald-500/25 hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform active:scale-95"
+                                @click="applySearch"
+                            >
+                                {{ locale === 'en' ? 'Search' : 'Cari' }}
+                            </button>
+                        </div>
+                        <div
+                            v-if="searchTerm"
+                            class="mt-2.5 flex items-center justify-between text-xs text-slate-500 dark:text-emerald-100/60 px-1"
+                        >
+                            <span>
+                                {{ locale === 'en' ? 'Showing results for:' : 'Menampilkan hasil untuk:' }} <strong>"{{ searchTerm }}"</strong>
+                            </span>
+                            <button
+                                class="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 font-bold"
+                                @click="clearSearch"
+                            >
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Filter Section -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 flex flex-wrap justify-center gap-2.5">
             <button
-              v-for="page in totalPages"
-              :key="page"
-              class="w-9 h-9 rounded-lg text-sm font-medium transition-colors"
-              :class="page === currentPage
-                ? 'bg-blue-900 text-white'
-                : 'text-gray-600 hover:bg-gray-100'"
-              @click="changePage(page)"
+                v-for="cat in categories"
+                :key="cat.value"
+                class="px-5 py-2 rounded-full border text-xs sm:text-sm font-semibold tracking-wide transition-all duration-300 transform active:scale-95"
+                :class="category === cat.value
+                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-600/10 dark:bg-amber-500 dark:border-amber-500 dark:text-emerald-950 dark:shadow-amber-500/20'
+                    : 'border-slate-200 dark:border-emerald-800/80 text-slate-600 dark:text-emerald-200/80 hover:border-emerald-500 dark:hover:border-amber-500 hover:text-emerald-600 dark:hover:text-amber-400 bg-white/80 dark:bg-emerald-950/40 backdrop-blur-sm'"
+                @click="category = cat.value"
             >
-              {{ page }}
+                {{ locale === 'en' ? cat.labelEn : cat.labelId }}
             </button>
-            <UButton
-              icon="i-heroicons-chevron-right"
-              variant="outline"
-              :disabled="currentPage === totalPages"
-              class="border-gray-300"
-              @click="changePage(currentPage + 1)"
-            />
-          </div>
-        </div>
+        </section>
 
-      </UContainer>
-    </section>
+        <!-- Articles Content Grid -->
+        <section class="py-14 lg:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Loading State -->
+                <div v-if="pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div v-for="n in 6" :key="n" class="space-y-4">
+                        <USkeleton class="h-48 w-full rounded-2xl" />
+                        <USkeleton class="h-4 w-1/4 rounded" />
+                        <USkeleton class="h-6 w-3/4 rounded" />
+                        <USkeleton class="h-4 w-5/6 rounded" />
+                    </div>
+                </div>
 
-  </div>
+                <!-- Error State -->
+                <div v-else-if="error" class="max-w-md mx-auto">
+                    <UAlert
+                        icon="i-heroicons-exclamation-triangle"
+                        color="red"
+                        variant="soft"
+                        :title="locale === 'en' ? 'Failed to load articles' : 'Gagal memuat artikel'"
+                        :description="locale === 'en' ? 'Please check your connection and try again.' : 'Silakan periksa koneksi Anda dan coba lagi.'"
+                    >
+                        <template #actions>
+                            <UButton size="sm" color="red" @click="refresh">
+                                {{ locale === 'en' ? 'Retry' : 'Coba lagi' }}
+                            </UButton>
+                        </template>
+                    </UAlert>
+                </div>
+
+                <!-- Empty State -->
+                <div v-else-if="!articles.length" class="text-center py-20">
+                    <div class="mx-auto w-20 h-20 rounded-3xl bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center">
+                        <UIcon name="i-lucide-newspaper" class="w-10 h-10 text-emerald-500 dark:text-emerald-400" />
+                    </div>
+                    <p class="mt-5 text-slate-500 dark:text-emerald-100/70 text-lg">
+                        {{ locale === 'en' ? 'No articles found.' : 'Tidak ada artikel ditemukan.' }}
+                    </p>
+                </div>
+
+                <!-- Articles Grid -->
+                <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <NuxtLink
+                        v-for="article in articles"
+                        :key="article.id"
+                        :to="`/articles/${slugOf(article)}`"
+                        class="group bg-white dark:bg-emerald-900/10 border border-emerald-100/40 dark:border-emerald-800/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300 flex flex-col h-full"
+                    >
+                        <!-- Cover Image -->
+                        <div class="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-emerald-950">
+                            <!-- Image element (using standard <img> tag for remote safety) -->
+                            <img
+                                v-if="coverOf(article)"
+                                :src="coverOf(article)"
+                                :alt="titleOf(article)"
+                                class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                            />
+                            <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-amber-50 dark:from-emerald-900/40 dark:to-emerald-950/60">
+                                <UIcon name="i-lucide-image" class="w-12 h-12 text-emerald-300 dark:text-emerald-700" />
+                            </div>
+
+                            <!-- Category Badge -->
+                            <span 
+                                class="absolute top-4 left-4 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg text-white shadow-sm"
+                                :class="getCategoryBg(article.category)"
+                            >
+                                {{ getCategoryLabel(article.category) }}
+                            </span>
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="p-6 flex flex-col flex-1">
+                            <!-- Date -->
+                            <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-emerald-100/40 mb-3">
+                                <UIcon name="i-lucide-calendar" class="w-3.5 h-3.5" />
+                                <span>{{ formatDate(article.created_at) }}</span>
+                            </div>
+
+                            <!-- Title -->
+                            <h3 class="font-serif font-extrabold text-lg text-emerald-950 dark:text-emerald-50 leading-snug group-hover:text-emerald-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mb-2.5">
+                                {{ titleOf(article) }}
+                            </h3>
+
+                            <!-- Excerpt -->
+                            <p class="text-slate-500 dark:text-emerald-100/60 text-sm leading-relaxed line-clamp-3 mb-6 flex-1">
+                                {{ stripHtml(contentOf(article)) }}
+                            </p>
+
+                            <!-- Card Footer -->
+                            <div class="pt-4 border-t border-slate-100 dark:border-emerald-900/50 flex items-center justify-between mt-auto">
+                                <!-- Author info -->
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-800/80 flex items-center justify-center">
+                                        <UIcon name="i-lucide-user" class="w-3.5 h-3.5 text-emerald-700 dark:text-amber-400" />
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-600 dark:text-emerald-100/80">
+                                        {{ article.author?.name || 'Admin YHIE' }}
+                                    </span>
+                                </div>
+
+                                <!-- Read Button -->
+                                <span class="text-xs font-bold text-emerald-600 group-hover:text-emerald-700 dark:text-amber-400 dark:group-hover:text-amber-300 flex items-center gap-1">
+                                    {{ locale === 'en' ? 'Read More' : 'Baca Selengkapnya' }}
+                                    <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                                </span>
+                            </div>
+                        </div>
+                    </NuxtLink>
+                </div>
+
+                <!-- Pagination Component -->
+                <ProgramPagination
+                    v-if="totalPages > 1"
+                    :page="page"
+                    :total-pages="totalPages"
+                    :page-items="pageItems"
+                    class="mt-14"
+                    @change-page="changePage"
+                />
+
+            </div>
+        </section>
+
+    </div>
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig()
-const base   = config.public.apiBase
+import { useArticles } from "~/composables/useArticles";
 
-// ── Kategori filter ────────────────────────────────────────────────────────
+const { locale } = useI18n();
+
+const {
+    page,
+    searchInput,
+    searchTerm,
+    category,
+    articles,
+    totalPages,
+    pending,
+    error,
+    pageItems,
+    titleOf,
+    contentOf,
+    slugOf,
+    coverOf,
+    applySearch,
+    clearSearch,
+    changePage,
+    refresh,
+} = useArticles();
+
+// Filter categories
 const categories = [
-  { label: 'Semua',      value: '' },
-  { label: 'Kegiatan',   value: 'kegiatan' },
-  { label: 'Keagamaan',  value: 'keagamaan' },
-  { label: 'Wisata',     value: 'wisata' },
-  { label: 'Pengumuman', value: 'pengumuman' },
-]
+    { value: "", labelId: "Semua", labelEn: "All" },
+    { value: "news", labelId: "Berita", labelEn: "News" },
+    { value: "announcement", labelId: "Pengumuman", labelEn: "Announcement" },
+    { value: "event", labelId: "Kegiatan", labelEn: "Event" },
+    { value: "education", labelId: "Edukasi", labelEn: "Education" },
+];
 
-const activeCategory = ref('')
-const currentPage    = ref(1)
+const getCategoryLabel = (cat?: string) => {
+    if (!cat) return "";
+    const found = categories.find(c => c.value === cat);
+    if (!found) return cat;
+    return locale.value === "en" ? found.labelEn : found.labelId;
+};
 
-// ── URL fetch dinamis berdasarkan kategori & halaman ──────────────────────
-const fetchUrl = computed(() => {
-  const base_url = activeCategory.value
-    ? `${base}/articles/category/${activeCategory.value}`
-    : `${base}/articles/published`
-  return base_url
-})
+// Dynamic Category colors
+const getCategoryBg = (cat?: string) => {
+    switch (cat) {
+        case "news":
+            return "bg-emerald-600 dark:bg-emerald-500";
+        case "announcement":
+            return "bg-amber-500 dark:bg-amber-600";
+        case "event":
+            return "bg-teal-600 dark:bg-teal-500";
+        case "education":
+            return "bg-emerald-700 dark:bg-emerald-600";
+        default:
+            return "bg-emerald-600 dark:bg-emerald-500";
+    }
+};
 
-const { data, pending, error, refresh } = await useFetch<any>(fetchUrl, {
-  query: computed(() => ({ page: currentPage.value, per_page: 9 })),
-  watch: [fetchUrl, currentPage],
-})
+// Format Date
+const formatDate = (dateStr: string): string => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString(locale.value === "en" ? "en-US" : "id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+};
 
-const articles   = computed(() => data.value?.data ?? [])
-const totalPages = computed(() => data.value?.last_page ?? 1)
+// Strip HTML tags from content
+const stripHtml = (html?: string): string => {
+    return html?.replace(/<[^>]*>/g, "") ?? "";
+};
 
-// ── Actions ────────────────────────────────────────────────────────────────
-function setCategory(val: string) {
-  activeCategory.value = val
-  currentPage.value    = 1
-}
-
-function changePage(page: number) {
-  currentPage.value = page
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-// ── Helpers ────────────────────────────────────────────────────────────────
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
-}
-
-function stripHtml(html: string): string {
-  return html?.replace(/<[^>]*>/g, '') ?? ''
-}
-
-// ── SEO ────────────────────────────────────────────────────────────────────
+// SEO
 useSeoMeta({
-  title: 'Berita & Artikel — YHIE',
-  description: 'Liputan kegiatan, tulisan keagamaan, dan informasi wisata Desa Tejasari dari Yayasan Hafiz Indonesia Emas.',
-  ogTitle: 'Berita & Artikel — YHIE',
-  ogDescription: 'Kabar terbaru dari Yayasan Hafiz Indonesia Emas.',
-})
+    title: () => locale.value === "en" ? "Articles & News - YHIE" : "Artikel & Berita - YHIE",
+    description: () =>
+        locale.value === "en"
+            ? "Read the latest news, blogs, and religious resources from Yayasan Hafiz Indonesia Emas."
+            : "Baca kabar berita terbaru, blog, dan tulisan keagamaan dari Yayasan Hafiz Indonesia Emas.",
+    ogTitle: () => locale.value === "en" ? "Articles & News - YHIE" : "Artikel & Berita - YHIE",
+    ogDescription: () =>
+        locale.value === "en"
+            ? "Latest news and articles from Yayasan Hafiz Indonesia Emas."
+            : "Kabar berita dan artikel terbaru dari Yayasan Hafiz Indonesia Emas.",
+});
 </script>

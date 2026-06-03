@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->json("image");
             $table->string("slug_id");
             $table->string("slug_en");
+            $table->string("category")->nullable();
             $table->timestamps();
         });
     }

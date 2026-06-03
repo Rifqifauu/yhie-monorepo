@@ -143,10 +143,10 @@
 
                 <div class="flex justify-center items-center pt-6">
                     <NuxtLink
-                        to="/partners"
+                        :to="localePath('/partner')"
                         class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md hover:shadow-lg transition flex items-center gap-2 group"
                     >
-                        Lihat Semua Partner
+                        {{ locale === 'en' ? 'View All Partners' : 'Lihat Semua Partner' }}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -172,6 +172,7 @@
 import { ref, computed, watch } from "vue";
 
 const { t, locale } = useI18n();
+const localePath = useLocalePath();
 
 const config = useRuntimeConfig();
 const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
