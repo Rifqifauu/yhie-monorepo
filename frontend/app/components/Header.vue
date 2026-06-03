@@ -18,10 +18,10 @@
                     <NuxtImg
                         src="/logo.png"
                         alt="Logo Aplikasi"
-                        class="w-16 h-auto object-contain"
+                        class="w-12 sm:w-16 h-auto object-contain"
                     />
                     <span
-                        class="text-emerald-900 dark:text-amber-400 font-semibold"
+                        class="text-emerald-900 dark:text-amber-400 font-semibold text-sm sm:text-base"
                         >Hafiz Indonesia Emas</span
                     >
                 </div>
@@ -57,7 +57,7 @@
                     </NuxtLink>
                 </ul>
 
-                <div class="flex gap-2 items-center">
+                <div class="hidden md:flex gap-2 items-center">
                     <USelect
                         v-model="currentLocale"
                         :items="languageOptions"
@@ -71,12 +71,12 @@
                             side: 'bottom',
                             sideOffset: 8,
                         }"
-                        class="w-20 sm:w-24 cursor-pointer rounded-full uppercase font-semibold text-xs border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 hover:scale-105 hover:border-amber-500/40 dark:hover:border-amber-400/40 focus:outline-none"
+                        class="w-24 cursor-pointer rounded-full uppercase font-semibold text-xs border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 hover:scale-105 hover:border-amber-500/40 dark:hover:border-amber-400/40 focus:outline-none"
                     />
 
                     <button
                         @click="toggleTheme"
-                        class="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 hover:scale-105 hover:border-amber-500/40 group focus:outline-none"
+                        class="w-9 h-9 flex items-center justify-center rounded-full border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 hover:scale-105 hover:border-amber-500/40 group focus:outline-none"
                         aria-label="Toggle Theme"
                     >
                         <UIcon
@@ -85,10 +85,12 @@
                             :class="isRotated ? 'rotate-180' : 'rotate-0'"
                         />
                     </button>
+                </div>
 
+                <div class="flex md:hidden items-center">
                     <button
                         @click="isMobileMenuOpen = !isMobileMenuOpen"
-                        class="flex md:hidden w-9 h-9 items-center justify-center rounded-full border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 hover:border-amber-500"
+                        class="flex w-9 h-9 items-center justify-center rounded-full border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 hover:border-amber-500"
                         aria-label="Toggle Menu"
                     >
                         <UIcon
@@ -114,7 +116,7 @@
         >
             <div
                 v-if="isMobileMenuOpen"
-                class="md:hidden mt-2 mx-auto max-w-7xl backdrop-blur-lg bg-white/90 dark:bg-gray-950/90 border border-emerald-500/20 dark:border-emerald-800/40 rounded-3xl p-5 shadow-xl"
+                class="md:hidden absolute mt-2 mx-auto w-full backdrop-blur-lg bg-white/95 dark:bg-gray-950/95 border border-emerald-500/20 dark:border-emerald-800/40 rounded-3xl p-5 shadow-xl"
             >
                 <ul
                     class="flex flex-col gap-2 font-medium text-sm text-gray-700 dark:text-emerald-100 mb-4"
@@ -152,23 +154,42 @@
                     class="border-emerald-500/10 dark:border-emerald-800/20 my-3"
                 />
 
-                <div
-                    class="flex items-center justify-between pt-2 px-2 sm:hidden"
-                >
-                    <span
-                        class="text-xs font-semibold text-gray-500 dark:text-emerald-300/60 uppercase"
-                        >Mode Tema</span
-                    >
-                    <button
-                        @click="toggleTheme"
-                        class="flex w-9 h-9 items-center justify-center rounded-full border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 focus:outline-none"
-                    >
-                        <UIcon
-                            :name="themeIcon"
-                            class="w-5 h-5 transition-transform duration-500 ease-out"
-                            :class="isRotated ? 'rotate-180' : 'rotate-0'"
+                <div class="flex flex-col gap-4 px-2 pt-2">
+                    <div class="flex items-center justify-between">
+                        <span
+                            class="text-xs font-semibold text-gray-500 dark:text-emerald-300/60 uppercase"
+                        >
+                            Bahasa / Language
+                        </span>
+                        <USelect
+                            v-model="currentLocale"
+                            :items="languageOptions"
+                            :icon="
+                                currentLocale === 'id'
+                                    ? 'i-circle-flags-id'
+                                    : 'i-circle-flags-us'
+                            "
+                            class="w-24 cursor-pointer rounded-full uppercase font-semibold text-xs border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300"
                         />
-                    </button>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span
+                            class="text-xs font-semibold text-gray-500 dark:text-emerald-300/60 uppercase"
+                        >
+                            Mode Tema
+                        </span>
+                        <button
+                            @click="toggleTheme"
+                            class="flex w-9 h-9 items-center justify-center rounded-full border border-emerald-100 dark:border-emerald-900 bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-emerald-200 transition-all duration-300 focus:outline-none"
+                        >
+                            <UIcon
+                                :name="themeIcon"
+                                class="w-5 h-5 transition-transform duration-500 ease-out"
+                                :class="isRotated ? 'rotate-180' : 'rotate-0'"
+                            />
+                        </button>
+                    </div>
                 </div>
             </div>
         </transition>
