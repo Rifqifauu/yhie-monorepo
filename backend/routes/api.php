@@ -6,6 +6,7 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\ProgramRegistrationController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
 
@@ -40,6 +41,9 @@ Route::prefix("settings")->group(function () {
     Route::get("/{key}", [SettingController::class, "show"]);
 });
 
+// Program Registration — public endpoint (tanpa auth)
+Route::post("program-registrations", [ProgramRegistrationController::class, "store"]);
+
 Route::apiResource("articles", ArticleController::class)->except([
     "show",
     "index",
@@ -60,4 +64,7 @@ Route::apiResource("partners", PartnerController::class)->except([
 Route::apiResource("settings", SettingController::class)->except([
     "show",
     "index",
+]);
+Route::apiResource("program-registrations", ProgramRegistrationController::class)->except([
+    "store",
 ]);

@@ -107,5 +107,32 @@
     "seoTitle": "About Us - YHIE",
     "seoDesc": "Learn about Yayasan Hafiz Indonesia Emas, our history, vision, mission, and core values in building a world-class Qur'anic education ecosystem.",
     "keywords": "hafiz quran certification, tahfidz retreat, iao certificate, yayasan hafiz indonesia emas, stress-free memorization exam, hafiz nature retreat, tahfidz certification"
+  },
+  "registration": {
+    "modalTitle": "Registration Form",
+    "selectedProgram": "Selected Program",
+    "personalInfo": "Personal Information",
+    "additionalInfo": "Additional Information",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email",
+    "phone": "WhatsApp Number",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "age": "Age",
+    "agePlaceholder": "Enter your age",
+    "address": "Address",
+    "addressPlaceholder": "Enter your full address",
+    "notes": "Additional Notes",
+    "notesPlaceholder": "Write any additional notes or questions (optional)",
+    "submit": "Submit Registration",
+    "submitting": "Submitting...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Registration Submitted Successfully!",
+    "successDesc": "Thank you for registering. Our team will contact you soon via email or WhatsApp.",
+    "error": "Failed to submit registration. Please try again.",
+    "required": "This field is required."
   }
 }

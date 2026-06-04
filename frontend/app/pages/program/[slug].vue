@@ -205,13 +205,13 @@
 
                             <!-- Buttons (Register & Share) -->
                             <div class="space-y-3">
-                                <NuxtLink
-                                    :to="localePath(`/register?program=${program.id}`)"
+                                <button
+                                    @click="isRegistrationModalOpen = true"
                                     class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 transform hover:-translate-y-0.5 flex justify-center items-center gap-2"
                                 >
                                     <UIcon name="i-lucide-pen-line" class="w-5 h-5" />
                                     <span>{{ locale === 'en' ? 'Register Now' : 'Daftar Sekarang' }}</span>
-                                </NuxtLink>
+                                </button>
 
                                 <button
                                     @click="copyShareLink"
@@ -226,6 +226,14 @@
                 </div>
             </div>
         </section>
+        <!-- Registration Modal -->
+        <ProgramRegistrationModal
+            v-if="program"
+            v-model="isRegistrationModalOpen"
+            :program-id="program.id"
+            :program-title="titleOf(program)"
+            :program-price="formatPrice(priceOf(program))"
+        />
     </div>
 </template>
 
@@ -238,6 +246,7 @@ const client = useSanctumClient();
 
 const slug = route.params.slug as string;
 const copied = ref(false);
+const isRegistrationModalOpen = ref(false);
 
 const { data: apiResponse, pending, error } = await useAsyncData(
     `program-${slug}`,

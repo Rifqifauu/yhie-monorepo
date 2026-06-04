@@ -108,5 +108,32 @@
     "seoTitle": "Tentang Kami - YHIE",
     "seoDesc": "Pelajari tentang Yayasan Hafiz Indonesia Emas, sejarah, visi, misi, dan nilai-nilai inti kami dalam membangun ekosistem pendidikan Al-Qur'an berkelas dunia.",
     "keywords": "sertifikasi hafiz quran, wisata tahfidz, sertifikat iao, yayasan hafiz indonesia emas, ujian hafalan tanpa stres, tadabbur alam hafiz, sertifikasi tahfidz"
+  },
+  "registration": {
+    "modalTitle": "Formulir Pendaftaran",
+    "selectedProgram": "Program Dipilih",
+    "personalInfo": "Informasi Pribadi",
+    "additionalInfo": "Informasi Tambahan",
+    "fullName": "Nama Lengkap",
+    "fullNamePlaceholder": "Masukkan nama lengkap Anda",
+    "email": "Email",
+    "phone": "Nomor WhatsApp",
+    "gender": "Jenis Kelamin",
+    "male": "Laki-laki",
+    "female": "Perempuan",
+    "age": "Umur",
+    "agePlaceholder": "Masukkan umur",
+    "address": "Alamat",
+    "addressPlaceholder": "Masukkan alamat lengkap Anda",
+    "notes": "Catatan Tambahan",
+    "notesPlaceholder": "Tulis catatan atau pertanyaan tambahan (opsional)",
+    "submit": "Kirim Pendaftaran",
+    "submitting": "Mengirim...",
+    "cancel": "Batal",
+    "close": "Tutup",
+    "success": "Pendaftaran Berhasil Terkirim!",
+    "successDesc": "Terima kasih telah mendaftar. Tim kami akan segera menghubungi Anda melalui email atau WhatsApp.",
+    "error": "Gagal mengirim pendaftaran. Silakan coba lagi.",
+    "required": "Field ini wajib diisi."
   }
 }
