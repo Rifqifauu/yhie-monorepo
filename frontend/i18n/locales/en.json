@@ -59,17 +59,53 @@
   },
   "about": {
     "title": "About Us",
-    "history": "History",
-    "vision": "Vision",
-    "mission": "Mission",
+    "slogan": "Get to Know Yayasan Hafiz Indonesia Emas",
+    "description": "Learn more about our history, vision, mission, and core values in building a world-class Qur'anic education ecosystem.",
+    "history": {
+      "title": "Our History",
+      "description": "Yayasan Hafiz Indonesia Emas was established to nurture a generation that is close to the Qur'an through structured, meaningful, and impactful learning. We believe Qur'anic education should not only produce strong memorization, but also shape character, discipline, and beneficial leadership in society."
+    },
+    "highlightQuote": "We are committed to presenting Qur'anic education that is excellent, relevant, and grounded in noble values.",
+    "vision": {
+      "title": "Vision",
+      "description": "To become a world-class Qur'anic education institution that nurtures excellent, noble, and impactful generations."
+    },
+    "mission": {
+      "title": "Mission",
+      "items": [
+        "Provide quality Qur'anic education with a structured and measurable approach.",
+        "Cultivate a learning environment that supports spiritual growth, discipline, and noble character.",
+        "Build synergy with families and strategic partners to expand educational impact.",
+        "Prepare a generation that is ready to contribute at national and global levels."
+      ]
+    },
+    "core": "Core",
     "values": "Values",
+    "coreValues": {
+      "integrity": {
+        "title": "Integrity",
+        "desc": "We uphold honesty, trust, and consistency in every educational process and service."
+      },
+      "excellence": {
+        "title": "Excellence",
+        "desc": "We continuously strive for the highest standards in learning quality, guidance, and outcomes."
+      },
+      "stressFree": {
+        "title": "Comfortable Learning",
+        "desc": "We create a calm, supportive, and motivating environment so students can grow optimally."
+      },
+      "globalSynergy": {
+        "title": "Global Synergy",
+        "desc": "We open collaboration and broader insights to connect local values with global opportunities."
+      }
+    },
     "ctaPrimary": "Register Now",
     "ctaSecondary": "View Program",
     "linkPrimary": "/register",
     "linkSecondary": "/program",
     "imageAlt": "A serene atmosphere of Qur'an recitation outdoors with Yayasan Hafiz Indonesia Emas",
-    "seoTitle": "Hafiz Certification & Nature Retreat | Yayasan Hafiz Indonesia Emas",
-    "seoDesc": "Official Hafiz Qur'an certification program with a nature retreat concept. Reduce exam stress, enhance focus, and achieve an international IAO certificate.",
+    "seoTitle": "About Us - YHIE",
+    "seoDesc": "Learn about Yayasan Hafiz Indonesia Emas, our history, vision, mission, and core values in building a world-class Qur'anic education ecosystem.",
     "keywords": "hafiz quran certification, tahfidz retreat, iao certificate, yayasan hafiz indonesia emas, stress-free memorization exam, hafiz nature retreat, tahfidz certification"
   }
 }

@@ -60,17 +60,53 @@
   },
   "about": {
     "title": "Tentang Kami",
-    "history": "Sejarah",
-    "vision": "Visi",
-    "mission": "Misi",
-    "values": "Nilai-nilai",
+    "slogan": "Mengenal Yayasan Hafiz Indonesia Emas",
+    "description": "Pelajari sejarah, visi, misi, dan nilai-nilai utama kami dalam membangun ekosistem pendidikan Al-Qur'an yang berkelas dunia.",
+    "history": {
+      "title": "Sejarah Kami",
+      "description": "Yayasan Hafiz Indonesia Emas hadir untuk membina generasi yang dekat dengan Al-Qur'an melalui pembelajaran yang terstruktur, bermakna, dan berdampak. Kami meyakini bahwa pendidikan Al-Qur'an tidak hanya melahirkan hafalan yang kuat, tetapi juga membentuk karakter, kedisiplinan, dan kepemimpinan yang bermanfaat bagi masyarakat."
+    },
+    "highlightQuote": "Kami berkomitmen menghadirkan pendidikan Al-Qur'an yang unggul, relevan, dan berlandaskan nilai-nilai mulia.",
+    "vision": {
+      "title": "Visi",
+      "description": "Menjadi lembaga pendidikan Al-Qur'an berkelas dunia yang melahirkan generasi unggul, berakhlak, dan berdampak luas."
+    },
+    "mission": {
+      "title": "Misi",
+      "items": [
+        "Menyelenggarakan pendidikan Al-Qur'an berkualitas dengan pendekatan yang terstruktur dan terukur.",
+        "Menumbuhkan lingkungan belajar yang mendukung pertumbuhan spiritual, kedisiplinan, dan akhlak mulia.",
+        "Membangun sinergi dengan keluarga dan mitra strategis untuk memperluas dampak pendidikan.",
+        "Menyiapkan generasi yang siap berkontribusi di tingkat nasional maupun global."
+      ]
+    },
+    "core": "Nilai",
+    "values": "Nilai-Nilai Inti",
+    "coreValues": {
+      "integrity": {
+        "title": "Integritas",
+        "desc": "Kami menjunjung kejujuran, amanah, dan konsistensi dalam setiap proses pendidikan dan pelayanan."
+      },
+      "excellence": {
+        "title": "Keunggulan",
+        "desc": "Kami terus berupaya menghadirkan standar terbaik dalam kualitas pembelajaran, pembinaan, dan hasil pendidikan."
+      },
+      "stressFree": {
+        "title": "Pembelajaran Nyaman",
+        "desc": "Kami menciptakan lingkungan yang tenang, suportif, dan memotivasi agar santri bertumbuh secara optimal."
+      },
+      "globalSynergy": {
+        "title": "Sinergi Global",
+        "desc": "Kami membuka kolaborasi dan wawasan yang lebih luas untuk menghubungkan nilai lokal dengan peluang global."
+      }
+    },
     "ctaPrimary": "Daftar Sekarang",
     "ctaSecondary": "Lihat Program",
     "linkPrimary": "/register",
     "linkSecondary": "/program",
     "imageAlt": "Suasana khusyuk setoran hafalan Al-Qur'an di alam terbuka bersama Yayasan Hafiz Indonesia Emas",
-    "seoTitle": "Sertifikasi Hafiz & Wisata Tadabbur Alam | Yayasan Hafiz Indonesia Emas",
-    "seoDesc": "Program sertifikasi Hafiz Al-Qur'an resmi dengan konsep wisata alam (tadabbur). Kurangi stres ujian, tingkatkan fokus, dan raih sertifikat internasional IAO.",
+    "seoTitle": "Tentang Kami - YHIE",
+    "seoDesc": "Pelajari tentang Yayasan Hafiz Indonesia Emas, sejarah, visi, misi, dan nilai-nilai inti kami dalam membangun ekosistem pendidikan Al-Qur'an berkelas dunia.",
     "keywords": "sertifikasi hafiz quran, wisata tahfidz, sertifikat iao, yayasan hafiz indonesia emas, ujian hafalan tanpa stres, tadabbur alam hafiz, sertifikasi tahfidz"
   }
 }
