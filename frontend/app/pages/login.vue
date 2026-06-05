@@ -82,15 +82,12 @@ const fields = [
         icon: "i-heroicons-lock-closed",
     },
 ];
+
 async function onSubmit(payload: any) {
     loading.value = true;
 
-    // Nuxt UI AuthForm biasanya membungkus data di dalam payload langsung,
-    // atau di dalam properti payload.body. Mari kita antisipasi keduanya:
-    const formData = payload.body || payload;
-
-    // line ini untuk ngecek di console log browser Anda, pastikan email & pass muncul
-    console.log("Data yang akan dikirim:", formData);
+    // UAuthForm mengirim SubmitEvent, data form ada di payload.data (Vue Proxy)
+    const formData = payload.data;
 
     try {
         await login({
