@@ -6,7 +6,6 @@ export interface Article {
   content_id: string;
   slug_en: string;
   slug_id: string;
-  // Menyesuaikan dengan logika di coverOf yang cukup dinamis
   image?: string | any[] | { path?: string; [key: string]: any } | any;
   [key: string]: any; // Fallback untuk properti tambahan dari backend
 }
@@ -22,7 +21,6 @@ export interface PaginatedResponse<T> {
 
 export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
-  // Tambahkan meta, message, atau status jika backend mereturnnya
 }
 
 export const useArticles = () => {
@@ -30,7 +28,6 @@ export const useArticles = () => {
   const { locale } = useI18n();
   const client = useSanctumClient();
 
-  // State
   const page = ref(1);
   const searchInput = ref("");
   const search = ref("");
@@ -38,12 +35,10 @@ export const useArticles = () => {
 
   const searchTerm = computed(() => search.value.trim());
 
-  // Reset halaman ke 1 saat kategori atau pencarian berubah
   watch([category, search], () => {
     page.value = 1;
   });
 
-  // Fetching data
   const {
     data: apiResponse,
     status,
@@ -62,7 +57,6 @@ export const useArticles = () => {
     { watch: [page, category, searchTerm] },
   );
 
-  // Computed Properties untuk Paginasi
   const paginator = computed<PaginatedResponse<Article>>(() => {
     if (!apiResponse.value) return {} as PaginatedResponse<Article>;
     return apiResponse.value.data ?? ({} as PaginatedResponse<Article>);
@@ -92,7 +86,6 @@ export const useArticles = () => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
 
-    // Menghindari double slash pada URL (misal: http://api.com//images/...)
     const base = backendUrl?.endsWith("/")
       ? backendUrl.slice(0, -1)
       : backendUrl || "";
