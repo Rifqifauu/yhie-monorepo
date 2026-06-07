@@ -10,6 +10,10 @@ use App\Http\Controllers\ProgramRegistrationController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
 
+Route::get("/user", function (Request $request) {
+    return $request->user();
+});
+
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);
     Route::get("/{slug}", [ArticleController::class, "show"]);
