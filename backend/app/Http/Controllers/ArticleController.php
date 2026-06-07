@@ -53,7 +53,7 @@ class ArticleController extends Controller
             'slug_id' => 'nullable|string|max:255',
             'slug_en' => 'nullable|string|max:255',
             'is_published' => 'required|boolean',
-            'author_id' => 'required|exists:users,id',
+            'author_id' => 'nullable|integer|exists:users,id',
             'category' => 'required|string|max:255',
         ];
 
@@ -75,22 +75,14 @@ class ArticleController extends Controller
                 $data['slug_en'] = Str::slug($data['title_en']);
             }
 
-            if ($request->hasFile('image')) {
-                $imagePaths = [];
-                foreach ($request->file('image') as $file) {
-                    $path = $file->store('articles', 'public');
-                    $imagePaths[] = '/storage/' . $path;
-                }
-                $data['image'] = $imagePaths;
-            } else {
-                $data['image'] = $data['image'] ?? [];
-            }
+            $data['author_id'] = $data['author_id'] ?? auth()->id() ?? 1;
+            $data['image'] = $this->storeImages($request);
 
             $article = Article::create($data);
 
             return response()->json([
                 'message' => 'Article created successfully.',
-                'data' => $article
+                'data' => $article->fresh('author')
             ], 201);
 
         } catch (\Throwable $e) {
@@ -137,7 +129,7 @@ class ArticleController extends Controller
             'slug_id' => 'nullable|string|max:255',
             'slug_en' => 'nullable|string|max:255',
             'is_published' => 'sometimes|required|boolean',
-            'author_id' => 'sometimes|required|exists:users,id',
+            'author_id' => 'sometimes|nullable|integer|exists:users,id',
             'category' => 'sometimes|required|string|max:255',
         ];
 
@@ -155,35 +147,29 @@ class ArticleController extends Controller
             $article = Article::findOrFail($id);
 
             if ($request->hasFile('image')) {
-                // Delete old images
-                if (is_array($article->image)) {
-                    foreach ($article->image as $oldImage) {
-                        $oldPath = str_replace('/storage/', '', $oldImage);
-                        Storage::disk('public')->delete($oldPath);
-                    }
-                }
-
-                // Upload new images
-                $newImagePaths = [];
-                foreach ($request->file('image') as $file) {
-                    $path = $file->store('articles', 'public');
-                    $newImagePaths[] = '/storage/' . $path;
-                }
-                $validated['image'] = $newImagePaths;
+                $this->deleteImages($article->image);
+                $validated['image'] = $this->storeImages($request);
+            } elseif ($request->boolean('remove_images')) {
+                $this->deleteImages($article->image);
+                $validated['image'] = [];
             }
 
-            if (isset($validated['title_id']) && empty($validated['slug_id'])) {
+            if (array_key_exists('slug_id', $validated) && empty($validated['slug_id']) && isset($validated['title_id'])) {
                 $validated['slug_id'] = Str::slug($validated['title_id']);
             }
-            if (isset($validated['title_en']) && empty($validated['slug_en'])) {
+            if (array_key_exists('slug_en', $validated) && empty($validated['slug_en']) && isset($validated['title_en'])) {
                 $validated['slug_en'] = Str::slug($validated['title_en']);
+            }
+
+            if (array_key_exists('author_id', $validated) && empty($validated['author_id'])) {
+                $validated['author_id'] = $article->author_id;
             }
 
             $article->update($validated);
 
             return response()->json([
                 'message' => 'Article updated successfully.',
-                'data' => $article
+                'data' => $article->fresh('author')
             ], 200);
 
         } catch (ModelNotFoundException $e) {
@@ -233,6 +219,32 @@ class ArticleController extends Controller
                 'message' => 'Failed to delete article. Please try again later.',
                 'data' => null
             ], 500);
+        }
+    }
+
+    private function storeImages(Request $request): array
+    {
+        if (! $request->hasFile('image')) {
+            return [];
+        }
+
+        return collect($request->file('image'))
+            ->map(function ($file) {
+                return '/storage/' . $file->store('articles', 'public');
+            })
+            ->values()
+            ->all();
+    }
+
+    private function deleteImages($images): void
+    {
+        if (! is_array($images)) {
+            return;
+        }
+
+        foreach ($images as $image) {
+            $oldPath = str_replace('/storage/', '', $image);
+            Storage::disk('public')->delete($oldPath);
         }
     }
 }
