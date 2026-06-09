@@ -2,6 +2,8 @@
     <HeroSection />
     <ProgramsSection />
     <BenefitSection />
+    <GallerySection />
+    <ArticlesSection />
     <PartnersSection />
     <CTASection />
 </template>
