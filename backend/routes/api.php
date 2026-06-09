@@ -9,6 +9,7 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ProgramRegistrationController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TransactionController;
 
 Route::get("/user", function (Request $request) {
     return $request->user();
@@ -46,7 +47,10 @@ Route::prefix("settings")->group(function () {
 });
 
 // Program Registration — public endpoint (tanpa auth)
-Route::post("program-registrations", [ProgramRegistrationController::class, "store"]);
+Route::post("program-registrations", [
+    ProgramRegistrationController::class,
+    "store",
+]);
 
 Route::apiResource("articles", ArticleController::class)->except([
     "show",
@@ -69,6 +73,9 @@ Route::apiResource("settings", SettingController::class)->except([
     "show",
     "index",
 ]);
-Route::apiResource("program-registrations", ProgramRegistrationController::class)->except([
-    "store",
-]);
+Route::apiResource("transactions", TransactionController::class);
+
+Route::apiResource(
+    "program-registrations",
+    ProgramRegistrationController::class,
+)->except(["store"]);

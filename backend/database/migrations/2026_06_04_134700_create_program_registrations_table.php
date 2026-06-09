@@ -12,7 +12,10 @@ return new class extends Migration {
     {
         Schema::create("program_registrations", function (Blueprint $table) {
             $table->id();
-            $table->foreignId("program_id")->constrained("programs")->cascadeOnDelete();
+            $table
+                ->foreignId("program_id")
+                ->constrained("programs")
+                ->cascadeOnDelete();
             $table->string("full_name");
             $table->string("email");
             $table->string("phone", 30);
@@ -20,6 +23,9 @@ return new class extends Migration {
             $table->integer("age")->nullable();
             $table->text("address")->nullable();
             $table->text("notes")->nullable();
+            $table
+                ->enum("status", ["pending", "approved", "rejected"])
+                ->default("pending");
             $table->timestamps();
         });
     }
