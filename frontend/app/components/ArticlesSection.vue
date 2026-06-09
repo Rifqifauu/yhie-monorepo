@@ -57,13 +57,13 @@
             <div v-else-if="error" class="max-w-md mx-auto">
                 <UAlert
                     icon="i-heroicons-exclamation-triangle"
-                    color="error"
+                    color="red"
                     variant="soft"
                     :title="locale === 'en' ? 'Failed to load articles' : 'Gagal memuat artikel'"
                     :description="locale === 'en' ? 'Please try again later.' : 'Silakan coba lagi.'"
                 >
                     <template #actions>
-                        <UButton size="sm" color="error" variant="soft" icon="i-heroicons-arrow-path" @click="() => refresh()">
+                        <UButton size="sm" color="red" variant="soft" icon="i-heroicons-arrow-path" @click="refresh">
                             {{ locale === 'en' ? 'Retry' : 'Coba Lagi' }}
                         </UButton>
                     </template>
@@ -174,7 +174,7 @@
                     <UButton
                         size="lg"
                         variant="outline"
-                        color="primary"
+                        color="emerald"
                         icon="i-lucide-newspaper"
                         trailing-icon="i-lucide-arrow-right"
                         class="group rounded-full px-8 border-emerald-400 dark:border-emerald-600 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/40"

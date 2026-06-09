@@ -1,85 +1,64 @@
 <template>
-    <section class="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-br from-emerald-800 via-emerald-900 to-emerald-950 dark:from-gray-950 dark:via-emerald-950 dark:to-gray-950 text-white border-t border-emerald-700/40 dark:border-emerald-900/60 transition-colors duration-300">
-
-        <!-- Background texture -->
+    <section class="relative overflow-hidden py-16 lg:py-24 bg-gradient-to-b from-emerald-50 via-emerald-100/80 to-emerald-800/40 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-950 text-slate-900 dark:text-white border-t border-emerald-200/60 dark:border-emerald-900/40 transition-colors duration-300">
+        <!-- Background Elements -->
         <img
             src="/shadow-mosque.webp"
-            class="absolute inset-0 w-full h-full object-cover object-center opacity-[0.07] pointer-events-none"
-            aria-hidden="true"
+            class="absolute bottom-0 right-0 w-auto h-full max-h-[85%] object-contain object-right-bottom pointer-events-none opacity-[0.12] dark:opacity-[0.06] dark:invert dark:brightness-110"
             alt=""
         />
-
-        <!-- Blobs -->
-        <div class="absolute -top-32 -left-32 w-96 h-96 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div
+            class="absolute -top-24 -left-24 w-80 h-80 bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-3xl"
+        ></div>
+        <div
+            class="absolute -bottom-28 -right-28 w-96 h-96 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-3xl"
+        ></div>
 
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-3xl mx-auto text-center" data-aos="fade-up">
+            <div class="grid lg:grid-cols-3 gap-10 items-center">
+                <!-- Left/Center content: Text -->
+                <div class="lg:col-span-2 text-center lg:text-left" data-aos="fade-up">
+                    <span
+                        class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-amber-600 dark:text-amber-400"
+                    >
+                        <UIcon name="i-lucide-sparkles" class="w-4 h-4" />
+                        {{ locale === 'en' ? 'Exclusive Community' : 'Komunitas Eksklusif' }}
+                    </span>
+                    <h2 class="mt-4 text-3xl md:text-5xl font-serif font-extrabold tracking-tight text-emerald-950 dark:text-white leading-tight">
+                        {{ t("cta.title") }}
+                    </h2>
+                    <p class="mt-4 text-lg text-slate-600 dark:text-emerald-100/90 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                        {{ t("cta.description") }}
+                    </p>
+                </div>
 
-                <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-amber-300 bg-amber-400/10 px-3.5 py-1.5 rounded-full border border-amber-400/20 mb-6">
-                    <UIcon name="i-lucide-sparkles" class="w-4 h-4" />
-                    {{ locale === 'en' ? 'Exclusive Community' : 'Komunitas Eksklusif' }}
-                </span>
-
-                <h2 class="text-3xl md:text-5xl font-serif font-extrabold tracking-tight leading-[1.15] mb-5 text-white">
-                    {{ t("cta.title") }}
-                </h2>
-
-                <p class="text-base md:text-lg text-emerald-100/80 leading-relaxed max-w-2xl mx-auto mb-10">
-                    {{ t("cta.description") }}
-                </p>
-
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <!-- Right content: CTA Action Buttons -->
+                <div class="flex flex-col sm:flex-row lg:flex-col gap-4 justify-center items-center lg:items-end" data-aos="fade-left">
                     <a
                         :href="waLink"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold shadow-xl shadow-amber-400/20 hover:shadow-amber-400/40 hover:-translate-y-0.5 transition-all duration-300 text-sm"
+                        class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-850 dark:from-amber-400 dark:to-amber-500 dark:hover:from-amber-500 dark:hover:to-amber-600 text-white dark:text-emerald-950 font-bold shadow-xl shadow-emerald-600/15 dark:shadow-amber-500/15 hover:shadow-emerald-600/30 dark:hover:shadow-amber-500/30 transition-all flex items-center justify-center gap-3 text-center"
                     >
-                        <UIcon name="i-lucide-message-circle" class="w-5 h-5" />
-                        {{ locale === 'en' ? 'Chat via WhatsApp' : 'Hubungi via WhatsApp' }}
+                        <UIcon name="i-lucide-phone" class="w-5 h-5" />
+                        <span>{{ locale === 'en' ? 'Chat via WhatsApp' : 'Hubungi WhatsApp' }}</span>
                     </a>
-
                     <NuxtLink
                         :to="localePath('/program')"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white font-semibold transition-all duration-300 text-sm"
+                        class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white/70 hover:bg-white border border-emerald-200 dark:bg-white/10 dark:hover:bg-white/20 dark:border-white/25 text-slate-800 dark:text-white font-bold transition-all flex items-center justify-center gap-3 text-center"
                     >
-                        {{ locale === 'en' ? 'Explore Programs' : 'Lihat Program' }}
-                        <UIcon name="i-lucide-arrow-right" class="w-4 h-4" />
+                        <span>{{ locale === 'en' ? 'Explore Programs' : 'Lihat Program' }}</span>
+                        <UIcon name="i-lucide-arrow-right" class="w-5 h-5" />
                     </NuxtLink>
                 </div>
-
-                <!-- Stats row -->
-                <div class="mt-14 pt-10 border-t border-white/10 grid grid-cols-3 gap-6 max-w-lg mx-auto">
-                    <div class="text-center">
-                        <p class="text-2xl font-serif font-extrabold text-white">500+</p>
-                        <p class="text-xs text-emerald-300/70 mt-1 font-medium uppercase tracking-wider">
-                            {{ locale === 'en' ? 'Graduates' : 'Wisudawan' }}
-                        </p>
-                    </div>
-                    <div class="text-center border-x border-white/10">
-                        <p class="text-2xl font-serif font-extrabold text-white">IAO</p>
-                        <p class="text-xs text-emerald-300/70 mt-1 font-medium uppercase tracking-wider">
-                            {{ locale === 'en' ? 'Accredited' : 'Terakreditasi' }}
-                        </p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-serif font-extrabold text-white">4+</p>
-                        <p class="text-xs text-emerald-300/70 mt-1 font-medium uppercase tracking-wider">
-                            {{ locale === 'en' ? 'Countries' : 'Negara' }}
-                        </p>
-                    </div>
-                </div>
-
             </div>
         </div>
     </section>
 </template>
 
 <script setup lang="ts">
-import { useSettings } from "~/composables/useSettings"
+import { useSettings } from "~/composables/useSettings";
 
-const { t, locale } = useI18n()
-const localePath = useLocalePath()
-const { waLink } = useSettings()
+const { t, locale } = useI18n();
+const localePath = useLocalePath();
+const { waLink } = useSettings();
 </script>
