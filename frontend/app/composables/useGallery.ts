@@ -1,9 +1,12 @@
+import { ref, computed, watch } from "vue";
+
 export interface GalleryMedia {
   id?: number | string;
   title_en: string;
   title_id: string;
   description_en: string;
   description_id: string;
+  category: string;
   image?: string | string[] | { path?: string; [key: string]: any } | any;
   [key: string]: any;
 }
@@ -25,11 +28,14 @@ export const useGallery = () => {
   const config = useRuntimeConfig();
   const { locale } = useI18n();
   const client = useSanctumClient();
-
   const page = ref(1);
   const category = ref("");
+  const searchInput = ref("");
+  const search = ref("");
+  const isSubmitting = ref(false);
+  const searchTerm = computed(() => search.value.trim());
 
-  watch(category, () => {
+  watch([category, search], () => {
     page.value = 1;
   });
 
@@ -39,41 +45,54 @@ export const useGallery = () => {
     error,
     refresh,
   } = useAsyncData<ApiResponse<GalleryMedia>>(
-    "gallery-page", // Static key, cache will be overwritten on param change
+    "gallery-page",
     () =>
       client("/api/media", {
         params: {
           page: page.value,
           category: category.value || undefined,
+          search: searchTerm.value || undefined,
         },
       }),
-    { watch: [page, category] },
+    { watch: [page, category, searchTerm] },
   );
 
-  // Computed Properties for Pagination
   const paginator = computed<PaginatedResponse<GalleryMedia>>(() => {
-    if (!apiResponse.value) return {} as PaginatedResponse<GalleryMedia>;
-    return apiResponse.value.data ?? ({} as PaginatedResponse<GalleryMedia>);
+    return (
+      apiResponse.value?.data ?? {
+        data: [],
+        current_page: 1,
+        last_page: 1,
+        total: 0,
+        from: null,
+        to: null,
+      }
+    );
   });
 
-  const mediaItems = computed<GalleryMedia[]>(() => paginator.value.data ?? []);
-  const totalPages = computed<number>(() => paginator.value.last_page ?? 1);
-  const totalItems = computed<number>(() => paginator.value.total ?? 0);
+  const mediaItems = computed<GalleryMedia[]>(() => paginator.value.data);
+  const totalPages = computed<number>(() => paginator.value.last_page);
+  const totalItems = computed<number>(() => paginator.value.total);
+  const fromItem = computed<number>(() => paginator.value.from ?? 0);
+  const toItem = computed<number>(() => paginator.value.to ?? 0);
   const pending = computed<boolean>(() => status.value === "pending");
 
-  const titleOf = (item: GalleryMedia): string =>
-    locale.value === "en" ? item.title_en : item.title_id;
+  const titleOf = (item: GalleryMedia): string => {
+    if (!item) return "";
+    return locale.value === "en" ? item.title_en : item.title_id;
+  };
 
-  const descOf = (item: GalleryMedia): string =>
-    locale.value === "en" ? item.description_en : item.description_id;
+  const descOf = (item: GalleryMedia): string => {
+    if (!item) return "";
+    return locale.value === "en" ? item.description_en : item.description_id;
+  };
 
-  const backendUrl = config.public.sanctum?.baseUrl;
+  const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
 
   const buildImageUrl = (path?: string): string => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
 
-    // Mencegah double slash (e.g., http://127.0.0.1:8000//storage/...)
     const base = backendUrl.endsWith("/")
       ? backendUrl.slice(0, -1)
       : backendUrl;
@@ -82,25 +101,21 @@ export const useGallery = () => {
     return `${base}${cleanPath}`;
   };
 
-  // Extract images from the media item
   const imagesOf = (item: GalleryMedia): string[] => {
+    if (!item) return [];
     const img = item.image;
     if (!img) return [];
 
-    // Array of path strings (from controller store)
     if (Array.isArray(img)) {
-      // Pastikan setiap elemen adalah string sebelum dibuild
       return img
         .filter((p) => typeof p === "string")
         .map((p: string) => buildImageUrl(p));
     }
 
-    // Object with 'path' key (from seeder)
     if (typeof img === "object" && img.path) {
       return [buildImageUrl(img.path)];
     }
 
-    // Plain string (JSON stringified or single path)
     if (typeof img === "string") {
       try {
         const parsed = JSON.parse(img);
@@ -113,7 +128,6 @@ export const useGallery = () => {
           return [buildImageUrl(parsed.path)];
         }
       } catch (e) {
-        // Jika bukan JSON yang valid, asumsikan itu adalah path gambar langsung
         return [buildImageUrl(img)];
       }
     }
@@ -121,13 +135,11 @@ export const useGallery = () => {
     return [];
   };
 
-  // First image (for thumbnail/cover display)
   const coverOf = (item: GalleryMedia): string => {
     const imgs = imagesOf(item);
     return imgs.length > 0 ? imgs[0] : "";
   };
 
-  // Pagination items with ellipsis (UI generator)
   const pageItems = computed(() => {
     const last = totalPages.value;
     const current = page.value;
@@ -157,27 +169,88 @@ export const useGallery = () => {
     }
   };
 
+  const applySearch = () => {
+    search.value = searchInput.value.trim();
+  };
+
+  const clearSearch = () => {
+    searchInput.value = "";
+    search.value = "";
+  };
+
+  const fetchDetail = async (id: string | number) => {
+    return await useAsyncData<GalleryMedia>(`media-detail-${id}`, () =>
+      client(`/api/media/${id}`),
+    );
+  };
+
+  const storeMedia = async (formData: FormData) => {
+    isSubmitting.value = true;
+    try {
+      const response = await client("/api/media", {
+        method: "POST",
+        body: formData,
+      });
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || "Terjadi kesalahan saat menyimpan media baru.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
+  const updateMedia = async (id: string | number, formData: FormData) => {
+    isSubmitting.value = true;
+
+    if (!formData.has("_method")) {
+      formData.append("_method", "PUT");
+    }
+
+    try {
+      const response = await client(`/api/media/${id}`, {
+        method: "POST", // Di-spoof menjadi PUT di mata Laravel router
+        body: formData,
+      });
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.data?.message || "Terjadi kesalahan saat memperbarui media.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   return {
-    // State
     page,
     category,
-
-    // Computed Data
+    searchInput,
+    searchTerm,
+    pending,
+    error,
+    isSubmitting,
     mediaItems,
     totalPages,
     totalItems,
-    pending,
-    error,
+    fromItem,
+    toItem,
     pageItems,
-
-    // Helpers
     titleOf,
     descOf,
     imagesOf,
     coverOf,
-
-    // Methods
+    buildImageUrl,
     changePage,
+    applySearch,
+    clearSearch,
     refresh,
+    fetchDetail,
+    storeMedia,
+    updateMedia,
   };
 };

@@ -1,18 +1,18 @@
 <template>
     <div class="space-y-6 flex flex-col h-full mx-auto w-full">
         <AdminHeader
-            title="Artikel"
-            icon="i-lucide-file-text"
-            description="Kelola artikel Anda di sini. Anda dapat membuat, mengedit, dan menghapus artikel melalui halaman ini."
+            title="Media"
+            icon="i-lucide-images"
+            description="Kelola media dan galeri Anda di sini. Anda dapat menambah, mengedit, dan menghapus media melalui halaman ini."
             :showCreate="true"
-            createRoute="/admin/articles/create"
+            createRoute="/admin/media/create"
         >
             <template #actions>
                 <div class="flex items-center gap-3">
                     <UInput
                         v-model="searchInput"
                         icon="i-lucide-search"
-                        placeholder="Cari judul atau penulis..."
+                        placeholder="Cari nama media..."
                         size="lg"
                         class="min-w-0 sm:w-72"
                         @keyup.enter="applySearch"
@@ -23,9 +23,8 @@
                         variant="soft"
                         icon="i-lucide-rotate-cw"
                         @click="refresh"
+                        >Muat ulang</UButton
                     >
-                        Muat ulang
-                    </UButton>
                     <UButton
                         color="neutral"
                         variant="ghost"
@@ -43,7 +42,7 @@
             <div class="overflow-x-auto scrollbar-hide">
                 <div class="min-w-max">
                     <UTable
-                        :data="articles"
+                        :data="mediaItems"
                         :columns="columns"
                         :loading="pending"
                         class="w-full min-w-max"
@@ -69,7 +68,7 @@
                 <span class="font-medium text-gray-900 dark:text-white">{{
                     totalItems
                 }}</span>
-                artikel
+                media
             </span>
 
             <UPagination
@@ -89,7 +88,7 @@
                 class="w-12 h-12 text-gray-400 mb-4"
             />
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                Tidak ada artikel
+                Tidak ada media
             </h3>
             <p class="text-gray-500 mt-1 max-w-sm">
                 Coba sesuaikan kata kunci pencarian atau filter yang Anda
@@ -100,14 +99,14 @@
                 color="neutral"
                 variant="soft"
                 class="mt-4"
-                @click="clearSearch"
+                @click="resetFilters"
             />
         </div>
         <AdminDeleteModal
             v-model:open="isDeleteModalOpen"
-            :id="selectedArticle?.id"
-            :title="selectedArticle?.title"
-            endpoint="api/articles"
+            :id="selectedMedia?.id"
+            :title="selectedMedia?.title_id"
+            endpoint="api/media"
             @success="handleDeleteSuccess"
             @error="handleDeleteError"
         />
@@ -115,15 +114,18 @@
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
+import { h, resolveComponent, computed, ref } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 import { useClipboard } from "@vueuse/core";
+// Asumsi GalleryMedia diexport dari file composable Anda
+import type { GalleryMedia } from "~/composables/useGallery";
 
 definePageMeta({
     layout: "admin",
 });
 
+// Resolusi komponen Nuxt UI
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 const UBadge = resolveComponent("UBadge");
@@ -132,32 +134,48 @@ const UAvatar = resolveComponent("UAvatar");
 const toast = useToast();
 const { copy } = useClipboard();
 
+// 1. Ekstrak data dan fungsi dari useGallery
 const {
-    articles,
+    mediaItems,
     pending,
     page,
     totalItems,
-    fromItem,
-    toItem,
+    category,
     changePage,
+    coverOf, // Gunakan helper ini untuk mengambil thumbnail
     searchInput,
     applySearch,
     clearSearch,
     refresh,
-} = useArticles();
+} = useGallery();
+
+// 2. Kalkulasi fromItem dan toItem secara lokal
+const fromItem = computed(() => {
+    if (totalItems.value === 0) return 0;
+    return (page.value - 1) * 10 + 1;
+});
+
+const toItem = computed(() => {
+    if (totalItems.value === 0) return 0;
+    return (page.value - 1) * 10 + mediaItems.value.length;
+});
+
+// 3. Buat aksi reset filter
+const resetFilters = () => {
+    category.value = "";
+    page.value = 1;
+    clearSearch();
+};
 
 const isDeleteModalOpen = ref(false);
-const selectedArticle = ref<{ id: number | string; title: string } | null>(
-    null,
-);
+const selectedMedia = ref<{ id: number | string; title: string } | null>(null);
 
-function triggerDelete(row: Row<Article>) {
+function triggerDelete(row: Row<GalleryMedia>) {
     const id = row.original.id;
-    const title =
-        row.original.title_id || row.original.title_en || "Article ini";
+    const title = row.original.title_id || row.original.title_en || "Media ini";
 
     if (id !== undefined && id !== null) {
-        selectedArticle.value = {
+        selectedMedia.value = {
             id: id,
             title: title,
         };
@@ -165,67 +183,65 @@ function triggerDelete(row: Row<Article>) {
     }
 }
 
-const handleDeleteSuccess = () => {
+function handleDeleteSuccess() {
+    isDeleteModalOpen.value = false;
+    selectedMedia.value = null;
     toast.add({
-        title: "Success",
-        description: "Article deleted successfully",
+        title: "Berhasil!",
+        description: "Media telah berhasil dihapus dari sistem.",
         color: "success",
+        icon: "i-lucide-circle-check",
     });
     refresh();
-};
+}
 
-const handleDeleteError = () => {
+function handleDeleteError(errorMessage: string) {
     toast.add({
-        title: "Error",
-        description: "Failed to delete article",
-        color: "error",
+        title: "Gagal menghapus media",
+        description:
+            errorMessage || "Terjadi masalah saat memproses permintaan Anda.",
+        color: "error", // Gunakan 'error' atau 'red' sesuai konfigurasi tema Nuxt UI Anda
+        icon: "i-lucide-circle-alert",
     });
-};
+}
 
-// ----------------------------------------------------
-// Konfigurasi Kolom Tabel (Dipercantik)
-// ----------------------------------------------------
-const columns: TableColumn<Article>[] = [
+const columns: TableColumn<GalleryMedia>[] = [
     {
-        id: "no", // Gunakan id alih-alih accessorKey karena datanya tidak ada di row.original
+        id: "no",
         header: "No",
         meta: {
             class: { th: "w-12 text-center", td: "text-center text-gray-500" },
         },
         cell: ({ row }) => {
-            // Asumsi items-per-page adalah 10 (sesuai dengan komponen UPagination Anda)
             const itemsPerPage = 10;
-
-            // Rumus: ((Halaman Saat Ini - 1) * Jumlah per Halaman) + Index Baris + 1
             const number = (page.value - 1) * itemsPerPage + row.index + 1;
-
             return h("span", {}, number);
         },
     },
     {
-        accessorKey: "title", // Menggunakan field title utama
-        header: "Judul Artikel",
+        id: "title",
+        header: "Judul Media",
         meta: {
-            class: { th: "min-w-[300px]" }, // Memberikan ruang lebih agar tidak terpotong
+            class: { th: "min-w-[250px]" },
         },
         cell: ({ row }) => {
+            const coverImage = coverOf(row.original);
+
             return h("div", { class: "flex items-center gap-3 py-1" }, [
-                // Placeholder gambar/thumbnail artikel
                 h(UAvatar, {
-                    src: row.original.thumbnail || "",
+                    src: coverImage,
                     icon: "i-lucide-image",
                     size: "md",
-                    alt: row.original.title_en || "Thumbnail",
-                    class: "rounded-md bg-gray-100 dark:bg-gray-800",
+                    alt: row.original.title_id || "Media Image",
+                    class: "rounded-md bg-gray-100 dark:bg-gray-800 shrink-0 object-cover",
                 }),
-                // Susunan Judul ID & EN
                 h("div", { class: "flex flex-col" }, [
                     h(
                         "span",
                         {
                             class: "font-medium text-gray-900 dark:text-white line-clamp-1",
                         },
-                        row.original.title ||
+                        row.original.title_id ||
                             row.original.title_en ||
                             "Tanpa Judul",
                     ),
@@ -241,12 +257,15 @@ const columns: TableColumn<Article>[] = [
     {
         accessorKey: "category",
         header: "Kategori",
+        meta: {
+            class: { th: "w-32" },
+        },
         cell: ({ row }) => {
             return h(
                 UBadge,
                 {
                     color: "primary",
-                    variant: "subtle", // subtle terlihat lebih modern di dalam tabel
+                    variant: "subtle",
                     class: "capitalize font-medium",
                 },
                 () => row.original.category || "Uncategorized",
@@ -254,47 +273,23 @@ const columns: TableColumn<Article>[] = [
         },
     },
     {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => {
-            const status = row.original.is_published ? "published" : "draft";
-            const colorMap: Record<string, string> = {
-                published: "success",
-                draft: "error",
-                archived: "neutral",
-            };
-
-            return h(
-                UBadge,
-                {
-                    color: colorMap[status] || "neutral",
-                    variant: "subtle",
-                    class: "capitalize",
-                    size: "sm",
-                },
-                () => status,
-            );
-        },
-    },
-    {
-        accessorKey: "created_at",
-        header: "Tanggal Dibuat",
+        id: "description",
+        header: "Deskripsi",
         meta: {
-            class: { th: "w-32" },
+            class: {
+                th: "min-w-[250px]",
+                td: "whitespace-normal break-words max-w-[400px]",
+            },
         },
         cell: ({ row }) => {
-            const dateStr = row.original.created_at;
-            const formatted = dateStr
-                ? new Date(dateStr).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                  })
-                : "-";
             return h(
-                "span",
-                { class: "text-sm text-gray-500 whitespace-nowrap" },
-                formatted,
+                "div",
+                {
+                    class: "text-gray-600 dark:text-gray-400 text-sm line-clamp-2",
+                },
+                row.original.description_id ||
+                    row.original.description_en ||
+                    "-",
             );
         },
     },
@@ -302,10 +297,7 @@ const columns: TableColumn<Article>[] = [
         id: "actions",
         header: "",
         meta: {
-            class: {
-                th: "w-16",
-                td: "text-right",
-            },
+            class: { th: "w-16", td: "text-right" },
         },
         cell: ({ row }) => {
             return h(
@@ -317,7 +309,7 @@ const columns: TableColumn<Article>[] = [
                 },
                 () =>
                     h(UButton, {
-                        icon: "i-lucide-more-vertical", // Ikon ellipsis yang konsisten dengan lucide
+                        icon: "i-lucide-more-vertical",
                         color: "neutral",
                         variant: "ghost",
                         size: "sm",
@@ -329,7 +321,7 @@ const columns: TableColumn<Article>[] = [
     },
 ];
 
-function getRowItems(row: Row<Article>) {
+function getRowItems(row: Row<GalleryMedia>) {
     return [
         [
             {
@@ -337,13 +329,13 @@ function getRowItems(row: Row<Article>) {
                 icon: "i-lucide-eye",
                 onSelect() {
                     const id = row.original.id;
-                    if (id) navigateTo(`/admin/articles/${id}`);
+                    if (id) navigateTo(`/admin/media/${id}`);
                 },
             },
         ],
         [
             {
-                label: "Copy ID Artikel",
+                label: "Copy ID Media",
                 icon: "i-lucide-copy",
                 onSelect() {
                     const id = row.original.id ? String(row.original.id) : "";
@@ -361,12 +353,12 @@ function getRowItems(row: Row<Article>) {
         ],
         [
             {
-                label: "Hapus Artikel",
+                label: "Hapus Media",
                 icon: "i-lucide-trash-2",
-                color: "error",
+                color: "error" as const,
                 onSelect() {
                     triggerDelete(row); // Menyambungkan aksi klik ke pemicu modal
-                }, // Beri warna merah untuk aksi destruktif (jika didukung)
+                },
             },
         ],
     ];

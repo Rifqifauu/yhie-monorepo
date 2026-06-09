@@ -1,18 +1,18 @@
 <template>
     <div class="space-y-6 flex flex-col h-full mx-auto w-full">
         <AdminHeader
-            title="Artikel"
-            icon="i-lucide-file-text"
-            description="Kelola artikel Anda di sini. Anda dapat membuat, mengedit, dan menghapus artikel melalui halaman ini."
+            title="Partner"
+            icon="i-lucide-stars"
+            description="Kelola partner Anda di sini. Anda dapat membuat, mengedit, dan menghapus partner melalui halaman ini."
             :showCreate="true"
-            createRoute="/admin/articles/create"
+            createRoute="/admin/partners/create"
         >
             <template #actions>
                 <div class="flex items-center gap-3">
                     <UInput
                         v-model="searchInput"
                         icon="i-lucide-search"
-                        placeholder="Cari judul atau penulis..."
+                        placeholder="Cari nama partner..."
                         size="lg"
                         class="min-w-0 sm:w-72"
                         @keyup.enter="applySearch"
@@ -23,9 +23,8 @@
                         variant="soft"
                         icon="i-lucide-rotate-cw"
                         @click="refresh"
+                        >Muat ulang</UButton
                     >
-                        Muat ulang
-                    </UButton>
                     <UButton
                         color="neutral"
                         variant="ghost"
@@ -43,7 +42,7 @@
             <div class="overflow-x-auto scrollbar-hide">
                 <div class="min-w-max">
                     <UTable
-                        :data="articles"
+                        :data="partners"
                         :columns="columns"
                         :loading="pending"
                         class="w-full min-w-max"
@@ -69,7 +68,7 @@
                 <span class="font-medium text-gray-900 dark:text-white">{{
                     totalItems
                 }}</span>
-                artikel
+                partner
             </span>
 
             <UPagination
@@ -89,7 +88,7 @@
                 class="w-12 h-12 text-gray-400 mb-4"
             />
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                Tidak ada artikel
+                Tidak ada partner
             </h3>
             <p class="text-gray-500 mt-1 max-w-sm">
                 Coba sesuaikan kata kunci pencarian atau filter yang Anda
@@ -105,17 +104,16 @@
         </div>
         <AdminDeleteModal
             v-model:open="isDeleteModalOpen"
-            :id="selectedArticle?.id"
-            :title="selectedArticle?.title"
-            endpoint="api/articles"
+            :id="selectedPartner?.id"
+            :title="selectedPartner?.title"
+            endpoint="api/partners"
             @success="handleDeleteSuccess"
             @error="handleDeleteError"
         />
     </div>
 </template>
-
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
+import { h, resolveComponent, ref } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 import { useClipboard } from "@vueuse/core";
@@ -126,14 +124,13 @@ definePageMeta({
 
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
-const UBadge = resolveComponent("UBadge");
 const UAvatar = resolveComponent("UAvatar");
 
 const toast = useToast();
 const { copy } = useClipboard();
 
 const {
-    articles,
+    partners,
     pending,
     page,
     totalItems,
@@ -144,157 +141,126 @@ const {
     applySearch,
     clearSearch,
     refresh,
-} = useArticles();
+} = usePartners();
+
+export interface Partner {
+    id?: number | string;
+    name_id: string;
+    name_en: string;
+    description_id: string;
+    description_en: string;
+    slug_id: string;
+    slug_en: string;
+    logo: string;
+}
 
 const isDeleteModalOpen = ref(false);
-const selectedArticle = ref<{ id: number | string; title: string } | null>(
+const selectedPartner = ref<{ id: number | string; title: string } | null>(
     null,
 );
 
-function triggerDelete(row: Row<Article>) {
+// Memicu modal delete terbuka dan mengikat data terpilih
+function triggerDelete(row: Row<Partner>) {
     const id = row.original.id;
-    const title =
-        row.original.title_id || row.original.title_en || "Article ini";
+    const title = row.original.name_id || row.original.name_en || "Partner ini";
 
     if (id !== undefined && id !== null) {
-        selectedArticle.value = {
-            id: id,
-            title: title,
+        selectedPartner.value = {
+            id,
+            title,
         };
         isDeleteModalOpen.value = true;
     }
 }
 
-const handleDeleteSuccess = () => {
+// Handler sukses saat item terhapus
+function handleDeleteSuccess() {
+    isDeleteModalOpen.value = false;
+    selectedPartner.value = null;
     toast.add({
-        title: "Success",
-        description: "Article deleted successfully",
+        title: "Berhasil!",
+        description: "Partner telah berhasil dihapus dari sistem.",
         color: "success",
+        icon: "i-lucide-circle-check",
     });
-    refresh();
-};
+    refresh(); // Muat ulang data tabel
+}
 
-const handleDeleteError = () => {
+// Handler error menerima lemparan string pesan dari modal
+function handleDeleteError(errorMessage: string) {
     toast.add({
-        title: "Error",
-        description: "Failed to delete article",
-        color: "error",
+        title: "Gagal menghapus partner!",
+        description: errorMessage || "Terjadi kesalahan pada sistem.",
+        color: "error", // Sesuaikan dengan konfigurasi warna Nuxt UI Anda ('error' atau 'red')
+        icon: "i-lucide-circle-alert",
     });
-};
+}
 
-// ----------------------------------------------------
-// Konfigurasi Kolom Tabel (Dipercantik)
-// ----------------------------------------------------
-const columns: TableColumn<Article>[] = [
+const columns: TableColumn<Partner>[] = [
     {
-        id: "no", // Gunakan id alih-alih accessorKey karena datanya tidak ada di row.original
+        id: "no",
         header: "No",
         meta: {
             class: { th: "w-12 text-center", td: "text-center text-gray-500" },
         },
         cell: ({ row }) => {
-            // Asumsi items-per-page adalah 10 (sesuai dengan komponen UPagination Anda)
             const itemsPerPage = 10;
-
-            // Rumus: ((Halaman Saat Ini - 1) * Jumlah per Halaman) + Index Baris + 1
             const number = (page.value - 1) * itemsPerPage + row.index + 1;
-
             return h("span", {}, number);
         },
     },
     {
-        accessorKey: "title", // Menggunakan field title utama
-        header: "Judul Artikel",
+        id: "name",
+        header: "Nama Partner",
         meta: {
-            class: { th: "min-w-[300px]" }, // Memberikan ruang lebih agar tidak terpotong
+            class: { th: "min-w-[250px]" },
         },
         cell: ({ row }) => {
             return h("div", { class: "flex items-center gap-3 py-1" }, [
-                // Placeholder gambar/thumbnail artikel
                 h(UAvatar, {
-                    src: row.original.thumbnail || "",
+                    src: row.original.logo || "",
                     icon: "i-lucide-image",
                     size: "md",
-                    alt: row.original.title_en || "Thumbnail",
-                    class: "rounded-md bg-gray-100 dark:bg-gray-800",
+                    alt: row.original.name_id || "Logo",
+                    class: "rounded-md bg-gray-100 dark:bg-gray-800 shrink-0",
                 }),
-                // Susunan Judul ID & EN
                 h("div", { class: "flex flex-col" }, [
                     h(
                         "span",
                         {
                             class: "font-medium text-gray-900 dark:text-white line-clamp-1",
                         },
-                        row.original.title ||
-                            row.original.title_en ||
-                            "Tanpa Judul",
+                        row.original.name_id ||
+                            row.original.name_en ||
+                            "Tanpa Nama",
                     ),
                     h(
                         "span",
                         { class: "text-xs text-gray-500 line-clamp-1 mt-0.5" },
-                        row.original.title_en || "No English Title",
+                        row.original.name_en || "No English Name",
                     ),
                 ]),
             ]);
         },
     },
     {
-        accessorKey: "category",
-        header: "Kategori",
-        cell: ({ row }) => {
-            return h(
-                UBadge,
-                {
-                    color: "primary",
-                    variant: "subtle", // subtle terlihat lebih modern di dalam tabel
-                    class: "capitalize font-medium",
-                },
-                () => row.original.category || "Uncategorized",
-            );
-        },
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => {
-            const status = row.original.is_published ? "published" : "draft";
-            const colorMap: Record<string, string> = {
-                published: "success",
-                draft: "error",
-                archived: "neutral",
-            };
-
-            return h(
-                UBadge,
-                {
-                    color: colorMap[status] || "neutral",
-                    variant: "subtle",
-                    class: "capitalize",
-                    size: "sm",
-                },
-                () => status,
-            );
-        },
-    },
-    {
-        accessorKey: "created_at",
-        header: "Tanggal Dibuat",
+        id: "description",
+        header: "Deskripsi",
         meta: {
-            class: { th: "w-32" },
+            class: {
+                th: "min-w-[300px]",
+                td: "whitespace-normal break-words max-w-[400px]",
+            },
         },
         cell: ({ row }) => {
-            const dateStr = row.original.created_at;
-            const formatted = dateStr
-                ? new Date(dateStr).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                  })
-                : "-";
             return h(
-                "span",
-                { class: "text-sm text-gray-500 whitespace-nowrap" },
-                formatted,
+                "div",
+                {
+                    class: "text-gray-600 dark:text-gray-400 text-sm line-clamp-2",
+                },
+                row.original.description_id ||
+                    row.original.description_en ||
+                    "-",
             );
         },
     },
@@ -302,10 +268,7 @@ const columns: TableColumn<Article>[] = [
         id: "actions",
         header: "",
         meta: {
-            class: {
-                th: "w-16",
-                td: "text-right",
-            },
+            class: { th: "w-16", td: "text-right" },
         },
         cell: ({ row }) => {
             return h(
@@ -317,7 +280,7 @@ const columns: TableColumn<Article>[] = [
                 },
                 () =>
                     h(UButton, {
-                        icon: "i-lucide-more-vertical", // Ikon ellipsis yang konsisten dengan lucide
+                        icon: "i-lucide-more-vertical",
                         color: "neutral",
                         variant: "ghost",
                         size: "sm",
@@ -329,7 +292,7 @@ const columns: TableColumn<Article>[] = [
     },
 ];
 
-function getRowItems(row: Row<Article>) {
+function getRowItems(row: Row<Partner>) {
     return [
         [
             {
@@ -337,13 +300,15 @@ function getRowItems(row: Row<Article>) {
                 icon: "i-lucide-eye",
                 onSelect() {
                     const id = row.original.id;
-                    if (id) navigateTo(`/admin/articles/${id}`);
+                    if (id) {
+                        navigateTo(`/admin/partners/${id}`); // Sesuaikan jika ada sub-route detail
+                    }
                 },
             },
         ],
         [
             {
-                label: "Copy ID Artikel",
+                label: "Copy ID Partner",
                 icon: "i-lucide-copy",
                 onSelect() {
                     const id = row.original.id ? String(row.original.id) : "";
@@ -361,12 +326,12 @@ function getRowItems(row: Row<Article>) {
         ],
         [
             {
-                label: "Hapus Artikel",
+                label: "Hapus Partner",
                 icon: "i-lucide-trash-2",
-                color: "error",
+                color: "error" as const,
                 onSelect() {
-                    triggerDelete(row); // Menyambungkan aksi klik ke pemicu modal
-                }, // Beri warna merah untuk aksi destruktif (jika didukung)
+                    triggerDelete(row); // Menghubungkan dropdown hapus ke pemicu modal
+                },
             },
         ],
     ];
