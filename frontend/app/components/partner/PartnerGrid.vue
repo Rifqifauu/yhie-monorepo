@@ -13,14 +13,14 @@
         <UAlert
             v-else-if="error"
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             :title="locale === 'en' ? 'Failed to load partners' : 'Gagal memuat data partner'"
             :description="locale === 'en' ? 'Please try again later.' : 'Silakan coba lagi beberapa saat.'"
             class="max-w-xl mx-auto"
         >
             <template #actions>
-                <UButton size="sm" color="red" @click="$emit('retry')">
+                <UButton size="sm" color="error" @click="$emit('retry')">
                     {{ locale === 'en' ? 'Retry' : 'Coba lagi' }}
                 </UButton>
             </template>

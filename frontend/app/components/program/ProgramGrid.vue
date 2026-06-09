@@ -16,14 +16,14 @@
         <UAlert
             v-else-if="error"
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             title="Gagal memuat program"
             description="Silakan coba lagi beberapa saat."
             class="max-w-xl mx-auto"
         >
             <template #actions>
-                <UButton size="sm" color="red" @click="$emit('retry')">
+                <UButton size="sm" color="error" @click="$emit('retry')">
                     Coba lagi
                 </UButton>
             </template>

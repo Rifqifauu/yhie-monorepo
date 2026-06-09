@@ -1,4 +1,6 @@
-<template></template>
-<script>
-const data =
+<template>
+  <div>Users Table</div>
+</template>
+<script setup lang="ts">
+//
 </script>
