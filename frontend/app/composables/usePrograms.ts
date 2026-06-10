@@ -169,6 +169,20 @@ export const usePrograms = () => {
       () => client(`/api/programs/${slug}`),
     );
   };
+  const createProgram = async (payload: FormData | Record<string, any>) => {
+    isSubmitting.value = true;
+    try {
+      const response = await client(`/api/programs`, {
+        method: "POST",
+        body: payload,
+      });
+      return { success: true, data: response };
+    } catch (err: any) {
+      return { success: false, error: err.data?.message || err.message };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
 
   const updateProgram = async (
     id: number | string,
@@ -223,5 +237,6 @@ export const usePrograms = () => {
     refresh,
     updateProgram,
     fetchDetail,
+    createProgram,
   };
 };

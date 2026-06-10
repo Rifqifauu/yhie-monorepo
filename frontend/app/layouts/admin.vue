@@ -87,12 +87,19 @@
 </template>
 
 <script setup lang="ts">
-// Hapus import { ref } dari 'vue' jika menggunakan useState Nuxt
-
+const route = useRoute();
 const isMobileSidebarOpen = useState("mobileSidebar", () => false);
-
-// Gunakan useState Nuxt agar state ini terbaca juga di AdminSidebar.vue
 const isDesktopSidebarOpen = useState("desktopSidebar", () => true);
+useHead({
+    titleTemplate: (titleChunk) => {
+        const path = route.path.split("/");
+        const segment = path[2]
+            ? path[2].charAt(0).toUpperCase() + path[2].slice(1)
+            : "Dashboard";
+
+        return `Admin YHIE - ${segment}`;
+    },
+});
 </script>
 
 <style scoped>

@@ -151,6 +151,32 @@ export const usePartners = () => {
       () => client(`/api/partners/${id}`),
     );
   };
+  const createPartner = async (payload: FormData | Record<string, any>) => {
+    isSubmitting.value = true;
+    try {
+      let body = payload;
+      if (payload instanceof FormData) {
+        body = payload;
+      } else {
+        body = JSON.stringify(payload);
+      }
+
+      const response = await client(`/api/partners`, {
+        method: "POST",
+        body: body,
+      });
+
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || err.message || "Gagal membuat data partner.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
 
   const updatePartner = async (
     id: number | string,
@@ -204,12 +230,12 @@ export const usePartners = () => {
     slugOf,
     imageUrl,
 
-    // Actions
     applySearch,
     clearSearch,
     changePage,
     refresh,
     fetchDetail, // Aksi baru untuk mengambil detail
     updatePartner, // Aksi baru untuk memicu request PUT/POST Spoofing ke API
+    createPartner,
   };
 };

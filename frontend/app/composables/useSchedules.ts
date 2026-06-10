@@ -1,3 +1,5 @@
+import { is } from "@nuxt/ui/runtime/locale/index.js";
+
 export interface Schedule {
   id: number | string;
   title_id: string;
@@ -31,6 +33,7 @@ export const useSchedules = () => {
   const search = ref("");
 
   const searchTerm = computed(() => search.value.trim());
+  const isSubmitting = ref(false);
 
   // Fetching Data
   const {
@@ -124,6 +127,61 @@ export const useSchedules = () => {
     }
   };
 
+  const fetchDetail = async (id: string) => {
+    return await useAsyncData<SingleApiResponse<Schedule>>(
+      `schedule-detail-${id}`,
+      () => client(`/api/schedules/${id}`),
+    );
+  };
+
+  const createSchedule = async (payload: FormData | Record<string, any>) => {
+    isSubmitting.value = true;
+    try {
+      const response = await client(`/api/schedules`, {
+        method: "POST",
+        body: payload,
+      });
+
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || err.message || "Gagal membuat data program.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
+  const updateSchedule = async (
+    id: number | string,
+    payload: FormData | Record<string, any>,
+  ) => {
+    isSubmitting.value = true;
+    try {
+      let body = payload;
+      if (payload instanceof FormData && !payload.has("_method")) {
+        payload.append("_method", "PUT");
+      }
+
+      const response = await client(`/api/schedules/${id}`, {
+        method: payload instanceof FormData ? "POST" : "PUT",
+        body: body,
+      });
+
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || err.message || "Gagal memperbarui data program.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   return {
     // State & Computed
     page,
@@ -147,5 +205,9 @@ export const useSchedules = () => {
     clearSearch,
     changePage,
     refresh,
+    isSubmitting,
+    fetchDetail,
+    updateSchedule,
+    createSchedule,
   };
 };

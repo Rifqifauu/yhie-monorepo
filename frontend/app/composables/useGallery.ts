@@ -203,6 +203,25 @@ export const useGallery = () => {
     }
   };
 
+  const createMedia = async (formData: FormData) => {
+    isSubmitting.value = true;
+    try {
+      const response = await client("/api/media", {
+        method: "POST",
+        body: formData,
+      });
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || "Terjadi kesalahan saat menyimpan media baru.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   const updateMedia = async (id: string | number, formData: FormData) => {
     isSubmitting.value = true;
 
@@ -252,5 +271,6 @@ export const useGallery = () => {
     fetchDetail,
     storeMedia,
     updateMedia,
+    createMedia,
   };
 };

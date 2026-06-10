@@ -1,5 +1,4 @@
 export default defineNuxtConfig({
-  // Menonaktifkan SSR secara global sesuai kebutuhan arsitektur SPA kamu
   ssr: false,
 
   compatibilityDate: "2025-07-15",
@@ -24,19 +23,36 @@ export default defineNuxtConfig({
     strategy: "prefix_except_default",
   },
 
-  // File CSS Global (Tailwind / Custom CSS)
   css: ["~/assets/css/main.css"],
 
   // Pengaturan Dasar Utama Modul Nuxt Sanctum
   sanctum: {
-    baseUrl: "https://api.sertifikasihafizh.xyz", // Domain API Utama (Fallback)
-    mode: "cookie", // 'cookie' untuk SPA + Sanctum bawaan, atau 'token' jika menggunakan API Token
-    ssr: false,
+    // Menyesuaikan dengan host lokal kamu saat development
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "https://local.sertifikasihafizh.xyz:3000"
+        : "https://sertifikasihafizh.xyz",
+    baseUrl: "https://api.sertifikasihafizh.xyz",
+    mode: "cookie",
+    redirectIfUnauthenticated: true,
     redirect: {
       keepRequestedRoute: true,
-      onLogin: "/admin/dashboard", // Rute setelah sukses login
-      onLogout: "/login", // Rute setelah sukses logout
-      onAuthOnly: "/login", // Rute jika user tidak terautentikasi (Middleware)
+      onLogin: "/admin/dashboard",
+      onLogout: "/login",
+      onAuthOnly: "/login",
+      onGuestOnly: "/",
+    },
+  },
+
+  // ✨ INI BAGIAN PALING PENTING ✨
+  // Menyalin trik Proxy dari project yang works
+  routeRules: {
+    "/sanctum/**": {
+      proxy: "https://api.sertifikasihafizh.xyz/sanctum/**",
+    },
+    "/api/**": {
+      proxy: "https://api.sertifikasihafizh.xyz/api/**",
+      cors: true,
     },
   },
 
@@ -46,9 +62,11 @@ export default defineNuxtConfig({
   $development: {
     devtools: { enabled: true },
 
-    sanctum: {
-      // Dipastikan konsisten menembak langsung ke server API agar useSanctumClient() tidak bingung
-      baseUrl: "https://api.sertifikasihafizh.xyz",
+    // Agar tidak perlu ngetik --host dan --https lagi
+    devServer: {
+      host: "local.sertifikasihafizh.xyz",
+      port: 3000, // Pastikan port ini kosong di Mac kamu
+      https: true,
     },
 
     runtimeConfig: {
@@ -62,11 +80,7 @@ export default defineNuxtConfig({
   // CONFIG ENVIROMENT: PRODUCTION (Build & Generate)
   // ==========================================
   $production: {
-    devtools: { enabled: false }, // Dimatikan demi performa & keamanan di server produksi
-
-    sanctum: {
-      baseUrl: "https://api.sertifikasihafizh.xyz",
-    },
+    devtools: { enabled: false },
 
     runtimeConfig: {
       public: {

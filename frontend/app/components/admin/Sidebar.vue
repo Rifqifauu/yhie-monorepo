@@ -144,6 +144,11 @@ const navigation = [
         icon: "i-lucide-users",
         badge: "New",
     },
+    {
+        label: "Registrations",
+        to: "/admin/registrations",
+        icon: "i-lucide-folders",
+    },
     { label: "Programs", to: "/admin/programs", icon: "i-lucide-book" },
     { label: "Articles", to: "/admin/articles", icon: "i-lucide-file-text" },
     { label: "Media", to: "/admin/media", icon: "i-lucide-image" },
