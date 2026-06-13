@@ -42,11 +42,13 @@ class DashboardController extends Controller
             );
         }
         return response()->json([
-            "registrations" => $registrations,
-            "articles" => $articles,
-            "pendingTransaction" => $pendingTransaction,
-            "successTransaction" => $successTransaction,
-            "upcomingSchedule" => $upcomingSchedule,
+            'pendingRegistrations' => $pendingRegistrations,
+            'approvedRegistration' => $approvedRegistration,
+            'rejectedRegistration' => $rejectedRegistration,
+            'articles' => $articles,
+            'pendingTransaction' => $pendingTransaction,
+            'totalRevenue' => $totalRevenue,
+            'upcomingSchedule' => $upcomingSchedule,
         ]);
     }
 }
