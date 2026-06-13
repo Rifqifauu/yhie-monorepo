@@ -29,26 +29,42 @@
                 Gagal memuat data partner.
             </div>
 
-            <!-- Logo grid -->
+            <!-- Logo marquee (running from right to left) -->
             <div
                 v-else-if="partners.length > 0"
-                class="flex flex-wrap justify-center items-center gap-4 md:gap-6"
+                class="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] [-webkit-mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
             >
-                <NuxtLink
-                    v-for="(partner, index) in partners"
-                    :key="partner.id"
-                    :to="localePath('/partner')"
-                    data-aos="fade-up"
-                    :data-aos-delay="index * 60"
-                    class="group flex items-center justify-center h-16 px-6 min-w-[120px] rounded-2xl border border-slate-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-emerald-900/30 hover:shadow-md transition-all duration-300"
-                >
-                    <img
-                        :src="getImageUrl(partner.logo)"
-                        :alt="locale === 'id' ? partner.name_id : partner.name_en"
-                        class="h-9 max-w-[100px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-400"
-                        @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
-                    />
-                </NuxtLink>
+                <div class="flex animate-marquee py-4 gap-0">
+                    <!-- First set of logos -->
+                    <NuxtLink
+                        v-for="partner in partners"
+                        :key="partner.id"
+                        :to="localePath('/partner')"
+                        class="group flex items-center justify-center h-16 px-6 min-w-[140px] mx-2 md:mx-3 rounded-2xl border border-slate-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-emerald-900/30 hover:shadow-md transition-all duration-300 shrink-0"
+                    >
+                        <img
+                            :src="getImageUrl(partner.logo)"
+                            :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                            class="h-9 max-w-[100px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-400"
+                            @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                        />
+                    </NuxtLink>
+                    <!-- Duplicate set of logos for seamless loop -->
+                    <NuxtLink
+                        v-for="partner in partners"
+                        :key="'dup-' + partner.id"
+                        :to="localePath('/partner')"
+                        class="group flex items-center justify-center h-16 px-6 min-w-[140px] mx-2 md:mx-3 rounded-2xl border border-slate-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-emerald-900/30 hover:shadow-md transition-all duration-300 shrink-0"
+                        aria-hidden="true"
+                    >
+                        <img
+                            :src="getImageUrl(partner.logo)"
+                            :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                            class="h-9 max-w-[100px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-400"
+                            @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                        />
+                    </NuxtLink>
+                </div>
             </div>
 
             <!-- Empty -->
@@ -101,3 +117,24 @@ const getImageUrl = (path: string | null | undefined) => {
     return `${backendUrl}/${cleanPath}`
 }
 </script>
+
+<style scoped>
+@keyframes marquee {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.animate-marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+    animation-play-state: paused;
+}
+</style>
