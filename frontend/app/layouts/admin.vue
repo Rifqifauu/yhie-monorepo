@@ -90,6 +90,7 @@
 const route = useRoute();
 const isMobileSidebarOpen = useState("mobileSidebar", () => false);
 const isDesktopSidebarOpen = useState("desktopSidebar", () => true);
+
 useHead({
     titleTemplate: (titleChunk) => {
         const path = route.path.split("/");

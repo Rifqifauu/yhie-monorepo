@@ -37,10 +37,10 @@ export default defineNuxtConfig({
     redirectIfUnauthenticated: true,
     redirect: {
       keepRequestedRoute: true,
-      onLogin: "/admin/dashboard",
+      onLogin: "/admin",
       onLogout: "/login",
       onAuthOnly: "/login",
-      onGuestOnly: "/",
+      onGuestOnly: "/admin",
     },
   },
 

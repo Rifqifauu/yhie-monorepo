@@ -9,12 +9,6 @@ use Illuminate\Support\Facades\Log;
 
 class ProgramRegistrationController extends Controller
 {
-    // ── PUBLIC ────────────────────────────────────────────────────────────────
-
-    /**
-     * POST /api/program-registrations
-     * Public endpoint — tidak memerlukan auth.
-     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -52,12 +46,6 @@ class ProgramRegistrationController extends Controller
         }
     }
 
-    // ── ADMIN ─────────────────────────────────────────────────────────────────
-
-    /**
-     * GET /api/program-registrations
-     * Daftar semua pendaftaran (paginated, searchable).
-     */
     public function index(Request $request): JsonResponse
     {
         $search = $request->query("search");
@@ -92,9 +80,6 @@ class ProgramRegistrationController extends Controller
         }
     }
 
-    /**
-     * GET /api/program-registrations/{registration}
-     */
     public function show(ProgramRegistration $programRegistration): JsonResponse
     {
         return response()->json(
@@ -106,9 +91,6 @@ class ProgramRegistrationController extends Controller
         );
     }
 
-    /**
-     * PUT /api/program-registrations/{registration}
-     */
     public function update(
         Request $request,
         ProgramRegistration $programRegistration,

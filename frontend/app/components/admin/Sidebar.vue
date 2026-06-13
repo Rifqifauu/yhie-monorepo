@@ -2,7 +2,6 @@
     <aside
         class="flex h-full w-full flex-col border-r border-slate-200 bg-white transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950"
     >
-        <!-- Header & Toggle Button -->
         <div
             class="flex items-center border-b border-slate-100 py-5 transition-all duration-300 dark:border-slate-800"
             :class="isOpen ? 'justify-between px-6' : 'justify-center px-4'"
@@ -94,27 +93,59 @@
                 </nav>
             </div>
         </div>
-
-        <!-- Footer / Logout -->
-        <div class="border-t border-slate-100 p-4 dark:border-slate-800">
+        <div class="border-t border-slate-200 p-4 dark:border-slate-800">
             <button
-                class="group flex w-full items-center rounded-lg py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-                :class="isOpen ? 'gap-3 px-3' : 'justify-center px-0'"
-                :title="!isOpen ? 'Logout' : ''"
+                @click="openLogoutModal"
+                class="group flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
             >
+                <span>Logout</span>
                 <UIcon
                     name="i-lucide-log-out"
-                    class="h-5 w-5 shrink-0 text-slate-400 group-hover:text-red-500 dark:text-slate-500 dark:group-hover:text-red-400"
+                    class="h-4 w-4 text-slate-400 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-red-600 dark:text-slate-500 dark:group-hover:text-red-400"
                 />
-                <span v-if="isOpen" class="truncate">Logout</span>
             </button>
         </div>
     </aside>
+    <UModal v-model:open="openModal">
+        <template #content>
+            <div class="p-6 space-y-6">
+                <div class="space-y-1">
+                    <h3
+                        class="text-lg font-semibold text-gray-950 dark:text-white"
+                    >
+                        Konfirmasi Logout
+                    </h3>
+                    <p class="text-sm text-gray-500">
+                        Apakah Anda yakin ingin logout?
+                    </p>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <UButton
+                        label="Batal"
+                        color="neutral"
+                        variant="ghost"
+                        @click="openModal = false"
+                    />
+                    <UButton
+                        label="Logout"
+                        color="error"
+                        :loading="loading"
+                        @click="handleLogout"
+                    />
+                </div>
+            </div>
+        </template>
+    </UModal>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+const { logout } = useSanctumAuth();
+const openModal = ref(false);
+const loading = ref(false);
+const toast = useToast();
 
 const props = defineProps({
     isMobile: {
@@ -129,6 +160,9 @@ const isDesktopSidebarOpen = useState("desktopSidebar", () => true);
 const isOpen = computed(() =>
     props.isMobile ? true : isDesktopSidebarOpen.value,
 );
+const openLogoutModal = () => {
+    openModal.value = true;
+};
 
 const toggleSidebar = () => {
     if (!props.isMobile) {
@@ -162,5 +196,17 @@ const isActive = (path: string) => {
         return route.path === path;
     }
     return route.path.startsWith(path);
+};
+const handleLogout = async () => {
+    try {
+        loading.value = true;
+        await logout();
+    } catch (error) {
+        toast.add({
+            title: "Error",
+            description: "Failed to logout. " + error,
+            color: "error",
+        });
+    }
 };
 </script>

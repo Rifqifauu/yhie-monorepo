@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@tiptap/starter-kit": "^3.26.0"
+  }
+}
