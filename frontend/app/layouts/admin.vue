@@ -1,16 +1,14 @@
 <template>
     <div
-        class="flex h-screen w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"
+        class="flex h-screen w-full overflow-hidden text-slate-900 dark:bg-slate-950 dark:text-slate-100"
     >
         <aside
-            class="relative z-20 hidden h-full shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out lg:block"
-            :class="isDesktopSidebarOpen ? 'w-[260px]' : 'w-0'"
+            class="relative z-20 hidden h-full shrink-0 transition-[width] duration-300 ease-in-out lg:block"
+            :class="isDesktopSidebarOpen ? 'w-[260px]' : 'w-20'"
         >
             <div
-                class="flex h-full w-[260px] flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out dark:border-slate-800 dark:bg-slate-900"
-                :class="
-                    isDesktopSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                "
+                class="absolute inset-y-0 left-0 flex h-full flex-col bg-white shadow-xl transition-[width] duration-300 ease-in-out dark:bg-slate-900 dark:shadow-slate-950/50"
+                :class="isDesktopSidebarOpen ? 'w-[260px]' : 'w-20'"
             >
                 <AdminSidebar
                     class="scrollbar-hide h-full w-full flex-1 overflow-y-auto overflow-x-hidden"
@@ -18,9 +16,11 @@
             </div>
         </aside>
 
-        <div class="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
+        <div
+            class="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-slate-400/30 shadow-inner dark:bg-slate-950/50"
+        >
             <header
-                class="z-10 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 lg:hidden"
+                class="z-20 flex h-16 shrink-0 items-center justify-between bg-white px-4 shadow-sm dark:bg-slate-900 lg:hidden"
             >
                 <div class="flex items-center gap-3">
                     <div
@@ -58,7 +58,7 @@
             >
                 <template #content>
                     <div
-                        class="relative flex h-full w-full max-w-[260px] flex-col bg-white shadow-xl dark:bg-slate-900"
+                        class="relative flex h-full w-full max-w-[260px] flex-col bg-white shadow-2xl dark:bg-slate-900"
                     >
                         <UButton
                             color="gray"
@@ -69,6 +69,7 @@
                         />
                         <AdminSidebar
                             class="scrollbar-hide flex-1 overflow-y-auto"
+                            is-mobile
                         />
                     </div>
                 </template>
@@ -86,20 +87,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+const route = useRoute();
+const isMobileSidebarOpen = useState("mobileSidebar", () => false);
+const isDesktopSidebarOpen = useState("desktopSidebar", () => true);
 
-const isMobileSidebarOpen = ref(false);
-const isDesktopSidebarOpen = ref(true);
+useHead({
+    titleTemplate: (titleChunk) => {
+        const path = route.path.split("/");
+        const segment = path[2]
+            ? path[2].charAt(0).toUpperCase() + path[2].slice(1)
+            : "Dashboard";
+
+        return `Admin YHIE - ${segment}`;
+    },
+});
 </script>
 
 <style scoped>
-/* Opsional: Menyembunyikan garis scrollbar pada sidebar secara visual,
-   tapi tetap bisa di-scroll menggunakan mouse wheel/trackpad jika menu terlalu banyak */
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
 .scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 </style>

@@ -37,7 +37,7 @@
                         {{ locale === 'en' ? 'Quick Links' : 'Tautan Cepat' }}
                     </h4>
                     <ul class="space-y-2.5 text-sm">
-                        <li v-for="(item, index) in menuItems" :key="index">
+                        <li v-for="(item, index) in tm('nav.menu')" :key="index">
                             <NuxtLink
                                 :to="localePath(rt(item.path))"
                                 class="text-slate-600 dark:text-emerald-100/70 hover:text-emerald-600 dark:hover:text-amber-400 transition-colors flex items-center gap-2 group"
@@ -114,20 +114,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { useSettings } from "~/composables/useSettings";
-
-interface MenuItem {
-    name: string;
-    path: string;
-}
 
 const { locale, tm, rt } = useI18n();
 const localePath = useLocalePath();
-
-const menuItems = computed<MenuItem[]>(() => {
-    return (tm("nav.menu") || []) as unknown as MenuItem[];
-});
 
 const { siteName, siteDescription, contactEmail, contactPhone, waLink } = useSettings();
 </script>

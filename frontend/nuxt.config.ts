@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "nuxt-auth-sanctum",
   ],
 
+  // Konfigurasi Lokalisasi Bahasa (i18n)
   i18n: {
     lazy: true,
     langDir: "locales/",
@@ -24,41 +25,62 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
-  // Pengaturan dasar Sanctum (yang tidak berubah antar environment)
+  // Pengaturan Dasar Utama Modul Nuxt Sanctum
   sanctum: {
-    ssr: false,
+    // Menyesuaikan dengan host lokal kamu saat development
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "https://local.sertifikasihafizh.xyz:3000"
+        : "https://sertifikasihafizh.xyz",
+    baseUrl: "https://api.sertifikasihafizh.xyz",
+    mode: "cookie",
+    redirectIfUnauthenticated: true,
+    redirect: {
+      keepRequestedRoute: true,
+      onLogin: "/admin",
+      onLogout: "/login",
+      onAuthOnly: "/login",
+      onGuestOnly: "/admin",
+    },
+  },
+
+  // ✨ INI BAGIAN PALING PENTING ✨
+  // Menyalin trik Proxy dari project yang works
+  routeRules: {
+    "/sanctum/**": {
+      proxy: "https://api.sertifikasihafizh.xyz/sanctum/**",
+    },
+    "/api/**": {
+      proxy: "https://api.sertifikasihafizh.xyz/api/**",
+      cors: true,
+    },
   },
 
   // ==========================================
-  // KHUSUS DEVELOPMENT (Lokal / npm run dev)
+  // CONFIG ENVIROMENT: DEVELOPMENT (npm run dev)
   // ==========================================
   $development: {
     devtools: { enabled: true },
 
-    routeRules: {
-      "/sanctum/**": { proxy: "https://api.sertifikasihafizh.xyz/sanctum/**" },
-      "/api/**": { proxy: "https://api.sertifikasihafizh.xyz/api/**" },
-    },
-
-    sanctum: {
-      baseUrl: "http://localhost:3000",
+    // Agar tidak perlu ngetik --host dan --https lagi
+    devServer: {
+      host: "local.sertifikasihafizh.xyz",
+      port: 3000, // Pastikan port ini kosong di Mac kamu
+      https: true,
     },
 
     runtimeConfig: {
       public: {
-        apiBase: "http://localhost:3000/api",
+        apiBase: "https://api.sertifikasihafizh.xyz/api",
       },
     },
   },
+
   // ==========================================
-  // KHUSUS PRODUCTION (Server / npx nuxi generate)
+  // CONFIG ENVIROMENT: PRODUCTION (Build & Generate)
   // ==========================================
   $production: {
-    devtools: { enabled: false }, // Dimatikan demi performa & keamanan di production
-
-    sanctum: {
-      baseUrl: "https://api.sertifikasihafizh.xyz",
-    },
+    devtools: { enabled: false },
 
     runtimeConfig: {
       public: {

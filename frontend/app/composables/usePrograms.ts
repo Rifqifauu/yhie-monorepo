@@ -1,3 +1,5 @@
+import { ref, reactive, computed } from "vue";
+
 // 1. Definisikan Interface
 export interface Program {
   id?: number | string;
@@ -5,11 +7,11 @@ export interface Program {
   title_id: string;
   description_en: string;
   description_id: string;
+  image_path?: string;
   slug_en: string;
   slug_id: string;
   price_en?: number | string;
   price_id?: number | string;
-  // Tambahkan properti lain yang relevan seperti image, category, dll.
   [key: string]: any;
 }
 
@@ -26,19 +28,23 @@ export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
 }
 
+// Interface tambahan untuk respons detail tunggal (Diperbaiki ke tipe generik T)
+export interface SingleApiResponse<T> {
+  data: T;
+}
+
 export const usePrograms = () => {
   const config = useRuntimeConfig();
   const { locale } = useI18n();
   const client = useSanctumClient();
 
-  // State
   const page = ref(1);
   const searchInput = ref("");
   const search = ref("");
 
   const searchTerm = computed(() => search.value.trim());
+  const isSubmitting = ref(false);
 
-  // Fetching Data
   const {
     data: apiResponse,
     status,
@@ -90,7 +96,6 @@ export const usePrograms = () => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
 
-    // Mencegah double slash
     const base = backendUrl.endsWith("/")
       ? backendUrl.slice(0, -1)
       : backendUrl;
@@ -101,7 +106,7 @@ export const usePrograms = () => {
 
   // Price formatting
   const formatPrice = (price?: number | string): string => {
-    if (price === null || price === undefined)
+    if (price === null || price === undefined || price === "")
       return locale.value === "en" ? "Free" : "Gratis";
 
     const numericPrice = typeof price === "string" ? parseFloat(price) : price;
@@ -158,14 +163,59 @@ export const usePrograms = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+  const fetchDetail = async (slug: string) => {
+    return await useAsyncData<SingleApiResponse<Program>>(
+      `program-detail-${slug}`,
+      () => client(`/api/programs/${slug}`),
+    );
+  };
+  const createProgram = async (payload: FormData | Record<string, any>) => {
+    isSubmitting.value = true;
+    try {
+      const response = await client(`/api/programs`, {
+        method: "POST",
+        body: payload,
+      });
+      return { success: true, data: response };
+    } catch (err: any) {
+      return { success: false, error: err.data?.message || err.message };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
+  const updateProgram = async (
+    id: number | string,
+    payload: FormData | Record<string, any>,
+  ) => {
+    isSubmitting.value = true;
+    try {
+      let body = payload;
+      if (payload instanceof FormData && !payload.has("_method")) {
+        payload.append("_method", "PUT");
+      }
+
+      const response = await client(`/api/programs/${id}`, {
+        method: payload instanceof FormData ? "POST" : "PUT",
+        body: body,
+      });
+
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || err.message || "Gagal memperbarui data program.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
 
   return {
-    // State
     page,
     searchInput,
     searchTerm,
-
-    // Data
     programs,
     totalPages,
     totalItems,
@@ -174,18 +224,19 @@ export const usePrograms = () => {
     pending,
     error,
     pageItems,
-
-    // Helpers
     titleOf,
     descOf,
     slugOf,
     priceOf,
     imageUrl,
     formatPrice,
-
+    isSubmitting,
     applySearch,
     clearSearch,
     changePage,
     refresh,
+    updateProgram,
+    fetchDetail,
+    createProgram,
   };
 };

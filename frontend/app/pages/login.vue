@@ -58,6 +58,7 @@ import { ref } from "vue";
 
 definePageMeta({
     layout: false,
+    middleware: ["sanctum:guest"],
 });
 
 const { login } = useSanctumAuth();

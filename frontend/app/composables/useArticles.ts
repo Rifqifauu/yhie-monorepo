@@ -1,3 +1,5 @@
+import type { is } from "@nuxt/ui/runtime/locale/index.js";
+
 // 1. Definisikan Interface untuk Type Safety
 export interface Article {
   title_en: string;
@@ -7,6 +9,7 @@ export interface Article {
   slug_en: string;
   slug_id: string;
   image?: string | any[] | { path?: string; [key: string]: any } | any;
+  is_published: boolean;
   [key: string]: any; // Fallback untuk properti tambahan dari backend
 }
 
@@ -34,6 +37,8 @@ export const useArticles = () => {
   const category = ref("");
 
   const searchTerm = computed(() => search.value.trim());
+
+  const isSubmitting = ref(false);
 
   watch([category, search], () => {
     page.value = 1;
@@ -69,6 +74,17 @@ export const useArticles = () => {
   const toItem = computed<number>(() => paginator.value.to ?? 0);
   const pending = computed<boolean>(() => status.value === "pending");
 
+  const imageUrl = (path?: string): string => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+
+    const base = backendUrl.endsWith("/")
+      ? backendUrl.slice(0, -1)
+      : backendUrl;
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
+    return `${base}${cleanPath}`;
+  };
   // Helper Functions (Localization)
   const titleOf = (article: Article): string =>
     locale.value === "en" ? article.title_en : article.title_id;
@@ -164,6 +180,58 @@ export const useArticles = () => {
     }
   };
 
+  const fetchDetail = async (slug: string) => {
+    return await useAsyncData<SingleApiResponse<Article>>(
+      `article-detail-${slug}`,
+      () => client(`/api/articles/${slug}`),
+    );
+  };
+  const createArticle = async (payload: FormData | Record<string, any>) => {
+    isSubmitting.value = true;
+    try {
+      const response = await client("/api/articles", {
+        method: "POST",
+        body: payload,
+      });
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || "Terjadi kesalahan saat menyimpan artikel baru.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
+  const updateArticle = async (
+    id: number | string,
+    payload: FormData | Record<string, any>,
+  ) => {
+    isSubmitting.value = true;
+    try {
+      let body = payload;
+      if (payload instanceof FormData && !payload.has("_method")) {
+        payload.append("_method", "PUT");
+      }
+
+      const response = await client(`/api/programs/${id}`, {
+        method: payload instanceof FormData ? "POST" : "PUT",
+        body: body,
+      });
+
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || err.message || "Gagal memperbarui data artikel.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
   return {
     // State
     page,
@@ -192,5 +260,9 @@ export const useArticles = () => {
     clearSearch,
     changePage,
     refresh,
+    fetchDetail,
+    updateArticle,
+    imageUrl,
+    createArticle,
   };
 };

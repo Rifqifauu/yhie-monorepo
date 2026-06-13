@@ -1,3 +1,5 @@
+import { ref, reactive, computed } from "vue";
+
 // 1. Definisikan Interface
 export interface Partner {
   id?: number | string;
@@ -7,7 +9,7 @@ export interface Partner {
   description_id: string;
   slug_en: string;
   slug_id: string;
-  // Tambahkan properti lain yang relevan dari backend (misal: logo, website, dll)
+  logo?: string; // Menambahkan opsional image property jika ada
   [key: string]: any;
 }
 
@@ -24,19 +26,27 @@ export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
 }
 
+// Interface tambahan untuk respons detail tunggal
+export interface SingleApiResponse<T> {
+  data: T;
+}
+
 export const usePartners = () => {
   const config = useRuntimeConfig();
   const { locale } = useI18n();
   const client = useSanctumClient();
 
-  // State
+  // State Utama
   const page = ref(1);
   const searchInput = ref("");
   const search = ref("");
 
+  // State Tambahan untuk Form & Edit/Update
+  const isSubmitting = ref(false);
+
   const searchTerm = computed(() => search.value.trim());
 
-  // Fetching Data
+  // Fetching Data List (Paginasi & Pencarian)
   const {
     data: apiResponse,
     status,
@@ -85,7 +95,6 @@ export const usePartners = () => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
 
-    // Mencegah double slash (e.g., http://127.0.0.1:8000//storage/...)
     const base = backendUrl.endsWith("/")
       ? backendUrl.slice(0, -1)
       : backendUrl;
@@ -115,16 +124,16 @@ export const usePartners = () => {
     return items;
   });
 
-  // Actions
+  // Actions untuk Pencarian & Navigasi Halaman
   const applySearch = () => {
     search.value = searchInput.value.trim();
-    page.value = 1; // Reset halaman ke 1 saat melakukan pencarian baru
+    page.value = 1;
   };
 
   const clearSearch = () => {
     searchInput.value = "";
     search.value = "";
-    page.value = 1; // Reset halaman ke 1 saat pencarian dihapus
+    page.value = 1;
   };
 
   const changePage = (target: number) => {
@@ -136,11 +145,74 @@ export const usePartners = () => {
     }
   };
 
+  const fetchDetail = async (id: number | string) => {
+    return await useAsyncData<SingleApiResponse<Partner>>(
+      `partner-detail-${id}`,
+      () => client(`/api/partners/${id}`),
+    );
+  };
+  const createPartner = async (payload: FormData | Record<string, any>) => {
+    isSubmitting.value = true;
+    try {
+      let body = payload;
+      if (payload instanceof FormData) {
+        body = payload;
+      } else {
+        body = JSON.stringify(payload);
+      }
+
+      const response = await client(`/api/partners`, {
+        method: "POST",
+        body: body,
+      });
+
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || err.message || "Gagal membuat data partner.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
+  const updatePartner = async (
+    id: number | string,
+    payload: FormData | Record<string, any>,
+  ) => {
+    isSubmitting.value = true;
+    try {
+      let body = payload;
+
+      if (payload instanceof FormData && !payload.has("_method")) {
+        payload.append("_method", "PUT");
+      }
+
+      const response = await client(`/api/partners/${id}`, {
+        method: payload instanceof FormData ? "POST" : "PUT",
+        body: body,
+      });
+
+      return { success: true, data: response };
+    } catch (err: any) {
+      return {
+        success: false,
+        error:
+          err.data?.message || err.message || "Gagal memperbarui data partner.",
+      };
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   return {
     // State
     page,
     searchInput,
     searchTerm,
+    isSubmitting, // Diexpose agar UI button bisa menampilkan loading status
 
     // Data
     partners,
@@ -158,10 +230,12 @@ export const usePartners = () => {
     slugOf,
     imageUrl,
 
-    // Actions
     applySearch,
     clearSearch,
     changePage,
     refresh,
+    fetchDetail, // Aksi baru untuk mengambil detail
+    updatePartner, // Aksi baru untuk memicu request PUT/POST Spoofing ke API
+    createPartner,
   };
 };
