@@ -32,69 +32,43 @@
                 </button>
             </div>
 
+            <!-- Logo marquee (running from right to left) -->
             <div
-                v-else-if="!partners || partners.length === 0"
-                class="text-center py-12 text-gray-500"
+                v-else-if="partners.length > 0"
+                class="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] [-webkit-mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
             >
-                <EmptyData
-                    title="partner"
-                    description="Belum ada data partner saat ini."
-                    icon="i-lucide-users"
-                />
-            </div>
-
-            <div v-else class="max-w-5xl mx-auto space-y-12">
-                <div
-                    v-if="activePartner"
-                    class="flex flex-col md:flex-row items-center gap-8 p-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl border border-emerald-800/10 dark:border-emerald-500/10 shadow-xl transition-all duration-500"
-                >
-                    <div
-                        class="w-full md:w-1/3 flex justify-center p-4 bg-emerald-50/50 dark:bg-gray-950/50 rounded-xl h-48 items-center"
+                <div class="flex animate-marquee py-4 gap-0">
+                    <!-- First set of logos -->
+                    <NuxtLink
+                        v-for="partner in partners"
+                        :key="partner.id"
+                        :to="localePath('/partner')"
+                        class="group flex items-center justify-center h-16 px-6 min-w-[140px] mx-2 md:mx-3 rounded-2xl border border-slate-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-emerald-900/30 hover:shadow-md transition-all duration-300 shrink-0"
                     >
                         <img
-                            :src="getImageUrl(activePartner?.logo)"
-                            :alt="
-                                locale === 'id'
-                                    ? activePartner?.name_id
-                                    : activePartner?.name_en
-                            "
-                            class="max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-105"
-                            @error="
-                                (e) =>
-                                    ((e.target as HTMLImageElement).src =
-                                        '/placeholder.jpg')
-                            "
+                            :src="getImageUrl(partner.logo)"
+                            :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                            class="h-9 max-w-[100px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-400"
+                            @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
                         />
-                    </div>
-
-                    <div
-                        class="w-full md:w-2/3 text-center md:text-left space-y-3"
+                    </NuxtLink>
+                    <!-- Duplicate set of logos for seamless loop -->
+                    <NuxtLink
+                        v-for="partner in partners"
+                        :key="'dup-' + partner.id"
+                        :to="localePath('/partner')"
+                        class="group flex items-center justify-center h-16 px-6 min-w-[140px] mx-2 md:mx-3 rounded-2xl border border-slate-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-emerald-900/30 hover:shadow-md transition-all duration-300 shrink-0"
+                        aria-hidden="true"
                     >
-                        <span
-                            class="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400"
-                        >
-                            Partner Terpilih
-                        </span>
-                        <h3
-                            class="text-2xl font-bold text-gray-900 dark:text-gray-100 font-serif"
-                        >
-                            {{
-                                locale === "id"
-                                    ? activePartner?.name_id
-                                    : activePartner?.name_en
-                            }}
-                        </h3>
-                        <p
-                            class="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed"
-                        >
-                            {{
-                                locale === "id"
-                                    ? activePartner?.description_id
-                                    : activePartner?.description_en
-                            }}
-                        </p>
-                    </div>
+                        <img
+                            :src="getImageUrl(partner.logo)"
+                            :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                            class="h-9 max-w-[100px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-400"
+                            @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                        />
+                    </NuxtLink>
                 </div>
+            </div>
 
                 <div class="space-y-4">
                     <p
@@ -237,3 +211,24 @@ const getImageUrl = (path: string | null | undefined) => {
     return `${backendUrl}/${cleanPath}`;
 };
 </script>
+
+<style scoped>
+@keyframes marquee {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.animate-marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+    animation-play-state: paused;
+}
+</style>
