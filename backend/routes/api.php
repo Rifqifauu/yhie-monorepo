@@ -10,6 +10,7 @@ use App\Http\Controllers\ProgramRegistrationController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,8 @@ use App\Http\Controllers\TransactionController;
 | Digunakan untuk menampilkan data ke pengunjung website (Frontend)
 | dan menerima *submit* form pendaftaran awal.
 */
+
+
 
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);
@@ -67,6 +70,8 @@ Route::middleware("auth:sanctum")->group(function () {
     Route::get("/user", function (Request $request) {
         return $request->user();
     });
+
+    Route::get("dashboard", [DashboardController::class, "index"]);
 
     Route::apiResource("articles", ArticleController::class)->except([
         "show",
