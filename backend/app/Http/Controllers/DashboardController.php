@@ -15,22 +15,38 @@ class DashboardController extends Controller
     {
         try {
             //ambil program registration dengan type program
-            $registrations = ProgramRegistration::where('status', 'pending')->count();
-            $articles = Article::where('is_published', 'true')->count();
-            $pendingTransaction = Transaction::where('payment_status', 'pending')->count();
-            $successTransaction = Transaction::where('payment_status', 'success')->sum('amount');
-            $upcomingSchedule = Schedule::where('start_date', '<', now()->addDays(7))->get();
+            $registrations = ProgramRegistration::where(
+                "status",
+                "pending",
+            )->count();
+            $articles = Article::where("is_published", "true")->count();
+            $pendingTransaction = Transaction::where(
+                "payment_status",
+                "pending",
+            )->count();
+            $successTransaction = Transaction::where(
+                "payment_status",
+                "success",
+            )->sum("amount");
+            $upcomingSchedule = Schedule::where(
+                "start_date",
+                "<",
+                now()->addDays(7),
+            )->get();
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 500);
+            return response()->json(
+                [
+                    "message" => $e->getMessage(),
+                ],
+                500,
+            );
         }
         return response()->json([
-            'registrations' => $registrations,
-            'articles' => $articles,
-            'pendingTransaction' => $pendingTransaction,
-            'successTransaction' => $successTransaction,
-            'upcomingSchedule' => $upcomingSchedule,
+            "registrations" => $registrations,
+            "articles" => $articles,
+            "pendingTransaction" => $pendingTransaction,
+            "successTransaction" => $successTransaction,
+            "upcomingSchedule" => $upcomingSchedule,
         ]);
     }
 }
