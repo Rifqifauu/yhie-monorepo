@@ -14,25 +14,30 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         try {
-            //ambil program registration dengan type program
-            $registrations = ProgramRegistration::where(
-                "status",
-                "pending",
-            )->count();
-            $articles = Article::where("is_published", "true")->count();
-            $pendingTransaction = Transaction::where(
-                "payment_status",
-                "pending",
-            )->count();
-            $successTransaction = Transaction::where(
-                "payment_status",
-                "success",
-            )->sum("amount");
-            $upcomingSchedule = Schedule::where(
-                "start_date",
-                "<",
-                now()->addDays(7),
-            )->get();
+
+            // Ambil statistik program registration secara efisien dalam satu query
+            $registrationStats = ProgramRegistration::selectRaw("
+                COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+                COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected
+            ")->first();
+
+            $pendingRegistrations = (int) ($registrationStats->pending ?? 0);
+            $approvedRegistration = (int) ($registrationStats->approved ?? 0);
+            $rejectedRegistration = (int) ($registrationStats->rejected ?? 0);
+
+            $articles = Article::where('is_published', 'true')->count();
+
+            // Ambil statistik transaksi secara efisien dalam satu query
+            $transactionStats = Transaction::selectRaw("
+                COUNT(CASE WHEN payment_status = 'pending' THEN 1 END) as pending,
+                SUM(CASE WHEN payment_status = 'success' THEN amount ELSE 0 END) as revenue
+            ")->first();
+
+            $pendingTransaction = (int) ($transactionStats->pending ?? 0);
+            $totalRevenue = (float) ($transactionStats->revenue ?? 0);
+
+            $upcomingSchedule = Schedule::where('start_date', '<', now()->addDays(7))->get();
         } catch (\Exception $e) {
             return response()->json(
                 [
