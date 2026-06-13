@@ -103,15 +103,23 @@
                 </UButton>
             </div>
         </div>
+
+        <AdminDeleteModal
+            v-model:open="isDeleteModalOpen"
+            :id="selectedSchedule?.id"
+            :title="selectedSchedule?.title || 'Jadwal'"
+            endpoint="api/schedules"
+            @success="handleDeleteSuccess"
+            @error="handleDeleteError"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
+import { h, resolveComponent, ref } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 import { useClipboard } from "@vueuse/core";
-// Asumsikan tipe Schedule di-import dari file composable Anda
 import type { Schedule } from "~/composables/useSchedules";
 
 definePageMeta({
@@ -139,6 +147,48 @@ const {
     titleOf,
     descOf,
 } = useSchedules();
+
+const isDeleteModalOpen = ref(false);
+
+// Perbaikan 1: Mendeklarasikan state untuk menyimpan jadwal yang dipilih saat tombol hapus diklik
+const selectedSchedule = ref<{ id: number | string; title: string } | null>(
+    null,
+);
+
+// Perbaikan 2: Fungsi triggerDelete sekarang menerima row dan mengisi selectedSchedule
+function triggerDelete(row: Row<Schedule>) {
+    const id = row.original.id;
+    const title = titleOf(row.original) || "Jadwal ini";
+
+    if (id !== undefined && id !== null) {
+        selectedSchedule.value = {
+            id: id,
+            title: title,
+        };
+        isDeleteModalOpen.value = true;
+    }
+}
+
+// Perbaikan 3: Memanggil fungsi refresh() bawaan composable untuk memperbarui tabel secara real-time
+function handleDeleteSuccess() {
+    isDeleteModalOpen.value = false;
+    toast.add({
+        title: "Berhasil!",
+        description: "Jadwal telah berhasil dihapus dari sistem.",
+        color: "success",
+        duration: 5000,
+    });
+    refresh();
+}
+
+function handleDeleteError(err: string) {
+    toast.add({
+        title: "Gagal menghapus jadwal",
+        description: err || "Terjadi kesalahan pada server.",
+        color: "warning",
+        duration: 5000,
+    });
+}
 
 const columns: TableColumn<Schedule>[] = [
     {
@@ -298,6 +348,9 @@ function getRowItems(row: Row<Schedule>) {
                 label: "Hapus Jadwal",
                 icon: "i-lucide-trash-2",
                 color: "error" as const,
+                onSelect() {
+                    triggerDelete(row);
+                },
             },
         ],
     ];

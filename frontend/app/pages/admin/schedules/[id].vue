@@ -22,7 +22,7 @@
                             >Edit Jadwal</UButton
                         >
                         <UButton
-                            color="danger"
+                            color="error"
                             variant="solid"
                             icon="i-lucide-trash"
                             @click="triggerDelete"
@@ -286,7 +286,7 @@ const handleUpdate = async () => {
         toast.add({
             title: "Gagal",
             description: result.error,
-            color: "danger",
+            color: "warning",
         });
     }
 };
@@ -298,6 +298,6 @@ function handleDeleteSuccess() {
     router.push("/admin/schedules");
 }
 function handleDeleteError(err: string) {
-    toast.add({ title: "Error", description: err, color: "danger" });
+    toast.add({ title: "Error", description: err, color: "warning" });
 }
 </script>
