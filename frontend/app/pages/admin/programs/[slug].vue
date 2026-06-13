@@ -457,7 +457,20 @@ function onFileChange(event: Event) {
 }
 
 const handleUpdate = async () => {
+    if (!program.value?.id) {
+        toast.add({
+            title: "Error",
+            description: "ID Program tidak ditemukan.",
+            color: "error",
+            icon: "i-lucide-circle-alert",
+        });
+        return;
+    }
+
     const formData = new FormData();
+
+    formData.append("_method", "PUT");
+
     formData.append("title_id", form.title_id);
     formData.append("title_en", form.title_en);
     formData.append("slug_id", form.slug_id);
@@ -465,16 +478,15 @@ const handleUpdate = async () => {
     formData.append("description_id", form.description_id);
     formData.append("description_en", form.description_en);
 
-    // Opsional appending untuk kolom harga
     if (form.price_id) formData.append("price_id", form.price_id);
     if (form.price_en) formData.append("price_en", form.price_en);
 
-    // Mengirim biner file gambar program baru jika dipilih
     if (selectedFile.value) {
-        formData.append("image", selectedFile.value);
+        // 3. Ubah key "image" menjadi "image_path" sesuai permintaan backend
+        formData.append("image_path", selectedFile.value);
     }
 
-    const result = await updateProgram(id, formData);
+    const result = await updateProgram(program.value.id, formData);
 
     if (result.success) {
         toast.add({
@@ -486,17 +498,16 @@ const handleUpdate = async () => {
         isEditing.value = false;
         imagePreview.value = null;
         selectedFile.value = null;
-        refresh(); // Memperbarui data layar
+        refresh();
     } else {
         toast.add({
             title: "Gagal memperbarui",
-            description: result.error,
-            color: "danger",
+            description: result.error || "Terjadi kesalahan",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
     }
 };
-
 function triggerDelete() {
     if (program.value?.id) {
         isDeleteModalOpen.value = true;

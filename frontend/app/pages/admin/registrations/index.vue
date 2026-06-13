@@ -4,7 +4,6 @@
             title="Pendaftaran"
             icon="i-lucide-clipboard-list"
             description="Kelola pendaftaran program. Cari, setujui, atau hapus pendaftaran dari sini."
-            showCreate="false"
         >
             <template #actions>
                 <div class="flex items-center gap-3">

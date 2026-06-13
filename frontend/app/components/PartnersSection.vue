@@ -36,7 +36,11 @@
                 v-else-if="!partners || partners.length === 0"
                 class="text-center py-12 text-gray-500"
             >
-                Tidak ada data partner saat ini.
+                <EmptyData
+                    title="partner"
+                    description="Belum ada data partner saat ini."
+                    icon="i-lucide-users"
+                />
             </div>
 
             <div v-else class="max-w-5xl mx-auto space-y-12">
@@ -146,7 +150,11 @@
                         :to="localePath('/partner')"
                         class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md hover:shadow-lg transition flex items-center gap-2 group"
                     >
-                        {{ locale === 'en' ? 'View All Partners' : 'Lihat Semua Partner' }}
+                        {{
+                            locale === "en"
+                                ? "View All Partners"
+                                : "Lihat Semua Partner"
+                        }}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"

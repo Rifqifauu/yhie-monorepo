@@ -2,11 +2,7 @@
     <div>
         <!-- Loading -->
         <div v-if="pending" class="space-y-4">
-            <USkeleton
-                v-for="n in 5"
-                :key="n"
-                class="h-28 rounded-2xl"
-            />
+            <USkeleton v-for="n in 5" :key="n" class="h-28 rounded-2xl" />
         </div>
 
         <!-- Error -->
@@ -15,13 +11,21 @@
             icon="i-heroicons-exclamation-triangle"
             color="red"
             variant="soft"
-            :title="locale === 'en' ? 'Failed to load partners' : 'Gagal memuat data partner'"
-            :description="locale === 'en' ? 'Please try again later.' : 'Silakan coba lagi beberapa saat.'"
+            :title="
+                locale === 'en'
+                    ? 'Failed to load partners'
+                    : 'Gagal memuat data partner'
+            "
+            :description="
+                locale === 'en'
+                    ? 'Please try again later.'
+                    : 'Silakan coba lagi beberapa saat.'
+            "
             class="max-w-xl mx-auto"
         >
             <template #actions>
                 <UButton size="sm" color="red" @click="$emit('retry')">
-                    {{ locale === 'en' ? 'Retry' : 'Coba lagi' }}
+                    {{ locale === "en" ? "Retry" : "Coba lagi" }}
                 </UButton>
             </template>
         </UAlert>
@@ -37,7 +41,11 @@
                 />
             </div>
             <p class="mt-4 text-slate-500 dark:text-emerald-100/70">
-                {{ locale === 'en' ? 'No partners found for this keyword.' : 'Belum ada mitra untuk kata kunci ini.' }}
+                {{
+                    locale === "en"
+                        ? "No partners found for this keyword."
+                        : "Belum ada mitra untuk kata kunci ini."
+                }}
             </p>
         </div>
 

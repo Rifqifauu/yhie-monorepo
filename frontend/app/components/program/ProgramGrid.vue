@@ -5,11 +5,7 @@
             v-if="pending"
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-            <USkeleton
-                v-for="n in 6"
-                :key="n"
-                class="h-80 rounded-3xl"
-            />
+            <USkeleton v-for="n in 6" :key="n" class="h-80 rounded-3xl" />
         </div>
 
         <!-- Error -->
@@ -31,17 +27,10 @@
 
         <!-- Empty -->
         <div v-else-if="!programs.length" class="text-center py-16">
-            <div
-                class="mx-auto w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center"
-            >
-                <UIcon
-                    name="i-lucide-library"
-                    class="w-8 h-8 text-emerald-600"
-                />
-            </div>
-            <p class="mt-4 text-slate-500 dark:text-emerald-100/70">
-                Belum ada program untuk kata kunci ini.
-            </p>
+            <EmptyData
+                title="Program"
+                description="Belum ada program untuk kata kunci ini."
+            />
         </div>
 
         <!-- Grid -->

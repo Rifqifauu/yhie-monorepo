@@ -1,6 +1,7 @@
 <template>
-    <div class="bg-slate-50 dark:bg-emerald-950 text-slate-900 dark:text-white min-h-screen">
-
+    <div
+        class="bg-slate-50 dark:bg-emerald-950 text-slate-900 dark:text-white min-h-screen"
+    >
         <!-- Hero Section with Cover Image -->
         <section
             class="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-emerald-950 dark:via-emerald-950 dark:to-amber-950/40 border-b border-emerald-100/70 dark:border-emerald-800/60"
@@ -18,10 +19,16 @@
             ></div>
 
             <!-- Decorative blurs -->
-            <div class="absolute -top-24 -right-24 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-28 -left-28 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl"></div>
+            <div
+                class="absolute -top-24 -right-24 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl"
+            ></div>
+            <div
+                class="absolute -bottom-28 -left-28 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl"
+            ></div>
 
-            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+            <div
+                class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20"
+            >
                 <!-- Back Link -->
                 <NuxtLink
                     :to="localePath('/articles')"
@@ -31,7 +38,11 @@
                         name="i-lucide-arrow-left"
                         class="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1.5"
                     />
-                    <span>{{ locale === 'en' ? 'Back to Articles' : 'Kembali ke Artikel' }}</span>
+                    <span>{{
+                        locale === "en"
+                            ? "Back to Articles"
+                            : "Kembali ke Artikel"
+                    }}</span>
                 </NuxtLink>
 
                 <!-- Loading Hero Skeleton -->
@@ -53,28 +64,46 @@
                     </span>
 
                     <!-- Title -->
-                    <h1 class="mt-5 text-3xl md:text-5xl font-serif font-extrabold tracking-tight text-emerald-950 dark:text-emerald-50 leading-[1.15]">
+                    <h1
+                        class="mt-5 text-3xl md:text-5xl font-serif font-extrabold tracking-tight text-emerald-950 dark:text-emerald-50 leading-[1.15]"
+                    >
                         {{ titleOf(article) }}
                     </h1>
 
                     <!-- Meta info row -->
-                    <div class="mt-6 flex flex-wrap items-center gap-5 text-sm text-slate-600 dark:text-emerald-100/70">
+                    <div
+                        class="mt-6 flex flex-wrap items-center gap-5 text-sm text-slate-600 dark:text-emerald-100/70"
+                    >
                         <!-- Author -->
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-800 flex items-center justify-center">
-                                <UIcon name="i-lucide-user" class="w-4 h-4 text-emerald-700 dark:text-amber-400" />
+                            <div
+                                class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-800 flex items-center justify-center"
+                            >
+                                <UIcon
+                                    name="i-lucide-user"
+                                    class="w-4 h-4 text-emerald-700 dark:text-amber-400"
+                                />
                             </div>
-                            <span class="font-semibold">{{ article.author?.name || 'Admin YHIE' }}</span>
+                            <span class="font-semibold">{{
+                                article.author?.name || "Admin YHIE"
+                            }}</span>
                         </div>
                         <!-- Date -->
                         <span class="inline-flex items-center gap-1.5">
-                            <UIcon name="i-lucide-calendar" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <UIcon
+                                name="i-lucide-calendar"
+                                class="w-4 h-4 text-emerald-600 dark:text-emerald-400"
+                            />
                             {{ formatDate(article.created_at) }}
                         </span>
                         <!-- Reading time -->
                         <span class="inline-flex items-center gap-1.5">
-                            <UIcon name="i-lucide-clock" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                            {{ readingTime }} {{ locale === 'en' ? 'min read' : 'menit baca' }}
+                            <UIcon
+                                name="i-lucide-clock"
+                                class="w-4 h-4 text-emerald-600 dark:text-emerald-400"
+                            />
+                            {{ readingTime }}
+                            {{ locale === "en" ? "min read" : "menit baca" }}
                         </span>
                     </div>
                 </div>
@@ -84,28 +113,52 @@
         <!-- Main Content -->
         <section class="py-12 lg:py-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
                 <!-- Error State -->
-                <div v-if="error || (!pending && !article)" class="max-w-md mx-auto text-center py-20">
-                    <div class="mx-auto w-20 h-20 rounded-3xl bg-red-100 dark:bg-red-950/40 flex items-center justify-center mb-6">
-                        <UIcon name="i-heroicons-exclamation-triangle" class="w-10 h-10 text-red-500" />
+                <div
+                    v-if="error || (!pending && !article)"
+                    class="max-w-md mx-auto text-center py-20"
+                >
+                    <div
+                        class="mx-auto w-20 h-20 rounded-3xl bg-red-100 dark:bg-red-950/40 flex items-center justify-center mb-6"
+                    >
+                        <UIcon
+                            name="i-heroicons-exclamation-triangle"
+                            class="w-10 h-10 text-red-500"
+                        />
                     </div>
-                    <h3 class="text-xl font-serif font-extrabold text-emerald-950 dark:text-emerald-50 mb-3">
-                        {{ locale === 'en' ? 'Article Not Found' : 'Artikel Tidak Ditemukan' }}
+                    <h3
+                        class="text-xl font-serif font-extrabold text-emerald-950 dark:text-emerald-50 mb-3"
+                    >
+                        {{
+                            locale === "en"
+                                ? "Article Not Found"
+                                : "Artikel Tidak Ditemukan"
+                        }}
                     </h3>
                     <p class="text-slate-500 dark:text-emerald-100/60 mb-6">
-                        {{ locale === 'en' ? 'The article you are looking for does not exist or has been removed.' : 'Artikel yang Anda cari tidak tersedia atau telah dihapus.' }}
+                        {{
+                            locale === "en"
+                                ? "The article you are looking for does not exist or has been removed."
+                                : "Artikel yang Anda cari tidak tersedia atau telah dihapus."
+                        }}
                     </p>
                     <NuxtLink
                         :to="localePath('/articles')"
                         class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold shadow-lg hover:shadow-emerald-500/30 transition-all inline-block"
                     >
-                        {{ locale === 'en' ? 'Browse Articles' : 'Lihat Semua Artikel' }}
+                        {{
+                            locale === "en"
+                                ? "Browse Articles"
+                                : "Lihat Semua Artikel"
+                        }}
                     </NuxtLink>
                 </div>
 
                 <!-- Loading State -->
-                <div v-else-if="pending" class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                <div
+                    v-else-if="pending"
+                    class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
+                >
                     <div class="lg:col-span-8 space-y-6">
                         <USkeleton class="aspect-[16/9] w-full rounded-3xl" />
                         <div class="space-y-3">
@@ -122,18 +175,24 @@
                 </div>
 
                 <!-- Article Content Grid -->
-                <div v-else-if="article" class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-
+                <div
+                    v-else-if="article"
+                    class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
+                >
                     <!-- Left: Main Article Content -->
-                    <article class="lg:col-span-8 space-y-8" data-aos="fade-right">
-
+                    <article
+                        class="lg:col-span-8 space-y-8"
+                        data-aos="fade-right"
+                    >
                         <!-- Cover Image Gallery -->
                         <div
                             v-if="allImages.length > 0"
                             class="relative overflow-hidden rounded-3xl border border-emerald-200/70 dark:border-emerald-800/60 bg-white/70 dark:bg-emerald-950/40 p-2 shadow-lg"
                         >
                             <!-- Main image -->
-                            <div class="relative aspect-[16/10] overflow-hidden rounded-2xl">
+                            <div
+                                class="relative aspect-[16/10] overflow-hidden rounded-2xl"
+                            >
                                 <img
                                     :src="allImages[activeImageIndex]"
                                     :alt="titleOf(article)"
@@ -144,36 +203,55 @@
                                     v-if="allImages.length > 1"
                                     class="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md text-white text-xs font-bold"
                                 >
-                                    {{ activeImageIndex + 1 }} / {{ allImages.length }}
+                                    {{ activeImageIndex + 1 }} /
+                                    {{ allImages.length }}
                                 </div>
                             </div>
 
                             <!-- Thumbnail strip -->
-                            <div v-if="allImages.length > 1" class="flex gap-2 mt-2 overflow-x-auto pb-1 custom-scrollbar">
+                            <div
+                                v-if="allImages.length > 1"
+                                class="flex gap-2 mt-2 overflow-x-auto pb-1 custom-scrollbar"
+                            >
                                 <button
                                     v-for="(img, idx) in allImages"
                                     :key="idx"
                                     @click="activeImageIndex = idx"
                                     class="relative w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-300"
-                                    :class="activeImageIndex === idx
-                                        ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-white dark:ring-offset-emerald-950 opacity-100'
-                                        : 'opacity-50 hover:opacity-80'"
+                                    :class="
+                                        activeImageIndex === idx
+                                            ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-white dark:ring-offset-emerald-950 opacity-100'
+                                            : 'opacity-50 hover:opacity-80'
+                                    "
                                 >
-                                    <img :src="img" :alt="`Image ${idx + 1}`" class="w-full h-full object-cover" />
+                                    <img
+                                        :src="img"
+                                        :alt="`Image ${idx + 1}`"
+                                        class="w-full h-full object-cover"
+                                    />
                                 </button>
                             </div>
                         </div>
 
                         <!-- Placeholder if no image -->
-                        <div v-else class="relative overflow-hidden rounded-3xl border border-emerald-200/70 dark:border-emerald-800/60 bg-white/70 dark:bg-emerald-950/40 p-2 shadow-lg">
-                            <div class="aspect-[16/10] rounded-2xl bg-gradient-to-br from-emerald-100 to-amber-50 dark:from-emerald-900/40 dark:to-emerald-950/60 flex items-center justify-center">
-                                <UIcon name="i-lucide-image" class="w-16 h-16 text-emerald-300 dark:text-emerald-700" />
+                        <div
+                            v-else
+                            class="relative overflow-hidden rounded-3xl border border-emerald-200/70 dark:border-emerald-800/60 bg-white/70 dark:bg-emerald-950/40 p-2 shadow-lg"
+                        >
+                            <div
+                                class="aspect-[16/10] rounded-2xl bg-gradient-to-br from-emerald-100 to-amber-50 dark:from-emerald-900/40 dark:to-emerald-950/60 flex items-center justify-center"
+                            >
+                                <UIcon
+                                    name="i-lucide-image"
+                                    class="w-16 h-16 text-emerald-300 dark:text-emerald-700"
+                                />
                             </div>
                         </div>
 
                         <!-- Article Content Card -->
-                        <div class="bg-white/60 dark:bg-emerald-900/20 backdrop-blur-md rounded-3xl border border-emerald-200/50 dark:border-emerald-800/50 p-6 md:p-10 shadow-sm">
-
+                        <div
+                            class="bg-white/60 dark:bg-emerald-900/20 backdrop-blur-md rounded-3xl border border-emerald-200/50 dark:border-emerald-800/50 p-6 md:p-10 shadow-sm"
+                        >
                             <!-- Content body -->
                             <div
                                 class="prose prose-emerald dark:prose-invert lg:prose-lg max-w-none text-slate-700 dark:text-emerald-100/90 leading-relaxed"
@@ -181,10 +259,18 @@
                             ></div>
 
                             <!-- Tags / Category footer -->
-                            <div class="mt-10 pt-6 border-t border-emerald-200/40 dark:border-emerald-800/40">
+                            <div
+                                class="mt-10 pt-6 border-t border-emerald-200/40 dark:border-emerald-800/40"
+                            >
                                 <div class="flex flex-wrap items-center gap-3">
-                                    <span class="text-xs font-bold text-slate-500 dark:text-emerald-200/50 uppercase tracking-wider">
-                                        {{ locale === 'en' ? 'Category' : 'Kategori' }}:
+                                    <span
+                                        class="text-xs font-bold text-slate-500 dark:text-emerald-200/50 uppercase tracking-wider"
+                                    >
+                                        {{
+                                            locale === "en"
+                                                ? "Category"
+                                                : "Kategori"
+                                        }}:
                                     </span>
                                     <span
                                         class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-white"
@@ -197,18 +283,43 @@
                         </div>
 
                         <!-- Share & Actions Bar -->
-                        <div class="bg-white/60 dark:bg-emerald-900/20 backdrop-blur-md rounded-3xl border border-emerald-200/50 dark:border-emerald-800/50 p-5 shadow-sm">
-                            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <p class="text-sm font-semibold text-slate-700 dark:text-emerald-100/80">
-                                    {{ locale === 'en' ? 'Share this article' : 'Bagikan artikel ini' }}
+                        <div
+                            class="bg-white/60 dark:bg-emerald-900/20 backdrop-blur-md rounded-3xl border border-emerald-200/50 dark:border-emerald-800/50 p-5 shadow-sm"
+                        >
+                            <div
+                                class="flex flex-col sm:flex-row items-center justify-between gap-4"
+                            >
+                                <p
+                                    class="text-sm font-semibold text-slate-700 dark:text-emerald-100/80"
+                                >
+                                    {{
+                                        locale === "en"
+                                            ? "Share this article"
+                                            : "Bagikan artikel ini"
+                                    }}
                                 </p>
                                 <div class="flex items-center gap-3">
                                     <button
                                         @click="copyShareLink"
                                         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white/40 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 font-semibold transition-all duration-300 text-sm"
                                     >
-                                        <UIcon :name="copied ? 'i-lucide-check' : 'i-lucide-link'" class="w-4 h-4" />
-                                        {{ copied ? (locale === 'en' ? 'Copied!' : 'Disalin!') : (locale === 'en' ? 'Copy Link' : 'Salin Link') }}
+                                        <UIcon
+                                            :name="
+                                                copied
+                                                    ? 'i-lucide-check'
+                                                    : 'i-lucide-link'
+                                            "
+                                            class="w-4 h-4"
+                                        />
+                                        {{
+                                            copied
+                                                ? locale === "en"
+                                                    ? "Copied!"
+                                                    : "Disalin!"
+                                                : locale === "en"
+                                                  ? "Copy Link"
+                                                  : "Salin Link"
+                                        }}
                                     </button>
                                     <a
                                         :href="`https://wa.me/?text=${encodeURIComponent(titleOf(article) + ' - ' + currentUrl)}`"
@@ -216,7 +327,10 @@
                                         rel="noopener noreferrer"
                                         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-semibold shadow-md hover:shadow-emerald-500/25 transition-all duration-300 text-sm"
                                     >
-                                        <UIcon name="i-lucide-share-2" class="w-4 h-4" />
+                                        <UIcon
+                                            name="i-lucide-share-2"
+                                            class="w-4 h-4"
+                                        />
                                         WhatsApp
                                     </a>
                                 </div>
@@ -225,51 +339,114 @@
                     </article>
 
                     <!-- Right: Sticky Sidebar -->
-                    <aside class="lg:col-span-4 lg:sticky lg:top-24 space-y-8" data-aos="fade-left">
-
+                    <aside
+                        class="lg:col-span-4 lg:sticky lg:top-24 space-y-8"
+                        data-aos="fade-left"
+                    >
                         <!-- Author Card -->
-                        <div class="bg-white/80 dark:bg-emerald-900/40 backdrop-blur-xl border border-emerald-200/70 dark:border-emerald-800/60 rounded-3xl p-6 shadow-xl">
+                        <div
+                            class="bg-white/80 dark:bg-emerald-900/40 backdrop-blur-xl border border-emerald-200/70 dark:border-emerald-800/60 rounded-3xl p-6 shadow-xl"
+                        >
                             <div class="flex items-center gap-4 mb-4">
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
-                                    <UIcon name="i-lucide-user" class="w-7 h-7 text-white" />
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg"
+                                >
+                                    <UIcon
+                                        name="i-lucide-user"
+                                        class="w-7 h-7 text-white"
+                                    />
                                 </div>
                                 <div>
-                                    <p class="font-serif font-bold text-lg text-emerald-950 dark:text-emerald-50">
-                                        {{ article.author?.name || 'Admin YHIE' }}
+                                    <p
+                                        class="font-serif font-bold text-lg text-emerald-950 dark:text-emerald-50"
+                                    >
+                                        {{
+                                            article.author?.name || "Admin YHIE"
+                                        }}
                                     </p>
-                                    <p class="text-xs text-slate-500 dark:text-emerald-100/50">
-                                        {{ locale === 'en' ? 'Official Contributor' : 'Kontributor Resmi' }}
+                                    <p
+                                        class="text-xs text-slate-500 dark:text-emerald-100/50"
+                                    >
+                                        {{
+                                            locale === "en"
+                                                ? "Official Contributor"
+                                                : "Kontributor Resmi"
+                                        }}
                                     </p>
                                 </div>
                             </div>
-                            <hr class="border-emerald-200/40 dark:border-emerald-800/40 mb-4" />
-                            <div class="space-y-2.5 text-sm text-slate-600 dark:text-emerald-100/70">
+                            <hr
+                                class="border-emerald-200/40 dark:border-emerald-800/40 mb-4"
+                            />
+                            <div
+                                class="space-y-2.5 text-sm text-slate-600 dark:text-emerald-100/70"
+                            >
                                 <div class="flex items-center gap-2.5">
-                                    <UIcon name="i-lucide-calendar" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                    <span>{{ locale === 'en' ? 'Published' : 'Diterbitkan' }}: {{ formatDate(article.created_at) }}</span>
+                                    <UIcon
+                                        name="i-lucide-calendar"
+                                        class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"
+                                    />
+                                    <span
+                                        >{{
+                                            locale === "en"
+                                                ? "Published"
+                                                : "Diterbitkan"
+                                        }}:
+                                        {{
+                                            formatDate(article.created_at)
+                                        }}</span
+                                    >
                                 </div>
                                 <div class="flex items-center gap-2.5">
-                                    <UIcon name="i-lucide-clock" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                    <span>{{ readingTime }} {{ locale === 'en' ? 'min read' : 'menit baca' }}</span>
+                                    <UIcon
+                                        name="i-lucide-clock"
+                                        class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"
+                                    />
+                                    <span
+                                        >{{ readingTime }}
+                                        {{
+                                            locale === "en"
+                                                ? "min read"
+                                                : "menit baca"
+                                        }}</span
+                                    >
                                 </div>
                                 <div class="flex items-center gap-2.5">
-                                    <UIcon name="i-lucide-tag" class="w-4 h-4 text-amber-500 shrink-0" />
-                                    <span>{{ getCategoryLabel(article.category) }}</span>
+                                    <UIcon
+                                        name="i-lucide-tag"
+                                        class="w-4 h-4 text-amber-500 shrink-0"
+                                    />
+                                    <span>{{
+                                        getCategoryLabel(article.category)
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Latest Articles Card -->
-                        <div class="bg-white/80 dark:bg-emerald-900/40 backdrop-blur-xl border border-emerald-200/70 dark:border-emerald-800/60 rounded-3xl p-6 shadow-xl">
-                            <h3 class="font-serif font-extrabold text-lg text-emerald-950 dark:text-emerald-50 mb-5 pb-3 border-b border-emerald-200/40 dark:border-emerald-800/40 flex items-center gap-2">
-                                <UIcon name="i-lucide-newspaper" class="w-5 h-5 text-amber-500" />
-                                {{ locale === 'en' ? 'Latest Publications' : 'Publikasi Terbaru' }}
+                        <div
+                            class="bg-white/80 dark:bg-emerald-900/40 backdrop-blur-xl border border-emerald-200/70 dark:border-emerald-800/60 rounded-3xl p-6 shadow-xl"
+                        >
+                            <h3
+                                class="font-serif font-extrabold text-lg text-emerald-950 dark:text-emerald-50 mb-5 pb-3 border-b border-emerald-200/40 dark:border-emerald-800/40 flex items-center gap-2"
+                            >
+                                <UIcon
+                                    name="i-lucide-newspaper"
+                                    class="w-5 h-5 text-amber-500"
+                                />
+                                {{
+                                    locale === "en"
+                                        ? "Latest Publications"
+                                        : "Publikasi Terbaru"
+                                }}
                             </h3>
 
                             <!-- Loading sidebar -->
                             <div v-if="latestPending" class="space-y-4">
                                 <div v-for="n in 4" :key="n" class="flex gap-3">
-                                    <USkeleton class="h-14 w-14 rounded-xl flex-shrink-0" />
+                                    <USkeleton
+                                        class="h-14 w-14 rounded-xl flex-shrink-0"
+                                    />
                                     <div class="flex-1 space-y-2">
                                         <USkeleton class="h-4 w-full rounded" />
                                         <USkeleton class="h-3 w-1/2 rounded" />
@@ -286,25 +463,40 @@
                                     class="flex gap-3.5 group cursor-pointer p-2 -mx-2 rounded-xl hover:bg-emerald-50/60 dark:hover:bg-emerald-900/30 transition-all duration-300"
                                 >
                                     <!-- Thumbnail -->
-                                    <div class="h-14 w-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-emerald-950 flex-shrink-0">
+                                    <div
+                                        class="h-14 w-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-emerald-950 flex-shrink-0"
+                                    >
                                         <img
                                             v-if="coverOf(lat)"
                                             :src="coverOf(lat)"
                                             :alt="titleOf(lat)"
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                         />
-                                        <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-amber-50 dark:from-emerald-900/40 dark:to-emerald-950/60">
-                                            <UIcon name="i-lucide-image" class="w-5 h-5 text-emerald-300 dark:text-emerald-700" />
+                                        <div
+                                            v-else
+                                            class="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-amber-50 dark:from-emerald-900/40 dark:to-emerald-950/60"
+                                        >
+                                            <UIcon
+                                                name="i-lucide-image"
+                                                class="w-5 h-5 text-emerald-300 dark:text-emerald-700"
+                                            />
                                         </div>
                                     </div>
 
                                     <!-- Details -->
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="font-serif font-bold text-sm text-emerald-950 dark:text-emerald-50 leading-snug group-hover:text-emerald-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mb-1">
+                                        <h4
+                                            class="font-serif font-bold text-sm text-emerald-950 dark:text-emerald-50 leading-snug group-hover:text-emerald-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mb-1"
+                                        >
                                             {{ titleOf(lat) }}
                                         </h4>
-                                        <span class="text-[10px] text-slate-400 dark:text-emerald-100/30 flex items-center gap-1">
-                                            <UIcon name="i-lucide-calendar" class="w-3 h-3" />
+                                        <span
+                                            class="text-[10px] text-slate-400 dark:text-emerald-100/30 flex items-center gap-1"
+                                        >
+                                            <UIcon
+                                                name="i-lucide-calendar"
+                                                class="w-3 h-3"
+                                            />
                                             {{ formatDate(lat.created_at) }}
                                         </span>
                                     </div>
@@ -315,15 +507,20 @@
                                     :to="localePath('/articles')"
                                     class="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-emerald-200/40 dark:border-emerald-800/40 text-sm font-bold text-emerald-600 dark:text-amber-400 hover:text-emerald-700 dark:hover:text-amber-300 transition-colors group"
                                 >
-                                    <span>{{ locale === 'en' ? 'View All Articles' : 'Lihat Semua Artikel' }}</span>
-                                    <UIcon name="i-lucide-arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    <span>{{
+                                        locale === "en"
+                                            ? "View All Articles"
+                                            : "Lihat Semua Artikel"
+                                    }}</span>
+                                    <UIcon
+                                        name="i-lucide-arrow-right"
+                                        class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                                    />
                                 </NuxtLink>
                             </div>
                         </div>
-
                     </aside>
                 </div>
-
             </div>
         </section>
     </div>
@@ -348,25 +545,22 @@ const {
 } = useAsyncData(
     `article-detail-${slug.value}`,
     () => client(`/api/articles/${slug.value}`),
-    { watch: [slug] }
+    { watch: [slug] },
 );
 
 const article = computed(() => (apiResponse.value as any)?.data ?? null);
 const pending = computed(() => status.value === "pending");
 
 // --- Fetch latest articles ---
-const {
-    data: latestApiResponse,
-    status: latestStatus,
-} = useAsyncData(
+const { data: latestApiResponse, status: latestStatus } = useAsyncData(
     "latest-articles-sidebar",
-    () => client("/api/articles", { params: { per_page: 5 } })
+    () => client("/api/articles", { params: { per_page: 5 } }),
 );
 
 const latestArticles = computed(() =>
-    ((latestApiResponse.value as any)?.data?.data ?? []).filter(
-        (item: any) => item.id !== article.value?.id
-    ).slice(0, 4)
+    ((latestApiResponse.value as any)?.data?.data ?? [])
+        .filter((item: any) => item.id !== article.value?.id)
+        .slice(0, 4),
 );
 const latestPending = computed(() => latestStatus.value === "pending");
 
@@ -380,7 +574,7 @@ const categories = [
 
 const getCategoryLabel = (cat?: string) => {
     if (!cat) return "";
-    const found = categories.find(c => c.value === cat);
+    const found = categories.find((c) => c.value === cat);
     if (!found) return cat;
     return locale.value === "en" ? found.labelEn : found.labelId;
 };
@@ -410,12 +604,15 @@ const contentOf = (item: any) =>
 const slugOf = (item: any) =>
     item && (locale.value === "en" ? item.slug_en : item.slug_id);
 
-const backendUrl = (config.public.sanctum?.baseUrl as string) || "http://127.0.0.1:8000";
+const backendUrl =
+    (config.public.sanctum?.baseUrl as string) || "http://127.0.0.1:8000";
 
 const buildImageUrl = (path?: string) => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
-    const base = backendUrl.endsWith("/") ? backendUrl.slice(0, -1) : backendUrl;
+    const base = backendUrl.endsWith("/")
+        ? backendUrl.slice(0, -1)
+        : backendUrl;
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
     return `${base}${cleanPath}`;
 };
@@ -454,14 +651,24 @@ const allImages = computed<string[]>(() => {
     if (!img) return [];
 
     if (Array.isArray(img)) {
-        return img.map((i: any) => buildImageUrl(typeof i === "string" ? i : i?.path || "")).filter(Boolean);
+        return img
+            .map((i: any) =>
+                buildImageUrl(typeof i === "string" ? i : i?.path || ""),
+            )
+            .filter(Boolean);
     }
 
     if (typeof img === "string") {
         try {
             const parsed = JSON.parse(img);
             if (Array.isArray(parsed)) {
-                return parsed.map((i: any) => buildImageUrl(typeof i === "string" ? i : i?.path || "")).filter(Boolean);
+                return parsed
+                    .map((i: any) =>
+                        buildImageUrl(
+                            typeof i === "string" ? i : i?.path || "",
+                        ),
+                    )
+                    .filter(Boolean);
             }
         } catch {
             const url = buildImageUrl(img);
@@ -474,11 +681,14 @@ const allImages = computed<string[]>(() => {
 
 const formatDate = (dateStr?: string): string => {
     if (!dateStr) return "";
-    return new Date(dateStr).toLocaleDateString(locale.value === "en" ? "en-US" : "id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
+    return new Date(dateStr).toLocaleDateString(
+        locale.value === "en" ? "en-US" : "id-ID",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        },
+    );
 };
 
 // Reading time calculation
@@ -528,9 +738,15 @@ const copyShareLink = () => {
 
 // SEO
 useSeoMeta({
-    title: () => titleOf(article.value) ? `${titleOf(article.value)} - YHIE` : "Article - YHIE",
+    title: () =>
+        titleOf(article.value)
+            ? `${titleOf(article.value)} - YHIE`
+            : "Article - YHIE",
     description: () => stripHtml(contentOf(article.value)).substring(0, 160),
-    ogTitle: () => titleOf(article.value) ? `${titleOf(article.value)} - YHIE` : "Article - YHIE",
+    ogTitle: () =>
+        titleOf(article.value)
+            ? `${titleOf(article.value)} - YHIE`
+            : "Article - YHIE",
     ogDescription: () => stripHtml(contentOf(article.value)).substring(0, 160),
     ogImage: () => allImages.value[0] || "",
 });
@@ -552,7 +768,7 @@ useSeoMeta({
 }
 
 :deep(.prose) {
-    font-family: 'Georgia', 'Times New Roman', serif;
+    font-family: "Georgia", "Times New Roman", serif;
 }
 
 :deep(.prose p) {

@@ -122,13 +122,10 @@
                 </div>
 
                 <div v-else class="text-center py-12">
-                    <UAlert
-                        icon="i-heroicons-information-circle"
-                        color="gray"
-                        variant="soft"
-                        title="Kosong"
+                    <EmptyData
+                        title="program"
                         description="Belum ada program yang tersedia saat ini."
-                        class="max-w-md mx-auto backdrop-blur-md bg-white/30 dark:bg-gray-900/30"
+                        icon="i-lucide-box"
                     />
                 </div>
             </div>

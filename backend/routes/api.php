@@ -22,6 +22,7 @@ use App\Http\Controllers\TransactionController;
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);
     Route::get("/{slug}", [ArticleController::class, "show"]);
+    Route::delete("/{id}", [ArticleController::class, "destroy"]);
 });
 
 Route::prefix("programs")->group(function () {

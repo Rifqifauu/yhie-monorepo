@@ -93,19 +93,50 @@
                 </nav>
             </div>
         </div>
+
+        <!-- Dropdown Menu Nuxt UI -->
         <div class="border-t border-slate-200 p-4 dark:border-slate-800">
-            <button
-                @click="openLogoutModal"
-                class="group flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-            >
-                <span>Logout</span>
-                <UIcon
-                    name="i-lucide-log-out"
-                    class="h-4 w-4 text-slate-400 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-red-600 dark:text-slate-500 dark:group-hover:text-red-400"
-                />
-            </button>
+            <!-- Dropdown Menu Nuxt UI -->
+            <div class="border-t border-slate-200 p-4 dark:border-slate-800">
+                <UDropdownMenu
+                    :items="userMenuItems"
+                    :content="{ placement: 'top-start', class: 'w-56' }"
+                    class="w-full"
+                >
+                    <!-- Tambahkan class w-full di sini agar tombolnya memenuhi container -->
+                    <button
+                        class="group flex w-full items-center justify-between rounded-lg px-2 py-2 text-sm font-medium transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        :title="!isOpen ? user?.name || 'Profil Pengguna' : ''"
+                    >
+                        <div
+                            class="flex items-center gap-3 w-full overflow-hidden"
+                        >
+                            <div
+                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                            >
+                                <UIcon name="i-lucide-user" class="h-4 w-4" />
+                            </div>
+
+                            <span
+                                v-if="isOpen"
+                                class="truncate text-slate-700 dark:text-slate-200 flex-1 text-left"
+                            >
+                                {{ user?.name || "Administrator" }}
+                            </span>
+                        </div>
+
+                        <UIcon
+                            v-if="isOpen"
+                            name="i-lucide-chevron-up"
+                            class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:text-slate-600 dark:group-hover:text-slate-300"
+                        />
+                    </button>
+                </UDropdownMenu>
+            </div>
         </div>
     </aside>
+
+    <!-- Modal Logout -->
     <UModal v-model:open="openModal">
         <template #content>
             <div class="p-6 space-y-6">
@@ -140,12 +171,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
-const { logout } = useSanctumAuth();
+import type { DropdownMenuItem } from "@nuxt/ui";
+
+const { user, logout } = useSanctumAuth();
+
 const openModal = ref(false);
 const loading = ref(false);
 const toast = useToast();
+const colorMode = useColorMode();
+const route = useRoute();
 
 const props = defineProps({
     isMobile: {
@@ -154,21 +190,44 @@ const props = defineProps({
     },
 });
 
-const route = useRoute();
 const isDesktopSidebarOpen = useState("desktopSidebar", () => true);
 
 const isOpen = computed(() =>
     props.isMobile ? true : isDesktopSidebarOpen.value,
 );
-const openLogoutModal = () => {
-    openModal.value = true;
-};
 
 const toggleSidebar = () => {
     if (!props.isMobile) {
         isDesktopSidebarOpen.value = !isDesktopSidebarOpen.value;
     }
 };
+
+const toggleTheme = () => {
+    colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
+};
+
+const openLogoutModal = () => {
+    openModal.value = true;
+};
+
+// Computed Items untuk UDropdownMenu
+const userMenuItems = computed<DropdownMenuItem[][]>(() => [
+    [
+        {
+            label: colorMode.value === "dark" ? "Mode Terang" : "Mode Gelap",
+            icon: colorMode.value === "dark" ? "i-lucide-sun" : "i-lucide-moon",
+            onSelect: toggleTheme,
+        },
+    ],
+    [
+        {
+            label: "Logout",
+            icon: "i-lucide-log-out",
+            color: "error",
+            onSelect: openLogoutModal,
+        },
+    ],
+]);
 
 const navigation = [
     { label: "Dashboard", to: "/admin", icon: "i-lucide-layout-dashboard" },
@@ -197,6 +256,7 @@ const isActive = (path: string) => {
     }
     return route.path.startsWith(path);
 };
+
 const handleLogout = async () => {
     try {
         loading.value = true;
@@ -207,6 +267,9 @@ const handleLogout = async () => {
             description: "Failed to logout. " + error,
             color: "error",
         });
+    } finally {
+        loading.value = false;
+        openModal.value = false;
     }
 };
 </script>
