@@ -1,6 +1,6 @@
 <template>
     <section
-        class="py-20 lg:py-28 border-t border-emerald-900 dark:border-emerald-200 bg-gradient-to-b from-white to-emerald-800/30 dark:from-emerald-900 dark:to-gray-900 transition-colors duration-500 overflow-hidden relative"
+        class="py-20 lg:py-28 bg-gradient-to-b from-white via-emerald-50/50 to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 transition-colors duration-500 overflow-hidden relative"
     >
         <UIcon
             v-for="astroid in astroids"

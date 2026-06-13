@@ -1,5 +1,5 @@
 <template>
-    <section class="relative overflow-hidden py-16 lg:py-24 bg-gradient-to-b from-emerald-50 via-emerald-100/80 to-emerald-800/40 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-950 text-slate-900 dark:text-white border-t border-emerald-200/60 dark:border-emerald-900/40 transition-colors duration-300">
+    <section class="relative overflow-hidden py-16 lg:py-24 bg-gradient-to-b from-white via-emerald-50 to-slate-50 dark:from-gray-950 dark:via-emerald-950/80 dark:to-emerald-950/80 text-slate-900 dark:text-white transition-colors duration-300">
         <!-- Background Elements -->
         <img
             src="/shadow-mosque.webp"
@@ -12,6 +12,11 @@
         <div
             class="absolute -bottom-28 -right-28 w-96 h-96 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-3xl"
         ></div>
+
+        <!-- Decorative crescent accent -->
+        <svg class="absolute top-6 left-8 w-16 h-16 text-amber-500/[0.08] dark:text-amber-400/[0.04] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 10a40 40 0 1 0 0 80 32 32 0 1 1 0-80z" />
+        </svg>
 
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-3 gap-10 items-center">

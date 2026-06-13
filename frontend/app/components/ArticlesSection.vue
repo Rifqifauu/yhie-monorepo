@@ -1,6 +1,6 @@
 <template>
     <section
-        class="py-20 lg:py-28 border-t border-emerald-900/20 dark:border-emerald-500/20 bg-gradient-to-b from-emerald-50 via-white to-white dark:from-emerald-950 dark:via-gray-950 dark:to-gray-950 overflow-hidden relative transition-colors duration-500"
+        class="py-20 lg:py-28 bg-gradient-to-b from-emerald-50 via-white to-white dark:from-emerald-950 dark:via-gray-950 dark:to-gray-950 overflow-hidden relative transition-colors duration-500"
     >
         <!-- Decorative blobs -->
         <div
@@ -9,6 +9,16 @@
         <div
             class="absolute bottom-0 right-0 w-80 h-80 bg-amber-400/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
         ></div>
+
+        <!-- Decorative crescent moon -->
+        <svg class="absolute top-8 right-16 w-28 h-28 text-emerald-500/[0.05] dark:text-emerald-400/[0.03] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 10a40 40 0 1 0 0 80 32 32 0 1 1 0-80z" />
+        </svg>
+
+        <!-- Decorative diamond ornament -->
+        <svg class="absolute bottom-10 left-10 w-16 h-16 text-amber-500/[0.06] dark:text-amber-400/[0.03] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+            <polygon points="50,5 95,50 50,95 5,50" />
+        </svg>
 
         <div
             class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10"
