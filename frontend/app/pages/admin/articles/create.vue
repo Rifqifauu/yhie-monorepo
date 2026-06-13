@@ -110,13 +110,24 @@
                             @change="onFileChange"
                         />
                     </UFormField>
-                    <UFormField label="Status Publikasi" name="is_published">
-                        <USelect
-                            v-model="form.is_published"
-                            :items="statusItem"
-                        />
-                    </UFormField>
-
+                    <div class="flex gap-4">
+                        <UFormField
+                            label="Status Publikasi"
+                            name="is_published"
+                        >
+                            <USelect
+                                v-model="form.is_published"
+                                :items="statusItem"
+                            />
+                        </UFormField>
+                        <UFormField label="Kategori" name="category" required>
+                            <UInput
+                                v-model="form.category"
+                                placeholder="Tulis kategori..."
+                                size="lg"
+                            />
+                        </UFormField>
+                    </div>
                     <UFormField
                         label="Konten (Bahasa Indonesia)"
                         name="content_id"
@@ -143,8 +154,8 @@ const { createArticle, isSubmitting } = useArticles();
 const imagePreview = ref<string | null>(null);
 const selectedFile = ref<File | null>(null);
 const statusItem = ref<SelectItem[]>([
-    { label: "Published", value: true },
-    { label: "Draft", value: false },
+    { label: "Published", value: 1 },
+    { label: "Draft", value: 0 },
 ]);
 const form = reactive({
     title_id: "",
@@ -153,7 +164,8 @@ const form = reactive({
     content_en: "",
     slug_id: "",
     slug_en: "",
-    is_published: false,
+    category: "",
+    is_published: 0,
 });
 
 function onFileChange(event: Event) {

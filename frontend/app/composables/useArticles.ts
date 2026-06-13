@@ -1,4 +1,4 @@
-import type { is } from "@nuxt/ui/runtime/locale/index.js";
+import { is } from "@nuxt/ui/runtime/locale/index.js";
 
 // 1. Definisikan Interface untuk Type Safety
 export interface Article {
@@ -264,5 +264,6 @@ export const useArticles = () => {
     updateArticle,
     imageUrl,
     createArticle,
+    isSubmitting,
   };
 };

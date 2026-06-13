@@ -124,7 +124,11 @@
                         :to="localePath('/partner')"
                         class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md hover:shadow-lg transition flex items-center gap-2 group"
                     >
-                        {{ locale === 'en' ? 'View All Partners' : 'Lihat Semua Partner' }}
+                        {{
+                            locale === "en"
+                                ? "View All Partners"
+                                : "Lihat Semua Partner"
+                        }}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"

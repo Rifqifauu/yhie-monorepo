@@ -69,20 +69,36 @@
                         Pratinjau Berkas
                     </span>
                     <span
-                        v-if="isEditing && imagePreview"
+                        v-if="isEditing && imagePreviews.length > 0"
                         class="text-[10px] bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-300 px-2 py-0.5 rounded font-medium"
                     >
-                        Berkas Baru
+                        {{ imagePreviews.length }} Berkas Baru
                     </span>
                 </div>
 
                 <div
+                    v-if="isEditing && imagePreviews.length > 0"
+                    class="grid grid-cols-2 gap-3"
+                >
+                    <div
+                        v-for="(preview, index) in imagePreviews"
+                        :key="index"
+                        class="relative group aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
+                    >
+                        <img
+                            :src="preview"
+                            :alt="`Preview Media ${index + 1}`"
+                            class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"
+                        />
+                    </div>
+                </div>
+
+                <div
+                    v-else
                     class="relative group aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
                 >
                     <img
-                        :src="
-                            imagePreview || coverOf(media) || '/placeholder.png'
-                        "
+                        :src="coverOf(media) || '/placeholder.png'"
                         alt="Preview Media"
                         class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"
                     />
@@ -129,6 +145,36 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <UFormField
+                            label="Slug (Bahasa Indonesia)"
+                            name="slug_id"
+                            required
+                        >
+                            <UInput
+                                v-model="form.slug_id"
+                                placeholder="Contoh: judul-media-kita"
+                                icon="i-lucide-link"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField
+                            label="Slug (Bahasa Inggris)"
+                            name="slug_en"
+                            required
+                        >
+                            <UInput
+                                v-model="form.slug_en"
+                                placeholder="Example: our-media-title"
+                                icon="i-lucide-link"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <UFormField
                             label="Kategori"
                             name="category"
                             required
@@ -144,13 +190,14 @@
                         </UFormField>
 
                         <UFormField
-                            label="Ganti Gambar (Opsional)"
-                            name="image"
-                            help="Pilih berkas baru jika ingin mengganti gambar saat ini."
+                            label="Unggah Gambar (Bisa lebih dari satu)"
+                            name="images"
+                            help="Pilih satu atau beberapa berkas baru."
                         >
                             <input
                                 type="file"
                                 accept="image/*"
+                                multiple
                                 class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-gray-800 dark:file:text-gray-300 cursor-pointer border border-gray-200 dark:border-gray-700 rounded-md p-1 bg-gray-50 dark:bg-gray-950"
                                 @change="onFileChange"
                             />
@@ -212,6 +259,11 @@
                             >
                                 {{ media?.title_id || "-" }}
                             </p>
+                            <p class="text-sm text-gray-500 mt-1">
+                                <span class="font-mono text-xs"
+                                    >Slug: {{ media?.slug_id || "-" }}</span
+                                >
+                            </p>
                         </div>
                         <div>
                             <h3
@@ -223,6 +275,11 @@
                                 class="text-base font-medium text-gray-600 dark:text-gray-300"
                             >
                                 {{ media?.title_en || "-" }}
+                            </p>
+                            <p class="text-sm text-gray-500 mt-1">
+                                <span class="font-mono text-xs"
+                                    >Slug: {{ media?.slug_en || "-" }}</span
+                                >
                             </p>
                         </div>
                     </div>
@@ -305,72 +362,79 @@ const toast = useToast();
 
 const { fetchDetail, updateMedia, isSubmitting, coverOf } = useGallery();
 
-// Request detail media dari API (Top-Level Await untuk SSR)
+// Request detail media dari API
 const { data: apiResponse, pending, refresh } = await fetchDetail(id);
 
-// FIXED: Menggunakan computed agar data selalu reaktif saat refresh() dipicu
 const media = computed(() => apiResponse.value?.data);
 
-// UI States
 const isEditing = ref(false);
 const isDeleteModalOpen = ref(false);
 
-// Image Upload States
-const selectedFile = ref<File | null>(null);
-const imagePreview = ref<string | null>(null);
+const selectedFiles = ref<File[]>([]);
+const imagePreviews = ref<string[]>([]);
 
-// Form Reactivity State
+// Form: Tambahkan slug_id dan slug_en
 const form = reactive({
     title_id: "",
     title_en: "",
+    slug_id: "",
+    slug_en: "",
     category: "",
     description_id: "",
     description_en: "",
 });
 
-// Masuk ke Mode Pengeditan dan Suntik Data Lama ke Form
 function startEdit() {
     if (!media.value) return;
 
     form.title_id = media.value.title_id || "";
     form.title_en = media.value.title_en || "";
+    form.slug_id = media.value.slug_id || ""; // <-- Baru
+    form.slug_en = media.value.slug_en || ""; // <-- Baru
     form.category = media.value.category || "";
     form.description_id = media.value.description_id || "";
     form.description_en = media.value.description_en || "";
 
-    selectedFile.value = null;
-    imagePreview.value = null;
+    selectedFiles.value = [];
+    imagePreviews.value = [];
     isEditing.value = true;
 }
 
-// Batalkan Mode Pengeditan
 function cancelEdit() {
     isEditing.value = false;
-    selectedFile.value = null;
-    imagePreview.value = null;
+    selectedFiles.value = [];
+    imagePreviews.value = [];
 }
 
-// Deteksi pemilihan file gambar lokal untuk pratinjau biner
 function onFileChange(event: Event) {
     const target = event.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-        const file = target.files[0];
-        selectedFile.value = file;
-        imagePreview.value = URL.createObjectURL(file);
+    if (target.files && target.files.length > 0) {
+        const filesArray = Array.from(target.files);
+        selectedFiles.value = filesArray;
+        imagePreviews.value = filesArray.map((file) =>
+            URL.createObjectURL(file),
+        );
+    } else {
+        selectedFiles.value = [];
+        imagePreviews.value = [];
     }
 }
 
-// Eksekusi Update Menggunakan FormData via Composable
 const handleUpdate = async () => {
     const formData = new FormData();
     formData.append("title_id", form.title_id);
     formData.append("title_en", form.title_en);
+    formData.append("slug_id", form.slug_id); // <-- Baru
+    formData.append("slug_en", form.slug_en); // <-- Baru
     formData.append("category", form.category);
     formData.append("description_id", form.description_id);
     formData.append("description_en", form.description_en);
 
-    if (selectedFile.value) {
-        formData.append("image", selectedFile.value);
+    // Kirim gambar sebagai Array `images[]` agar bisa ditangkap Laravel dengan benar
+    if (selectedFiles.value.length > 0) {
+        selectedFiles.value.forEach((file) => {
+            formData.append("images[]", file);
+        });
     }
 
     const result = await updateMedia(id, formData);
@@ -383,9 +447,9 @@ const handleUpdate = async () => {
             icon: "i-lucide-circle-check",
         });
         isEditing.value = false;
-        imagePreview.value = null;
-        selectedFile.value = null;
-        refresh(); // Otomatis memicu update pada computed 'media'
+        imagePreviews.value = [];
+        selectedFiles.value = [];
+        refresh();
     } else {
         toast.add({
             title: "Gagal memperbarui",
@@ -396,7 +460,6 @@ const handleUpdate = async () => {
     }
 };
 
-// Pemicu Modal Penghapusan Data
 function triggerDelete() {
     if (media.value?.id) {
         isDeleteModalOpen.value = true;

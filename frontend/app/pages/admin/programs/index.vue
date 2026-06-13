@@ -216,7 +216,7 @@ const columns: TableColumn<Program>[] = [
         cell: ({ row }) => {
             return h("div", { class: "flex items-center gap-3 py-1" }, [
                 h(UAvatar, {
-                    src: imageUrl(row.original.image || ""),
+                    src: imageUrl(row.original.image_path || ""),
                     icon: "i-lucide-image",
                     size: "md",
                     alt: titleOf(row.original),

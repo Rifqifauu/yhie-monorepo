@@ -141,6 +141,7 @@ const {
     applySearch,
     clearSearch,
     refresh,
+    imageUrl,
 } = usePartners();
 
 export interface Partner {
@@ -218,7 +219,7 @@ const columns: TableColumn<Partner>[] = [
         cell: ({ row }) => {
             return h("div", { class: "flex items-center gap-3 py-1" }, [
                 h(UAvatar, {
-                    src: row.original.logo || "",
+                    src: imageUrl(row.original.logo || ""),
                     icon: "i-lucide-image",
                     size: "md",
                     alt: row.original.name_id || "Logo",

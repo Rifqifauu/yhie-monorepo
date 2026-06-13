@@ -196,12 +196,11 @@
                             label="Deskripsi (Bahasa Indonesia)"
                             name="description_id"
                         >
-                            <UTextarea
-                                v-model="form.description_id"
+                            <RichEditor
+                                v-model="form.content_id"
                                 placeholder="Tulis deskripsi artikel lengkap dalam Bahasa Indonesia di sini..."
-                                :rows="4"
-                                size="lg"
                                 class="w-full"
+                                editorClass="min-h-[200px] text-lg"
                             />
                         </UFormField>
 
@@ -209,12 +208,11 @@
                             label="Deskripsi (Bahasa Inggris)"
                             name="description_en"
                         >
-                            <UTextarea
-                                v-model="form.description_en"
-                                placeholder="Tulis deskripsi artikel lengkap dalam Bahasa Inggris di sini..."
-                                :rows="4"
-                                size="lg"
+                            <RichEditor
+                                v-model="form.content_en"
+                                placeholder="Tulis deskripsi artikel lengkap dalam Bahasa Indonesia di sini..."
                                 class="w-full"
+                                editorClass="min-h-[200px] text-lg"
                             />
                         </UFormField>
                     </div>
@@ -321,6 +319,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
+import RichEditor from "~/components/RichEditor.vue";
 
 definePageMeta({
     layout: "admin",
@@ -394,7 +393,7 @@ const handleUpdate = async () => {
         formData.append("image", selectedFile.value);
     }
 
-    const result = await updateArticle(id, formData);
+    const result = await updateArticle(article.value?.id, formData);
 
     if (result.success) {
         toast.add({
