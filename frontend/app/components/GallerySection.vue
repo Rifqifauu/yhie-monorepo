@@ -1,6 +1,6 @@
 <template>
     <section
-        class="py-20 lg:py-28 border-t border-emerald-900/20 dark:border-emerald-500/20 bg-gradient-to-b from-emerald-800/30 via-white to-emerald-50 dark:from-slate-950 dark:via-emerald-950 dark:to-emerald-950 overflow-hidden relative transition-colors duration-500"
+        class="py-20 lg:py-28 bg-gradient-to-b from-emerald-50 via-white to-emerald-50 dark:from-gray-900 dark:via-emerald-950 dark:to-emerald-950 overflow-hidden relative transition-colors duration-500"
     >
         <!-- Decorative blobs -->
         <div
@@ -9,6 +9,19 @@
         <div
             class="absolute bottom-0 left-1/4 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
         ></div>
+
+        <!-- Decorative geometric ring -->
+        <svg class="absolute -top-6 -left-6 w-40 h-40 text-emerald-500/[0.05] dark:text-emerald-400/[0.03] pointer-events-none" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="50" cy="50" r="40" />
+            <circle cx="50" cy="50" r="30" />
+            <line x1="50" y1="10" x2="50" y2="20" /><line x1="50" y1="80" x2="50" y2="90" />
+            <line x1="10" y1="50" x2="20" y2="50" /><line x1="80" y1="50" x2="90" y2="50" />
+        </svg>
+
+        <!-- Decorative small star -->
+        <svg class="absolute bottom-12 right-12 w-20 h-20 text-amber-400/[0.06] dark:text-amber-400/[0.03] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+            <polygon points="50,5 61,40 98,40 68,60 79,95 50,73 21,95 32,60 2,40 39,40" />
+        </svg>
 
         <div
             class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10"

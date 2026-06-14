@@ -1,8 +1,36 @@
 <template>
     <div
-        class="w-full mx-auto bg-gradient-to-b from-emerald-50 via-emerald-100 to-emerald-800/40 dark:from-gray-950 dark:via-emerald-950 dark:to-slate-950 px-4 py-16 border-t border-emerald-800/20 dark:border-emerald-500/20"
+        class="relative w-full mx-auto bg-gradient-to-b from-white via-white to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 px-4 py-20 overflow-hidden transition-colors duration-500"
     >
-        <div class="max-w-7xl mx-auto pb-6">
+        <!-- Decorative blobs -->
+        <div
+            class="absolute -top-20 right-1/4 w-80 h-80 bg-amber-400/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
+        ></div>
+        <div
+            class="absolute bottom-0 left-1/6 w-72 h-72 bg-emerald-400/10 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
+        ></div>
+
+        <!-- Subtle geometric pattern -->
+        <div
+            class="absolute inset-0 opacity-[0.02] dark:opacity-[0.015] pointer-events-none"
+            style="
+                background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+                background-size: 32px 32px;
+            "
+        ></div>
+
+        <!-- Decorative star ornament -->
+        <svg class="absolute top-8 left-12 w-20 h-20 text-emerald-500/[0.06] dark:text-emerald-400/[0.03] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+            <polygon points="50,0 61,35 100,35 68,57 79,91 50,70 21,91 32,57 0,35 39,35" />
+        </svg>
+
+        <!-- Decorative arc ornament -->
+        <svg class="absolute bottom-6 right-8 w-36 h-18 text-amber-400/[0.05] dark:text-amber-400/[0.03] pointer-events-none" viewBox="0 0 200 100" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 80 Q100 10 180 80" />
+            <path d="M40 80 Q100 25 160 80" />
+        </svg>
+
+        <div class="max-w-7xl mx-auto pb-6 relative z-10">
             <h2
                 class="text-3xl md:text-5xl font-serif font-bold text-center mb-12 text-gray-800 dark:text-gray-100"
             >
@@ -161,7 +189,6 @@
                 </NuxtLink>
             </div>
         </div>
-    </div>
 </template>
 
 <script setup lang="ts">

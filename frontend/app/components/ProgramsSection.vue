@@ -1,8 +1,35 @@
 <template>
     <div
-        class="w-full mx-auto bg-gradient-to-b from-emerald-50 via-emerald-100 to-emerald-800/40 dark:from-gray-950 dark:via-emerald-950 dark:to-slate-950 px-4 py-16 border-t border-emerald-800/20 dark:border-emerald-500/20"
+        class="relative w-full mx-auto bg-gradient-to-b from-slate-50 via-white to-white dark:from-emerald-950 dark:via-gray-900 dark:to-gray-900 px-4 py-20 overflow-hidden transition-colors duration-500"
     >
-        <div class="max-w-7xl mx-auto pb-6">
+        <!-- Decorative blobs -->
+        <div
+            class="absolute top-0 left-1/4 w-80 h-80 bg-emerald-400/10 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
+        ></div>
+        <div
+            class="absolute bottom-0 right-1/6 w-96 h-96 bg-amber-400/8 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
+        ></div>
+
+        <!-- Subtle dot pattern -->
+        <div
+            class="absolute inset-0 opacity-[0.03] dark:opacity-[0.02] pointer-events-none"
+            style="
+                background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+                background-size: 24px 24px;
+            "
+        ></div>
+
+        <!-- Decorative 8-pointed star -->
+        <svg class="absolute top-10 right-10 w-32 h-32 text-emerald-500/[0.06] dark:text-emerald-400/[0.04] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+            <polygon points="50,0 61,35 100,35 68,57 79,91 50,70 21,91 32,57 0,35 39,35" />
+        </svg>
+
+        <!-- Decorative crescent -->
+        <svg class="absolute bottom-16 left-8 w-24 h-24 text-amber-500/[0.07] dark:text-amber-400/[0.04] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 10a40 40 0 1 0 0 80 32 32 0 1 1 0-80z" />
+        </svg>
+
+        <div class="max-w-7xl mx-auto pb-6 relative z-10">
             <h2
                 class="text-3xl md:text-5xl font-bold font-serif mb-12 text-center text-gray-900 dark:text-gray-50 tracking-tight"
             >
@@ -53,7 +80,7 @@
             <div v-else>
                 <div
                     v-if="data && data.length > 0"
-                    class="grid grid-cols-1 md:grid-cols-3 gap-8"
+                    class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto"
                 >
                     <UCard
                         v-for="program in data"
@@ -70,9 +97,9 @@
                     >
                         <template #header>
                             <div
-                                class="relative w-full h-48 overflow-hidden bg-gray-100 dark:bg-gray-800"
+                                class="relative w-full h-56 overflow-hidden bg-gray-100 dark:bg-gray-800"
                             >
-                                <NuxtImage
+                                <img
                                     :src="getImageUrl(program.image_path)"
                                     :alt="
                                         locale === 'id'
@@ -80,8 +107,8 @@
                                             : program.title_en
                                     "
                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    placeholder
                                     loading="lazy"
+                                    @error="handleImageError"
                                 />
                                 <div
                                     class="absolute bottom-3 right-3 backdrop-blur-md bg-emerald-600/80 dark:bg-emerald-500/80 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
@@ -147,7 +174,7 @@ const { data, status, error, refresh } = await useAsyncData(
     {
         transform: (response: any) => {
             const programList = response?.data?.data || [];
-            return programList.slice(0, 3);
+            return programList.slice(0, 2);
         },
     },
 );
@@ -156,6 +183,11 @@ const getImageUrl = (path: string) => {
     if (!path) return "/placeholder.jpg";
     if (path.startsWith("http")) return path;
     return `${backendUrl}/${path.startsWith("/") ? path.substring(1) : path}`;
+};
+
+const handleImageError = (e: Event) => {
+    const target = e.target as HTMLImageElement;
+    if (target) target.src = '/placeholder.jpg';
 };
 
 // Helper format mata uang sederhana sesuai locale
