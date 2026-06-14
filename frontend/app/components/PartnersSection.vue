@@ -2,7 +2,6 @@
     <div
         class="relative w-full mx-auto bg-gradient-to-b from-white via-white to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 px-4 py-20 overflow-hidden transition-colors duration-500"
     >
-        <!-- Decorative blobs -->
         <div
             class="absolute -top-20 right-1/4 w-80 h-80 bg-amber-400/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
         ></div>
@@ -10,7 +9,6 @@
             class="absolute bottom-0 left-1/6 w-72 h-72 bg-emerald-400/10 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
         ></div>
 
-        <!-- Subtle geometric pattern -->
         <div
             class="absolute inset-0 opacity-[0.02] dark:opacity-[0.015] pointer-events-none"
             style="
@@ -19,12 +17,10 @@
             "
         ></div>
 
-        <!-- Decorative star ornament -->
         <svg class="absolute top-8 left-12 w-20 h-20 text-emerald-500/[0.06] dark:text-emerald-400/[0.03] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
             <polygon points="50,0 61,35 100,35 68,57 79,91 50,70 21,91 32,57 0,35 39,35" />
         </svg>
 
-        <!-- Decorative arc ornament -->
         <svg class="absolute bottom-6 right-8 w-36 h-18 text-amber-400/[0.05] dark:text-amber-400/[0.03] pointer-events-none" viewBox="0 0 200 100" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M20 80 Q100 10 180 80" />
             <path d="M40 80 Q100 25 160 80" />
@@ -60,13 +56,11 @@
                 </button>
             </div>
 
-            <!-- Logo marquee (running from right to left) -->
             <div
                 v-else-if="partners.length > 0"
                 class="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] [-webkit-mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
             >
                 <div class="flex animate-marquee py-4 gap-0">
-                    <!-- First set of logos -->
                     <NuxtLink
                         v-for="partner in partners"
                         :key="partner.id"
@@ -88,7 +82,6 @@
                             "
                         />
                     </NuxtLink>
-                    <!-- Duplicate set of logos for seamless loop -->
                     <NuxtLink
                         v-for="partner in partners"
                         :key="'dup-' + partner.id"
@@ -113,14 +106,12 @@
                     </NuxtLink>
                 </div>
             </div>
-
             <div class="space-y-4">
                 <p
                     class="text-center text-sm font-medium text-gray-500 dark:text-gray-400"
                 >
                     Silakan pilih mitra di bawah untuk melihat informasi detail:
                 </p>
-
                 <div class="flex flex-wrap justify-center gap-4">
                     <button
                         v-for="partner in partners"
@@ -161,7 +152,6 @@
                     </button>
                 </div>
             </div>
-
             <div class="flex justify-center items-center pt-6">
                 <NuxtLink
                     :to="localePath('/partner')"
@@ -193,16 +183,12 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-
 const { t, locale } = useI18n();
 const localePath = useLocalePath();
-
 const config = useRuntimeConfig();
 const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
 
 const client = useSanctumClient();
-
-// State untuk menyimpan ID partner yang sedang aktif dipilih oleh pengguna
 const selectedPartnerId = ref<number | null>(null);
 
 const {
