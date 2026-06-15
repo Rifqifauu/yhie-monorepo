@@ -12,16 +12,32 @@
         <div
             class="absolute inset-0 opacity-[0.02] dark:opacity-[0.015] pointer-events-none"
             style="
-                background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+                background-image: radial-gradient(
+                    circle,
+                    currentColor 1px,
+                    transparent 1px
+                );
                 background-size: 32px 32px;
             "
         ></div>
 
-        <svg class="absolute top-8 left-12 w-20 h-20 text-emerald-500/[0.06] dark:text-emerald-400/[0.03] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
-            <polygon points="50,0 61,35 100,35 68,57 79,91 50,70 21,91 32,57 0,35 39,35" />
+        <svg
+            class="absolute top-8 left-12 w-20 h-20 text-emerald-500/[0.06] dark:text-emerald-400/[0.03] pointer-events-none"
+            viewBox="0 0 100 100"
+            fill="currentColor"
+        >
+            <polygon
+                points="50,0 61,35 100,35 68,57 79,91 50,70 21,91 32,57 0,35 39,35"
+            />
         </svg>
 
-        <svg class="absolute bottom-6 right-8 w-36 h-18 text-amber-400/[0.05] dark:text-amber-400/[0.03] pointer-events-none" viewBox="0 0 200 100" fill="none" stroke="currentColor" stroke-width="1.5">
+        <svg
+            class="absolute bottom-6 right-8 w-36 h-18 text-amber-400/[0.05] dark:text-amber-400/[0.03] pointer-events-none"
+            viewBox="0 0 200 100"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+        >
             <path d="M20 80 Q100 10 180 80" />
             <path d="M40 80 Q100 25 160 80" />
         </svg>
@@ -179,6 +195,7 @@
                 </NuxtLink>
             </div>
         </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -218,7 +235,6 @@ const activePartner = computed(() => {
     );
 });
 
-// Watcher untuk mengeset ID awal ketika data baru berhasil masuk pertama kali
 watch(
     partners,
     (newPartners) => {
@@ -229,11 +245,9 @@ watch(
     { immediate: true },
 );
 
-// Fungsi pembuat URL Gambar
 const getImageUrl = (path: string | null | undefined) => {
     if (!path) return "/placeholder.jpg";
     if (path.startsWith("http://") || path.startsWith("https://")) return path;
-
     const cleanPath = path.startsWith("/") ? path.substring(1) : path;
     return `${backendUrl}/${cleanPath}`;
 };
