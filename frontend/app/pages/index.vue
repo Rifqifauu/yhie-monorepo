@@ -2,6 +2,7 @@
     <HeroSection />
     <ProgramsSection />
     <BenefitSection />
+    <ScheduleSection />
     <GallerySection />
     <ArticlesSection />
     <PartnersSection />

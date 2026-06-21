@@ -23,6 +23,10 @@ export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
 }
 
+export interface SingleApiResponse<T> {
+  data: T;
+}
+
 export const useSchedules = () => {
   const { locale } = useI18n();
   const client = useSanctumClient();
@@ -147,7 +151,7 @@ export const useSchedules = () => {
       return {
         success: false,
         error:
-          err.data?.message || err.message || "Gagal membuat data program.",
+          err.data?.message || err.message || "Gagal membuat data jadwal.",
       };
     } finally {
       isSubmitting.value = false;
@@ -175,7 +179,7 @@ export const useSchedules = () => {
       return {
         success: false,
         error:
-          err.data?.message || err.message || "Gagal memperbarui data program.",
+          err.data?.message || err.message || "Gagal memperbarui data jadwal.",
       };
     } finally {
       isSubmitting.value = false;

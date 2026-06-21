@@ -3,23 +3,21 @@
         class="relative w-full mx-auto bg-gradient-to-b from-white via-white to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 px-4 py-20 overflow-hidden transition-colors duration-500"
     >
         <div
-            class="absolute -top-20 right-1/4 w-80 h-80 bg-amber-400/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
+            class="absolute -top-20 right-1/4 w-96 h-96 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse"
         ></div>
         <div
-            class="absolute bottom-0 left-1/6 w-72 h-72 bg-emerald-400/10 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
+            class="absolute bottom-0 left-1/6 w-80 h-80 bg-teal-400/20 dark:bg-teal-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse"
+            style="animation-delay: 2s;"
         ></div>
 
-        <div
-            class="absolute inset-0 opacity-[0.02] dark:opacity-[0.015] pointer-events-none"
-            style="
-                background-image: radial-gradient(
-                    circle,
-                    currentColor 1px,
-                    transparent 1px
-                );
-                background-size: 32px 32px;
-            "
-        ></div>
+        <!-- Dynamic Background Grid -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#10b981_1px,transparent_1px),linear-gradient(to_bottom,#10b981_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-[0.04] dark:opacity-[0.06]"></div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="absolute left-0 top-1/4 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute right-0 bottom-1/4 w-40 h-40 bg-teal-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
 
         <svg
             class="absolute top-8 left-12 w-20 h-20 text-emerald-500/[0.06] dark:text-emerald-400/[0.03] pointer-events-none"
@@ -43,11 +41,15 @@
         </svg>
 
         <div class="max-w-7xl mx-auto pb-6 relative z-10">
-            <h2
-                class="text-3xl md:text-5xl font-serif font-bold text-center mb-12 text-gray-800 dark:text-gray-100"
-            >
-                {{ t("partners.title") }}
-            </h2>
+            <div class="text-center mb-16 max-w-3xl mx-auto px-4">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-50 tracking-tight">
+                    {{ t("partners.title") }}
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-emerald-800 to-emerald-500 mx-auto rounded-full"></div>
+                <p class="text-lg font-medium text-emerald-850 dark:text-emerald-100/80 mt-4 block">
+                    {{ locale === 'id' ? 'Telah berkolaborasi dan dipercaya oleh berbagai institusi serta perusahaan.' : 'Collaborated and trusted by various institutions and companies.' }}
+                </p>
+            </div>
 
             <div
                 v-if="status === 'pending'"
@@ -76,50 +78,75 @@
                 v-else-if="partners.length > 0"
                 class="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] [-webkit-mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
             >
-                <div class="flex animate-marquee py-4 gap-0">
-                    <NuxtLink
-                        v-for="partner in partners"
-                        :key="partner.id"
-                        :to="localePath('/partner')"
-                        class="group flex items-center justify-center h-16 px-6 min-w-[140px] mx-2 md:mx-3 rounded-2xl border border-slate-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-emerald-900/30 hover:shadow-md transition-all duration-300 shrink-0"
-                    >
-                        <img
-                            :src="getImageUrl(partner.logo)"
-                            :alt="
-                                locale === 'id'
-                                    ? partner.name_id
-                                    : partner.name_en
-                            "
-                            class="h-9 max-w-[100px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-400"
-                            @error="
-                                (e) =>
-                                    ((e.target as HTMLImageElement).src =
-                                        '/placeholder.jpg')
-                            "
-                        />
-                    </NuxtLink>
-                    <NuxtLink
-                        v-for="partner in partners"
-                        :key="'dup-' + partner.id"
-                        :to="localePath('/partner')"
-                        class="group flex items-center justify-center h-16 px-6 min-w-[140px] mx-2 md:mx-3 rounded-2xl border border-slate-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-white dark:hover:bg-emerald-900/30 hover:shadow-md transition-all duration-300 shrink-0"
-                        aria-hidden="true"
-                    >
-                        <img
-                            :src="getImageUrl(partner.logo)"
-                            :alt="
-                                locale === 'id'
-                                    ? partner.name_id
-                                    : partner.name_en
-                            "
-                            class="h-9 max-w-[100px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-400"
-                            @error="
-                                (e) =>
-                                    ((e.target as HTMLImageElement).src =
-                                        '/placeholder.jpg')
-                            "
-                        />
-                    </NuxtLink>
+                <!-- First Row (Moving Right to Left) -->
+                <div class="flex animate-marquee py-3 gap-0">
+                        <NuxtLink
+                            v-for="partner in partners"
+                            :key="partner.id"
+                            :to="localePath('/partner')"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                        >
+                            <!-- Decorative glow on hover -->
+                            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
+                            
+                            <img
+                                :src="getImageUrl(partner.logo)"
+                                :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                                class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
+                                @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                            />
+                        </NuxtLink>
+                        <NuxtLink
+                            v-for="partner in partners"
+                            :key="'dup-' + partner.id"
+                            :to="localePath('/partner')"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                            aria-hidden="true"
+                        >
+                            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
+                            
+                            <img
+                                :src="getImageUrl(partner.logo)"
+                                :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                                class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
+                                @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                            />
+                        </NuxtLink>
+                </div>
+
+                <!-- Second Row (Moving Left to Right) -->
+                <div class="flex animate-marquee-reverse py-3 gap-0 mt-2">
+                        <NuxtLink
+                            v-for="partner in [...partners].reverse()"
+                            :key="'rev-' + partner.id"
+                            :to="localePath('/partner')"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                        >
+                            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
+                            
+                            <img
+                                :src="getImageUrl(partner.logo)"
+                                :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                                class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
+                                @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                            />
+                        </NuxtLink>
+                        <NuxtLink
+                            v-for="partner in [...partners].reverse()"
+                            :key="'rev-dup-' + partner.id"
+                            :to="localePath('/partner')"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                            aria-hidden="true"
+                        >
+                            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
+                            
+                            <img
+                                :src="getImageUrl(partner.logo)"
+                                :alt="locale === 'id' ? partner.name_id : partner.name_en"
+                                class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
+                                @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                            />
+                        </NuxtLink>
                 </div>
             </div>
 
@@ -218,13 +245,29 @@ const getImageUrl = (path: string | null | undefined) => {
     }
 }
 
+@keyframes marquee-reverse {
+    0% {
+        transform: translate3d(-50%, 0, 0);
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
 .animate-marquee {
     display: flex;
     width: max-content;
     animation: marquee 30s linear infinite;
 }
 
-.animate-marquee:hover {
+.animate-marquee-reverse {
+    display: flex;
+    width: max-content;
+    animation: marquee-reverse 35s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-marquee-reverse:hover {
     animation-play-state: paused;
 }
 </style>
