@@ -12,7 +12,7 @@
 
         <!-- Dynamic Background Grid -->
         <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-[linear-gradient(to_right,#10b981_1px,transparent_1px),linear-gradient(to_bottom,#10b981_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-[0.04] dark:opacity-[0.06]"></div>
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#10b981_1px,transparent_1px),linear-gradient(to_bottom,#10b981_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-15 dark:opacity-[0.06]"></div>
         </div>
 
         <!-- Decorative Elements -->
@@ -84,7 +84,7 @@
                             v-for="partner in partners"
                             :key="partner.id"
                             :to="localePath('/partner')"
-                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                         >
                             <!-- Decorative glow on hover -->
                             <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
@@ -100,7 +100,7 @@
                             v-for="partner in partners"
                             :key="'dup-' + partner.id"
                             :to="localePath('/partner')"
-                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                             aria-hidden="true"
                         >
                             <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
@@ -120,7 +120,7 @@
                             v-for="partner in [...partners].reverse()"
                             :key="'rev-' + partner.id"
                             :to="localePath('/partner')"
-                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                         >
                             <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
                             
@@ -135,7 +135,7 @@
                             v-for="partner in [...partners].reverse()"
                             :key="'rev-dup-' + partner.id"
                             :to="localePath('/partner')"
-                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border border-white/60 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
+                            class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                             aria-hidden="true"
                         >
                             <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>

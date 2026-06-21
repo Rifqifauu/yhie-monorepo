@@ -2,19 +2,12 @@
     <section class="relative w-full mx-auto px-4 py-24 overflow-hidden transition-colors duration-500 bg-slate-50 dark:bg-emerald-950/80">
         <!-- Background Decorations -->
         <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-            <!-- Grid Pattern -->
-            <svg class="absolute inset-0 h-full w-full opacity-[0.03] dark:opacity-[0.05]" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <pattern id="schedule-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                        <path d="M0 40V0H40" fill="none" stroke="currentColor" stroke-width="1"></path>
-                    </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#schedule-grid)"></rect>
-            </svg>
+            <!-- Dynamic Grid Pattern -->
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#10b981_1px,transparent_1px),linear-gradient(to_bottom,#10b981_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_80%,transparent_100%)] opacity-15 dark:opacity-[0.06]"></div>
             
             <!-- Glowing Blobs -->
-            <div class="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-96 h-96 bg-emerald-400/20 dark:bg-emerald-600/20 rounded-full blur-3xl opacity-50 mix-blend-multiply dark:mix-blend-screen"></div>
-            <div class="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-80 h-80 bg-teal-400/20 dark:bg-teal-600/20 rounded-full blur-3xl opacity-50 mix-blend-multiply dark:mix-blend-screen"></div>
+            <div class="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-96 h-96 bg-emerald-400/30 dark:bg-emerald-600/20 rounded-full blur-[100px] opacity-70 mix-blend-multiply dark:mix-blend-screen animate-pulse"></div>
+            <div class="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-80 h-80 bg-teal-400/30 dark:bg-teal-600/20 rounded-full blur-[100px] opacity-70 mix-blend-multiply dark:mix-blend-screen animate-pulse" style="animation-delay: 1.5s;"></div>
         </div>
 
         <div class="max-w-6xl mx-auto relative z-10">
@@ -83,15 +76,15 @@
                                 index % 2 === 0 ? 'md:pr-16 md:text-right flex flex-col md:items-end' : 'md:pl-16 md:ml-auto flex flex-col md:items-start'
                             ]">
                                 <!-- Card -->
-                                <div class="w-full flex flex-col bg-white/70 dark:bg-emerald-950/40 backdrop-blur-md rounded-3xl p-7 border border-white/60 dark:border-emerald-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] hover:shadow-[0_15px_40px_rgb(16,185,129,0.1)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                                <div class="w-full flex flex-col bg-emerald-50 dark:bg-emerald-950/50 backdrop-blur-md rounded-3xl p-7 border-2 dark:border border-emerald-200 dark:border-emerald-800/60 shadow-[0_10px_40px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] hover:shadow-[0_15px_50px_rgb(16,185,129,0.15)] hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden">
                                     
                                     <!-- Card Decorative Gradient -->
                                     <div :class="[
-                                        'absolute top-0 w-40 h-40 bg-gradient-to-br from-emerald-100/60 to-transparent dark:from-emerald-800/40 -z-10',
+                                        'absolute top-0 w-40 h-40 bg-gradient-to-br from-white to-transparent dark:from-emerald-800/40 -z-10',
                                         index % 2 === 0 ? 'right-0 rounded-bl-full' : 'left-0 rounded-br-full'
                                     ]"></div>
 
-                                    <div :class="['inline-flex flex-col text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/50 px-4 py-2 rounded-xl border border-emerald-100 dark:border-emerald-800/50 shadow-sm backdrop-blur-sm mb-4', 
+                                    <div :class="['inline-flex flex-col text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-emerald-900/50 px-4 py-2 rounded-xl border border-white dark:border-emerald-800/50 shadow-sm backdrop-blur-sm mb-4', 
                                          index % 2 === 0 ? 'md:items-end items-start' : 'items-start'
                                     ]">
                                         <div class="flex items-center gap-1.5">
