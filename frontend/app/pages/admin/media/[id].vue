@@ -131,9 +131,11 @@
             <div
                 class="lg:col-span-2 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6"
             >
-                <form
+                <UForm
                     v-if="isEditing"
-                    @submit.prevent="handleUpdate"
+                    :schema="schema"
+                    :state="form"
+                    @submit="handleUpdate"
                     class="space-y-6"
                 >
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -313,7 +315,7 @@
                             />
                         </UFormField>
                     </div>
-                </form>
+                </UForm>
 
                 <div v-else class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -420,9 +422,20 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
+import { z } from "zod";
 
 definePageMeta({
     layout: "admin",
+});
+
+const schema = z.object({
+    title_id: z.string().min(1, "Judul (ID) wajib diisi"),
+    title_en: z.string().min(1, "Judul (EN) wajib diisi"),
+    slug_id: z.string().min(1, "Slug (ID) wajib diisi"),
+    slug_en: z.string().min(1, "Slug (EN) wajib diisi"),
+    category: z.string().min(1, "Kategori wajib diisi"),
+    description_id: z.string().max(100, "Deskripsi maksimal 100 karakter").optional(),
+    description_en: z.string().max(100, "Deskripsi maksimal 100 karakter").optional(),
 });
 
 const id = useRoute().params.id as string;
