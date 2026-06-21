@@ -81,7 +81,7 @@
                 <div
                     v-for="n in 8"
                     :key="n"
-                    class="break-inside-avoid inline-block w-full mb-4 rounded-2xl overflow-hidden transform-gpu"
+                    class="safari-masonry-item mb-4 rounded-2xl overflow-hidden"
                     :class="
                         n % 4 === 0
                             ? 'h-64'
@@ -135,9 +135,7 @@
                 <div
                     v-for="(item, index) in previewItems"
                     :key="item.id ?? index"
-                    class="break-inside-avoid inline-block w-full mb-4 group relative overflow-hidden rounded-2xl cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500 transform-gpu"
-                    :data-aos="'fade-up'"
-                    :data-aos-delay="index * 60"
+                    class="safari-masonry-item mb-4 group relative overflow-hidden rounded-2xl cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500"
                     @click="openLightbox(item)"
                 >
                     <div
@@ -397,6 +395,19 @@ const getDynamicDesc = (item: any): string => {
 </script>
 
 <style scoped>
+/* Safari Webkit Fixes for Masonry Columns */
+.safari-masonry-item {
+    display: inline-block;
+    width: 100%;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
 /* Desain Scrollbar Halus untuk teks Deskripsi Panjang */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
