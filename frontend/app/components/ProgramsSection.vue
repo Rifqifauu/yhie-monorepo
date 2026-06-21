@@ -1,53 +1,44 @@
 <template>
     <div
-        class="relative w-full mx-auto bg-gradient-to-b from-slate-50 via-white to-white dark:from-emerald-950 dark:via-gray-900 dark:to-gray-900 px-4 py-20 overflow-hidden transition-colors duration-500"
+        class="relative w-full mx-auto px-4 py-24 overflow-hidden transition-colors duration-500"
     >
-        <!-- Decorative blobs -->
         <div
-            class="absolute top-0 left-1/4 w-80 h-80 bg-emerald-400/10 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"
+            class="absolute inset-0 bg-white/40 dark:bg-gray-800/20 transition-colors duration-500 z-10"
         ></div>
         <div
-            class="absolute bottom-0 right-1/6 w-96 h-96 bg-amber-400/8 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
+            class="absolute inset-0 w-full h-full bg-fixed bg-center bg-cover bg-no-repeat opacity-[0.5] dark:opacity-[0.3] -z-10"
+            style="background-image: url(&quot;/gunungslamet.png&quot;)"
         ></div>
 
-        <!-- Subtle dot pattern -->
-        <div
-            class="absolute inset-0 opacity-[0.03] dark:opacity-[0.02] pointer-events-none"
-            style="
-                background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
-                background-size: 24px 24px;
-            "
-        ></div>
-
-        <!-- Decorative 8-pointed star -->
-        <svg class="absolute top-10 right-10 w-32 h-32 text-emerald-500/[0.06] dark:text-emerald-400/[0.04] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
-            <polygon points="50,0 61,35 100,35 68,57 79,91 50,70 21,91 32,57 0,35 39,35" />
-        </svg>
-
-        <!-- Decorative crescent -->
-        <svg class="absolute bottom-16 left-8 w-24 h-24 text-amber-500/[0.07] dark:text-amber-400/[0.04] pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
-            <path d="M50 10a40 40 0 1 0 0 80 32 32 0 1 1 0-80z" />
-        </svg>
-
-        <div class="max-w-7xl mx-auto pb-6 relative z-10">
-            <h2
-                class="text-3xl md:text-5xl font-bold font-serif mb-12 text-center text-gray-900 dark:text-gray-50 tracking-tight"
-            >
-                {{ t("programs.title") }}
-            </h2>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="text-center mb-16 max-w-5xl mx-auto p-4 rounded-2xl">
+                <h2
+                    class="text-4xl md:text-5xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-50 tracking-tight"
+                >
+                    {{ t("programs.title") }}
+                </h2>
+                <div
+                    class="w-20 h-1 bg-gradient-to-r from-emerald-800 to-emerald-500 mx-auto rounded-full"
+                ></div>
+                <span
+                    class="text-lg font-medium text-emerald-850 dark:text-white mt-4 block"
+                >
+                    {{ t("programs.description") }}
+                </span>
+            </div>
 
             <div
                 v-if="status === 'pending'"
-                class="flex flex-col items-center justify-center py-16 gap-4"
+                class="flex flex-col items-center justify-center py-20 gap-4"
             >
                 <UIcon
                     name="i-heroicons-arrow-path"
                     class="w-12 h-12 animate-spin text-emerald-600 dark:text-emerald-400"
                 />
                 <span
-                    class="text-sm font-medium text-emerald-700 dark:text-emerald-300"
+                    class="text-sm font-medium tracking-wide text-emerald-700 dark:text-emerald-300"
                 >
-                    Memuat data program...
+                    Memuat data eksklusif...
                 </span>
             </div>
 
@@ -60,7 +51,7 @@
                     description="Terjadi kesalahan saat mengambil data program dari server."
                     :ui="{
                         wrapper:
-                            'backdrop-blur-md bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50',
+                            'backdrop-blur-md bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-2xl',
                     }"
                 >
                     <template #actions>
@@ -80,72 +71,77 @@
             <div v-else>
                 <div
                     v-if="data && data.length > 0"
-                    class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto"
+                    class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 max-w-5xl mx-auto"
                 >
-                    <UCard
+                    <div
                         v-for="program in data"
                         :key="program.id"
-                        class="group transition-all duration-500 hover:-translate-y-2 overflow-hidden shadow-2xl rounded-xl"
-                        :ui="{
-                            base: 'backdrop-blur-md bg-white/40 dark:bg-gray-900/40 border border-white/40 dark:border-gray-800/50 shadow-xl hover:shadow-2xl hover:border-emerald-500/30 dark:hover:border-emerald-400/30',
-                            body: { padding: 'px-6 py-5' },
-                            header: {
-                                padding:
-                                    'p-0 border-b border-gray-200/30 dark:border-gray-800/30',
-                            },
-                        }"
+                        class="relative w-full h-[520px] rounded-[2.5rem] flex flex-col p-4 group transition-all duration-500 hover:-translate-y-2 bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]"
                     >
-                        <template #header>
-                            <div
-                                class="relative w-full h-56 overflow-hidden bg-gray-100 dark:bg-gray-800"
-                            >
-                                <img
-                                    :src="getImageUrl(program.image_path)"
-                                    :alt="
-                                        locale === 'id'
-                                            ? program.title_id
-                                            : program.title_en
-                                    "
-                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    loading="lazy"
-                                    @error="handleImageError"
-                                />
-                                <div
-                                    class="absolute bottom-3 right-3 backdrop-blur-md bg-emerald-600/80 dark:bg-emerald-500/80 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
-                                >
-                                    {{
-                                        formatPrice(
-                                            locale === "id"
-                                                ? program.price_id
-                                                : program.price_en,
-                                        )
-                                    }}
-                                </div>
-                            </div>
-                        </template>
+                        <div
+                            class="relative w-full h-[55%] rounded-[2rem] overflow-hidden mb-5"
+                        >
+                            <img
+                                :src="getImageUrl(program.image_path)"
+                                :alt="getLocalizedData(program, 'title')"
+                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                loading="lazy"
+                                @error="handleImageError"
+                            />
+                        </div>
 
-                        <div class="space-y-3">
+                        <div class="flex-1 flex flex-col px-4 pb-2">
                             <h3
-                                class="text-xl font-bold font-serif text-gray-900 dark:text-white line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300"
+                                class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white leading-tight mb-2 line-clamp-1"
                             >
-                                {{
-                                    locale === "id"
-                                        ? program.title_id
-                                        : program.title_en
-                                }}
+                                {{ getLocalizedData(program, "title") }}
                             </h3>
 
                             <p
-                                class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm line-clamp-4"
+                                class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-2"
                             >
-                                {{
-                                    locale === "id"
-                                        ? program.description_id
-                                        : program.description_en
-                                }}
+                                {{ getLocalizedData(program, "description") }}
                             </p>
+
+                            <div
+                                class="flex flex-wrap items-center gap-3 mt-auto mb-4"
+                            >
+                                <div
+                                    class="px-4 py-1.5 rounded-full bg-white/50 dark:bg-black/30 backdrop-blur-md text-gray-800 dark:text-white text-xs font-semibold border border-white/40 dark:border-white/10 shadow-sm"
+                                >
+                                    {{
+                                        formatPrice(
+                                            getLocalizedData(program, "price"),
+                                        )
+                                    }}
+                                </div>
+                                <div
+                                    class="px-4 py-1.5 rounded-full bg-white/50 dark:bg-black/30 backdrop-blur-md text-gray-800 dark:text-white text-xs font-semibold border border-white/40 dark:border-white/10 shadow-sm flex items-center gap-1.5"
+                                >
+                                    <UIcon
+                                        name="i-heroicons-star-solid"
+                                        class="w-3.5 h-3.5 text-amber-500 dark:text-amber-400"
+                                    />
+                                    Unggulan
+                                </div>
+                            </div>
+
+                            <NuxtLink
+                                :to="`/programs/${program.id}`"
+                                class="block w-full"
+                            >
+                                <button
+                                    class="w-full bg-emerald-700 dark:bg-emerald-500 cursor-pointer hover:bg-emerald-900 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold py-3.5 rounded-full transition-colors duration-300 text-sm shadow-md"
+                                >
+                                    {{
+                                        locale === "id"
+                                            ? "Pesan sekarang"
+                                            : "Reserve now"
+                                    }}
+                                </button>
+                            </NuxtLink>
                         </div>
-                    </UCard>
+                    </div>
                 </div>
 
                 <div v-else class="text-center py-12">
@@ -155,20 +151,52 @@
                         icon="i-lucide-box"
                     />
                 </div>
+
+                <div
+                    v-if="data && data.length > 0"
+                    class="mt-16 flex justify-center"
+                >
+                    <UButton
+                        size="xl"
+                        color="white"
+                        variant="solid"
+                        class="rounded-full px-10 py-4 text-sm font-semibold shadow-lg hover:shadow-xl text-gray-900 bg-white/80 dark:bg-white/10 dark:text-white backdrop-blur-md hover:bg-white dark:hover:bg-white/20 transition-all duration-300 border border-white/50 dark:border-white/10"
+                        to="/programs"
+                    >
+                        {{
+                            locale === "id"
+                                ? "Lihat Program Lainnya"
+                                : "View All Programs"
+                        }}
+                    </UButton>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-const { t, locale } = useI18n();
+import { useI18n } from "vue-i18n"; // Pastikan ini diimport atau menggunakan auto-imports bawaan Nuxt
 
+// Definisikan tipe data untuk program agar lebih aman secara TypeScript
+interface Program {
+    id: string | number;
+    image_path: string;
+    title_id: string;
+    title_en: string;
+    description_id: string;
+    description_en: string;
+    price_id: number | string;
+    price_en: number | string;
+}
+
+const { t, locale } = useI18n();
 const config = useRuntimeConfig();
 const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
-
 const client = useSanctumClient();
 
-const { data, status, error, refresh } = await useAsyncData(
+// Fetch Data
+const { data, status, error, refresh } = await useAsyncData<Program[]>(
     "programs",
     () => client("/api/programs"),
     {
@@ -179,6 +207,15 @@ const { data, status, error, refresh } = await useAsyncData(
     },
 );
 
+// Helpers
+const getLocalizedData = (
+    program: Program,
+    field: "title" | "description" | "price",
+) => {
+    const key = `${field}_${locale.value}` as keyof Program;
+    return program[key];
+};
+
 const getImageUrl = (path: string) => {
     if (!path) return "/placeholder.jpg";
     if (path.startsWith("http")) return path;
@@ -187,25 +224,21 @@ const getImageUrl = (path: string) => {
 
 const handleImageError = (e: Event) => {
     const target = e.target as HTMLImageElement;
-    if (target) target.src = '/placeholder.jpg';
+    if (target) target.src = "/placeholder.jpg";
 };
 
-// Helper format mata uang sederhana sesuai locale
 const formatPrice = (price: number | string) => {
     const numericPrice = typeof price === "string" ? parseFloat(price) : price;
     if (isNaN(numericPrice)) return price;
 
-    if (locale.value === "id") {
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-        }).format(numericPrice);
-    } else {
-        return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-        }).format(numericPrice);
-    }
+    const options =
+        locale.value === "id"
+            ? { style: "currency", currency: "IDR", minimumFractionDigits: 0 }
+            : { style: "currency", currency: "USD" };
+
+    return new Intl.NumberFormat(
+        locale.value === "id" ? "id-ID" : "en-US",
+        options,
+    ).format(numericPrice);
 };
 </script>

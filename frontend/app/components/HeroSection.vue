@@ -220,7 +220,7 @@ const parallaxLentera = ref<HTMLElement | null>(null);
 
 const loading = ref(true);
 const tanggalMasehi = ref("");
-const showJadwal = ref(false);
+const showJadwal = ref(true);
 const jadwalSholat = ref({
     subuh: "--:--",
     dzuhur: "--:--",

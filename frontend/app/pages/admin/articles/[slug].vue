@@ -51,6 +51,7 @@
                 </div>
             </template>
         </AdminHeader>
+
         <div v-if="pending" class="flex justify-center py-12">
             <span class="text-sm text-gray-500">Memuat data article...</span>
         </div>
@@ -66,27 +67,67 @@
                     <span
                         class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
                     >
-                        Gambar Artikel
+                        Pratinjau Gambar
                     </span>
                     <span
-                        v-if="isEditing && imagePreview"
+                        v-if="isEditing && imagePreviews.length > 0"
                         class="text-[10px] bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-300 px-2 py-0.5 rounded font-medium"
                     >
-                        Berkas Baru
+                        {{ imagePreviews.length }} Berkas Baru
+                    </span>
+                    <span
+                        v-else-if="article?.image && article.image.length > 0"
+                        class="text-[10px] bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 px-2 py-0.5 rounded font-medium"
+                    >
+                        {{ article.image.length }} Berkas Tersimpan
                     </span>
                 </div>
 
+                <!-- Preview file baru yang baru dipilih (mode edit) -->
                 <div
+                    v-if="isEditing && imagePreviews.length > 0"
+                    class="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-1"
+                >
+                    <div
+                        v-for="(preview, index) in imagePreviews"
+                        :key="`new-${index}`"
+                        class="relative group aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
+                    >
+                        <img
+                            :src="preview"
+                            :alt="`Preview Artikel ${index + 1}`"
+                            class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"
+                        />
+                    </div>
+                </div>
+
+                <!-- Preview gambar lama dari server -->
+                <div
+                    v-else-if="article?.image && article.image.length > 0"
+                    class="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-1"
+                >
+                    <div
+                        v-for="(img, index) in article.image"
+                        :key="`old-${index}`"
+                        class="relative group aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
+                    >
+                        <img
+                            :src="imageUrl(img.url || img.file_path || img)"
+                            :alt="`Gambar Artikel ${index + 1}`"
+                            class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"
+                        />
+                    </div>
+                </div>
+
+                <!-- Fallback kosong -->
+                <div
+                    v-else
                     class="relative group aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
                 >
                     <img
-                        :src="
-                            imagePreview ||
-                            imageUrl(article?.image_path) ||
-                            '/placeholder.png'
-                        "
+                        src="/placeholder.jpg"
                         alt="Preview Artikel"
-                        class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"
+                        class="w-full h-full object-contain rounded-md opacity-40 grayscale"
                     />
                 </div>
             </div>
@@ -160,19 +201,94 @@
                         </UFormField>
                     </div>
 
-                    <!-- Baris 4: File Upload Gambar -->
+                    <!-- Baris 3: Kategori -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <UFormField
+                            label="Kategori"
+                            name="category"
+                            help="Gunakan koma untuk memisahkan jika lebih dari satu."
+                        >
+                            <UInput
+                                v-model="form.category"
+                                placeholder="Contoh: berita, edukasi, pengumuman"
+                                icon="i-lucide-folder"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField
+                            label="Status Publikasi"
+                            name="is_published"
+                        >
+                            <USwitch
+                                v-model="form.is_published"
+                                label="Publikasikan artikel ini"
+                            />
+                        </UFormField>
+                    </div>
+
+                    <!-- Baris 4: Upload Gambar Multiple -->
                     <div class="grid grid-cols-1 gap-6">
                         <UFormField
-                            label="Ganti Gambar Artikel (Opsional)"
+                            label="Unggah Gambar Baru (Maks 2MB/file)"
                             name="image"
-                            help="Pilih berkas baru jika ingin memperbarui gambar artikel saat ini."
+                            help="Pilih satu atau beberapa gambar. Gambar baru akan menggantikan gambar lama jika diisi."
                         >
-                            <input
-                                type="file"
-                                accept="image/*"
-                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-gray-800 dark:file:text-gray-300 cursor-pointer border border-gray-200 dark:border-gray-700 rounded-md p-1 bg-gray-50 dark:bg-gray-950"
-                                @change="onFileChange"
-                            />
+                            <div class="space-y-3">
+                                <div
+                                    v-if="selectedFiles.length > 0"
+                                    class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1"
+                                >
+                                    <div
+                                        v-for="(item, index) in selectedFiles"
+                                        :key="item.id"
+                                        class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg"
+                                    >
+                                        <img
+                                            :src="item.preview"
+                                            class="w-10 h-10 object-cover rounded-md border border-gray-200 dark:border-gray-700"
+                                        />
+                                        <div class="flex-1 min-w-0">
+                                            <p
+                                                class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate"
+                                            >
+                                                {{ item.file.name }}
+                                            </p>
+                                            <p class="text-xs text-gray-500">
+                                                {{ item.sizeMB }} MB
+                                            </p>
+                                        </div>
+                                        <UButton
+                                            color="danger"
+                                            variant="ghost"
+                                            icon="i-lucide-trash"
+                                            size="sm"
+                                            @click="removeFile(index)"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        class="hidden"
+                                        ref="fileInputRef"
+                                        @change="onFileAdded"
+                                    />
+                                    <UButton
+                                        color="primary"
+                                        variant="soft"
+                                        icon="i-lucide-plus"
+                                        class="w-full justify-center border border-dashed border-primary-300 dark:border-primary-800"
+                                        @click="triggerFileInput"
+                                    >
+                                        Pilih Gambar Baru
+                                    </UButton>
+                                </div>
+                            </div>
                         </UFormField>
                     </div>
 
@@ -190,27 +306,27 @@
                         ></div>
                     </div>
 
-                    <!-- Baris 5: Deskripsi Lengkap -->
+                    <!-- Baris 5: Konten Lengkap -->
                     <div class="grid grid-cols-1 gap-6">
                         <UFormField
-                            label="Deskripsi (Bahasa Indonesia)"
-                            name="description_id"
+                            label="Konten (Bahasa Indonesia)"
+                            name="content_id"
                         >
                             <RichEditor
                                 v-model="form.content_id"
-                                placeholder="Tulis deskripsi artikel lengkap dalam Bahasa Indonesia di sini..."
+                                placeholder="Tulis konten artikel lengkap dalam Bahasa Indonesia di sini..."
                                 class="w-full"
                                 editorClass="min-h-[200px] text-lg"
                             />
                         </UFormField>
 
                         <UFormField
-                            label="Deskripsi (Bahasa Inggris)"
-                            name="description_en"
+                            label="Konten (Bahasa Inggris)"
+                            name="content_en"
                         >
                             <RichEditor
                                 v-model="form.content_en"
-                                placeholder="Tulis deskripsi artikel lengkap dalam Bahasa Indonesia di sini..."
+                                placeholder="Write complete article content in English here..."
                                 class="w-full"
                                 editorClass="min-h-[200px] text-lg"
                             />
@@ -274,6 +390,42 @@
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3
+                                class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                            >
+                                Kategori
+                            </h3>
+                            <span
+                                class="text-xs font-mono font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950/40 border border-primary-100 dark:border-primary-900 px-2.5 py-1 rounded-md inline-block"
+                            >
+                                {{ article?.category || "Uncategorized" }}
+                            </span>
+                        </div>
+                        <div>
+                            <h3
+                                class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                            >
+                                Status
+                            </h3>
+                            <span
+                                :class="[
+                                    'text-xs font-medium px-2.5 py-1 rounded-md inline-block',
+                                    article?.is_published
+                                        ? 'bg-success-50 text-success-700 dark:bg-success-950/40 dark:text-success-300 border border-success-100 dark:border-success-900'
+                                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700',
+                                ]"
+                            >
+                                {{
+                                    article?.is_published
+                                        ? "Published"
+                                        : "Draft"
+                                }}
+                            </span>
+                        </div>
+                    </div>
+
                     <hr class="border-gray-100 dark:border-gray-800" />
 
                     <div class="grid grid-cols-1 gap-6">
@@ -283,11 +435,12 @@
                             >
                                 Konten (Indonesia)
                             </h3>
-                            <p
-                                class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed bg-gray-50 dark:bg-gray-950/50 p-4 rounded-lg border border-gray-100 dark:border-gray-800"
-                            >
-                                {{ article?.content_id || "Tidak ada konten." }}
-                            </p>
+                            <div
+                                class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-950/50 p-4 rounded-lg border border-gray-100 dark:border-gray-800 prose prose-sm dark:prose-invert max-w-none"
+                                v-html="
+                                    article?.content_id || 'Tidak ada konten.'
+                                "
+                            ></div>
                         </div>
                         <div>
                             <h3
@@ -295,11 +448,12 @@
                             >
                                 Konten (Inggris)
                             </h3>
-                            <p
-                                class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed bg-gray-50 dark:bg-gray-950/50 p-4 rounded-lg border border-gray-100 dark:border-gray-800"
-                            >
-                                {{ article?.content_en || "Tidak ada konten." }}
-                            </p>
+                            <div
+                                class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-950/50 p-4 rounded-lg border border-gray-100 dark:border-gray-800 prose prose-sm dark:prose-invert max-w-none"
+                                v-html="
+                                    article?.content_en || 'Tidak ada konten.'
+                                "
+                            ></div>
                         </div>
                     </div>
                 </div>
@@ -329,7 +483,7 @@ const slug = useRoute().params.slug as string;
 const router = useRouter();
 const toast = useToast();
 
-const { fetchDetail, updateArticle, isSubmitting, imageUrl } = useArticles();
+const { fetchDetail, isSubmitting, imageUrl, updateArticle } = useArticles();
 
 const { data: apiResponse, pending, refresh } = await fetchDetail(slug);
 
@@ -338,8 +492,19 @@ const article = computed(() => apiResponse.value?.data);
 const isEditing = ref(false);
 const isDeleteModalOpen = ref(false);
 
-const selectedFile = ref<File | null>(null);
-const imagePreview = ref<string | null>(null);
+interface ImageFile {
+    id: string;
+    file: File;
+    preview: string;
+    sizeMB: string;
+}
+
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const selectedFiles = ref<ImageFile[]>([]);
+
+const imagePreviews = computed(() =>
+    selectedFiles.value.map((item) => item.preview),
+);
 
 const form = reactive({
     title_id: "",
@@ -348,6 +513,8 @@ const form = reactive({
     content_en: "",
     slug_id: "",
     slug_en: "",
+    category: "",
+    is_published: false,
 });
 
 function startEdit() {
@@ -359,25 +526,71 @@ function startEdit() {
     form.content_en = article.value.content_en || "";
     form.slug_id = article.value.slug_id || "";
     form.slug_en = article.value.slug_en || "";
+    form.category = article.value.category || "";
+    form.is_published = !!article.value.is_published;
 
-    selectedFile.value = null;
-    imagePreview.value = null;
+    clearSelectedFiles();
     isEditing.value = true;
 }
 
 function cancelEdit() {
     isEditing.value = false;
-    selectedFile.value = null;
-    imagePreview.value = null;
+    clearSelectedFiles();
 }
 
-function onFileChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-        const file = target.files[0];
-        selectedFile.value = file;
-        imagePreview.value = URL.createObjectURL(file);
+function clearSelectedFiles() {
+    selectedFiles.value.forEach((item) => URL.revokeObjectURL(item.preview));
+    selectedFiles.value = [];
+    if (fileInputRef.value) fileInputRef.value.value = "";
+}
+
+function triggerFileInput() {
+    if (fileInputRef.value) {
+        fileInputRef.value.click();
     }
+}
+
+// Validasi ukuran file
+function onFileAdded(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+
+    const newFiles = Array.from(target.files);
+    let hasOversized = false;
+    const MAX_SIZE_MB = 2;
+
+    newFiles.forEach((file) => {
+        const sizeInMB = file.size / (1024 * 1024);
+
+        if (sizeInMB > MAX_SIZE_MB) {
+            hasOversized = true;
+            return;
+        }
+
+        selectedFiles.value.push({
+            id: Math.random().toString(36).substring(7),
+            file: file,
+            preview: URL.createObjectURL(file),
+            sizeMB: sizeInMB.toFixed(2),
+        });
+    });
+
+    if (hasOversized) {
+        toast.add({
+            title: "Peringatan",
+            description: `Beberapa gambar ditolak karena ukurannya melebihi batas maksimal ${MAX_SIZE_MB}MB.`,
+            color: "warning",
+            icon: "i-lucide-alert-triangle",
+        });
+    }
+
+    target.value = "";
+}
+
+function removeFile(index: number) {
+    const removedItem = selectedFiles.value[index];
+    URL.revokeObjectURL(removedItem.preview);
+    selectedFiles.value.splice(index, 1);
 }
 
 const handleUpdate = async () => {
@@ -388,9 +601,16 @@ const handleUpdate = async () => {
     formData.append("slug_en", form.slug_en);
     formData.append("content_id", form.content_id);
     formData.append("content_en", form.content_en);
+    formData.append("category", form.category);
+    formData.append("is_published", form.is_published ? "1" : "0");
 
-    if (selectedFile.value) {
-        formData.append("image", selectedFile.value);
+    // Untuk update via FormData, Laravel butuh method spoofing
+    formData.append("_method", "PUT");
+
+    if (selectedFiles.value.length > 0) {
+        selectedFiles.value.forEach((item) => {
+            formData.append("image[]", item.file);
+        });
     }
 
     const result = await updateArticle(article.value?.id, formData);
@@ -403,9 +623,8 @@ const handleUpdate = async () => {
             icon: "i-lucide-circle-check",
         });
         isEditing.value = false;
-        imagePreview.value = null;
-        selectedFile.value = null;
-        refresh(); // Memperbarui data layar
+        clearSelectedFiles();
+        refresh();
     } else {
         toast.add({
             title: "Gagal memperbarui",

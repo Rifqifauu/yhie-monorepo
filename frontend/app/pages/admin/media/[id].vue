@@ -74,20 +74,43 @@
                     >
                         {{ imagePreviews.length }} Berkas Baru
                     </span>
+                    <span
+                        v-else-if="media?.image && media.image.length > 0"
+                        class="text-[10px] bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 px-2 py-0.5 rounded font-medium"
+                    >
+                        {{ media.image.length }} Berkas Tersimpan
+                    </span>
                 </div>
 
                 <div
                     v-if="isEditing && imagePreviews.length > 0"
-                    class="grid grid-cols-2 gap-3"
+                    class="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-1"
                 >
                     <div
                         v-for="(preview, index) in imagePreviews"
-                        :key="index"
+                        :key="`new-${index}`"
                         class="relative group aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
                     >
                         <img
                             :src="preview"
                             :alt="`Preview Media ${index + 1}`"
+                            class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"
+                        />
+                    </div>
+                </div>
+
+                <div
+                    v-else-if="media?.image && media.image.length > 0"
+                    class="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-1"
+                >
+                    <div
+                        v-for="(img, index) in media.image"
+                        :key="`old-${index}`"
+                        class="relative group aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
+                    >
+                        <img
+                            :src="coverOf(media)"
+                            :alt="`Media Tersimpan ${index + 1}`"
                             class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"
                         />
                     </div>
@@ -190,17 +213,63 @@
                         </UFormField>
 
                         <UFormField
-                            label="Unggah Gambar (Bisa lebih dari satu)"
-                            name="images"
-                            help="Pilih satu atau beberapa berkas baru."
+                            label="Unggah Gambar Baru (Maks 2MB/file)"
+                            name="image"
                         >
-                            <input
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-gray-800 dark:file:text-gray-300 cursor-pointer border border-gray-200 dark:border-gray-700 rounded-md p-1 bg-gray-50 dark:bg-gray-950"
-                                @change="onFileChange"
-                            />
+                            <div class="space-y-3">
+                                <div
+                                    v-if="selectedFiles.length > 0"
+                                    class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1"
+                                >
+                                    <div
+                                        v-for="(item, index) in selectedFiles"
+                                        :key="item.id"
+                                        class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg"
+                                    >
+                                        <img
+                                            :src="item.preview"
+                                            class="w-10 h-10 object-cover rounded-md border border-gray-200 dark:border-gray-700"
+                                        />
+                                        <div class="flex-1 min-w-0">
+                                            <p
+                                                class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate"
+                                            >
+                                                {{ item.file.name }}
+                                            </p>
+                                            <p class="text-xs text-gray-500">
+                                                {{ item.sizeMB }} MB
+                                            </p>
+                                        </div>
+                                        <UButton
+                                            color="danger"
+                                            variant="ghost"
+                                            icon="i-lucide-trash"
+                                            size="sm"
+                                            @click="removeFile(index)"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        class="hidden"
+                                        ref="fileInputRef"
+                                        @change="onFileAdded"
+                                    />
+                                    <UButton
+                                        color="primary"
+                                        variant="soft"
+                                        icon="i-lucide-plus"
+                                        class="w-full justify-center border border-dashed border-primary-300 dark:border-primary-800"
+                                        @click="triggerFileInput"
+                                    >
+                                        Pilih Gambar Baru
+                                    </UButton>
+                                </div>
+                            </div>
                         </UFormField>
                     </div>
 
@@ -362,18 +431,28 @@ const toast = useToast();
 
 const { fetchDetail, updateMedia, isSubmitting, coverOf } = useGallery();
 
-// Request detail media dari API
 const { data: apiResponse, pending, refresh } = await fetchDetail(id);
-
 const media = computed(() => apiResponse.value?.data);
 
 const isEditing = ref(false);
 const isDeleteModalOpen = ref(false);
 
-const selectedFiles = ref<File[]>([]);
-const imagePreviews = ref<string[]>([]);
+// Interface khusus untuk Repeater Image
+interface ImageFile {
+    id: string;
+    file: File;
+    preview: string;
+    sizeMB: string;
+}
 
-// Form: Tambahkan slug_id dan slug_en
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const selectedFiles = ref<ImageFile[]>([]);
+
+// Derived state: Mengambil daftar URL preview dari selectedFiles untuk ditampilkan di grid kiri
+const imagePreviews = computed(() =>
+    selectedFiles.value.map((item) => item.preview),
+);
+
 const form = reactive({
     title_id: "",
     title_en: "",
@@ -389,51 +468,94 @@ function startEdit() {
 
     form.title_id = media.value.title_id || "";
     form.title_en = media.value.title_en || "";
-    form.slug_id = media.value.slug_id || ""; // <-- Baru
-    form.slug_en = media.value.slug_en || ""; // <-- Baru
+    form.slug_id = media.value.slug_id || "";
+    form.slug_en = media.value.slug_en || "";
     form.category = media.value.category || "";
     form.description_id = media.value.description_id || "";
     form.description_en = media.value.description_en || "";
 
-    selectedFiles.value = [];
-    imagePreviews.value = [];
+    clearSelectedFiles();
     isEditing.value = true;
 }
 
 function cancelEdit() {
     isEditing.value = false;
-    selectedFiles.value = [];
-    imagePreviews.value = [];
+    clearSelectedFiles();
 }
 
-function onFileChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-        const filesArray = Array.from(target.files);
-        selectedFiles.value = filesArray;
-        imagePreviews.value = filesArray.map((file) =>
-            URL.createObjectURL(file),
-        );
-    } else {
-        selectedFiles.value = [];
-        imagePreviews.value = [];
+function clearSelectedFiles() {
+    selectedFiles.value.forEach((item) => URL.revokeObjectURL(item.preview));
+    selectedFiles.value = [];
+    if (fileInputRef.value) fileInputRef.value.value = ""; // Reset input
+}
+
+function triggerFileInput() {
+    if (fileInputRef.value) {
+        fileInputRef.value.click();
     }
+}
+
+// Logic validasi ukuran file
+function onFileAdded(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+
+    const newFiles = Array.from(target.files);
+    let hasOversized = false;
+    const MAX_SIZE_MB = 2;
+
+    newFiles.forEach((file) => {
+        const sizeInMB = file.size / (1024 * 1024);
+
+        // Jika lebih besar dari 2MB, tolak filenya
+        if (sizeInMB > MAX_SIZE_MB) {
+            hasOversized = true;
+            return; // Skip file ini, lanjut ke file berikutnya di loop
+        }
+
+        // Masukkan file valid ke state
+        selectedFiles.value.push({
+            id: Math.random().toString(36).substring(7), // ID unik untuk key v-for
+            file: file,
+            preview: URL.createObjectURL(file),
+            sizeMB: sizeInMB.toFixed(2), // Format 2 desimal
+        });
+    });
+
+    if (hasOversized) {
+        toast.add({
+            title: "Peringatan",
+            description: `Beberapa gambar ditolak karena ukurannya melebihi batas maksimal ${MAX_SIZE_MB}MB.`,
+            color: "warning",
+            icon: "i-lucide-alert-triangle",
+        });
+    }
+
+    // Reset isi input biar file yang sama bisa dipilih lagi kalau baru saja dihapus
+    target.value = "";
+}
+
+// Hapus file spesifik dari repeater
+function removeFile(index: number) {
+    const removedItem = selectedFiles.value[index];
+    URL.revokeObjectURL(removedItem.preview); // Cegah memory leak
+    selectedFiles.value.splice(index, 1);
 }
 
 const handleUpdate = async () => {
     const formData = new FormData();
     formData.append("title_id", form.title_id);
     formData.append("title_en", form.title_en);
-    formData.append("slug_id", form.slug_id); // <-- Baru
-    formData.append("slug_en", form.slug_en); // <-- Baru
+    formData.append("slug_id", form.slug_id);
+    formData.append("slug_en", form.slug_en);
     formData.append("category", form.category);
     formData.append("description_id", form.description_id);
     formData.append("description_en", form.description_en);
 
-    // Kirim gambar sebagai Array `images[]` agar bisa ditangkap Laravel dengan benar
+    // Ambil object .file-nya saja untuk dikirim ke Laravel API
     if (selectedFiles.value.length > 0) {
-        selectedFiles.value.forEach((file) => {
-            formData.append("images[]", file);
+        selectedFiles.value.forEach((item) => {
+            formData.append("image[]", item.file);
         });
     }
 
@@ -447,8 +569,7 @@ const handleUpdate = async () => {
             icon: "i-lucide-circle-check",
         });
         isEditing.value = false;
-        imagePreviews.value = [];
-        selectedFiles.value = [];
+        clearSelectedFiles();
         refresh();
     } else {
         toast.add({

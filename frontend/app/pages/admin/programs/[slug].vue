@@ -86,7 +86,7 @@
                         :src="
                             imagePreview ||
                             imageUrl(program?.image_path) ||
-                            '/placeholder.png'
+                            '/placeholder.jpg'
                         "
                         alt="Preview Program"
                         class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"

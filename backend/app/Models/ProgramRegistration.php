@@ -17,6 +17,8 @@ class ProgramRegistration extends Model
         "address",
         "notes",
         "status",
+        "id_card",
+        "photo",
     ];
 
     protected $casts = [

@@ -41,7 +41,7 @@
                     class="relative aspect-square w-full bg-gray-50 dark:bg-gray-950 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 p-2 flex items-center justify-center shadow-inner"
                 >
                     <img
-                        :src="imagePreview || '/placeholder.png'"
+                        :src="imagePreview || '/placeholder.jpg'"
                         alt="Preview Program"
                         class="w-full h-full object-contain rounded-md"
                     />

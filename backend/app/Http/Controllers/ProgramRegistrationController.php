@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProgramRegistration;
+use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProgramRegistrationController extends Controller
@@ -20,22 +22,44 @@ class ProgramRegistrationController extends Controller
             "age" => "nullable|integer|min:1|max:150",
             "address" => "nullable|string|max:1000",
             "notes" => "nullable|string|max:1000",
+            "amount" => "required|numeric|min:0", // Ambil nominal harga program dari frontend/database
         ]);
 
+        // Bungkus dengan DB::transaction demi keamanan data jikalau salah satu query fail
+        DB::beginTransaction();
+
         try {
+            // 1. Simpan Data Registrasi
             $registration = ProgramRegistration::create($data);
+
+            // 2. Otomatis Buat Data Transaksi Awal (Pending)
+            $registration->transactions()->create([
+                "reference_id" =>
+                    "INV-" .
+                    date("Ymd") .
+                    "-" .
+                    strtoupper(bin2hex(random_bytes(4))),
+                "amount" => $data["amount"],
+                "payment_status" => "pending",
+                "payment_method" => "manual_transfer", // Nanti diganti dinamis kalau sudah pakai PG
+            ]);
+
+            DB::commit();
 
             return response()->json(
                 [
-                    "message" => "Registration submitted successfully.",
-                    "data" => $registration->load("program"),
+                    "message" =>
+                        "Registration and invoice created successfully.",
+                    "data" => $registration->load(["program", "transactions"]),
                 ],
                 201,
             );
         } catch (\Throwable $e) {
+            DB::rollBack();
             Log::error(
                 "Error creating program registration: " . $e->getMessage(),
             );
+
             return response()->json(
                 [
                     "message" =>
@@ -51,7 +75,11 @@ class ProgramRegistrationController extends Controller
         $search = $request->query("search");
 
         try {
-            $registrations = ProgramRegistration::with("program")
+            // Load program beserta histori transaksinya sekalian
+            $registrations = ProgramRegistration::with([
+                "program",
+                "transactions",
+            ])
                 ->orderBy("created_at", "desc")
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
@@ -85,7 +113,10 @@ class ProgramRegistrationController extends Controller
         return response()->json(
             [
                 "message" => "Registration fetched successfully.",
-                "data" => $programRegistration->load("program"),
+                "data" => $programRegistration->load([
+                    "program",
+                    "transactions",
+                ]),
             ],
             200,
         );
@@ -112,7 +143,9 @@ class ProgramRegistrationController extends Controller
             return response()->json(
                 [
                     "message" => "Registration updated successfully.",
-                    "data" => $programRegistration->fresh()->load("program"),
+                    "data" => $programRegistration
+                        ->fresh()
+                        ->load(["program", "transactions"]),
                 ],
                 200,
             );
@@ -128,13 +161,11 @@ class ProgramRegistrationController extends Controller
         }
     }
 
-    /**
-     * DELETE /api/program-registrations/{registration}
-     */
     public function destroy(
         ProgramRegistration $programRegistration,
     ): JsonResponse {
         try {
+            // Karena di migration pakai cascadeOnDelete, transaksi terkait otomatis ikut terhapus
             $programRegistration->delete();
 
             return response()->json(

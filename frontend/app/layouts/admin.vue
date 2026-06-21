@@ -97,7 +97,6 @@ useHead({
         const segment = path[2]
             ? path[2].charAt(0).toUpperCase() + path[2].slice(1)
             : "Dashboard";
-
         return `Admin YHIE - ${segment}`;
     },
 });

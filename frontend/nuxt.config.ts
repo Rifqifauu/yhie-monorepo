@@ -10,6 +10,17 @@ export default defineNuxtConfig({
     "nuxt-aos",
     "nuxt-auth-sanctum",
   ],
+  vite: {
+    optimizeDeps: {
+      include: [
+        "@nuxt/ui > prosemirror-state",
+        "@nuxt/ui > prosemirror-transform",
+        "@nuxt/ui > prosemirror-model",
+        "@nuxt/ui > prosemirror-view",
+        "@nuxt/ui > prosemirror-gapcursor",
+      ],
+    },
+  },
 
   // Konfigurasi Lokalisasi Bahasa (i18n)
   i18n: {

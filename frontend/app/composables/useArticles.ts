@@ -216,7 +216,7 @@ export const useArticles = () => {
         payload.append("_method", "PUT");
       }
 
-      const response = await client(`/api/programs/${id}`, {
+      const response = await client(`/api/articles/${id}`, {
         method: payload instanceof FormData ? "POST" : "PUT",
         body: body,
       });

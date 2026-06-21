@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
+import { h, resolveComponent, computed, ref } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 import { useClipboard } from "@vueuse/core";
@@ -144,6 +144,8 @@ const {
     applySearch,
     clearSearch,
     refresh,
+    coverOf,
+    titleOf,
 } = useArticles();
 
 const isDeleteModalOpen = ref(false);
@@ -153,8 +155,8 @@ const selectedArticle = ref<{ id: number | string; title: string } | null>(
 
 function triggerDelete(row: Row<Article>) {
     const id = row.original.id;
-    const title =
-        row.original.title_id || row.original.title_en || "Article ini";
+    // Menggunakan titleOf untuk mendapatkan title fallback yang sesuai bahasa
+    const title = titleOf(row.original) || "Artikel ini";
 
     if (id !== undefined && id !== null) {
         selectedArticle.value = {
@@ -183,51 +185,47 @@ const handleDeleteError = () => {
 };
 
 // ----------------------------------------------------
-// Konfigurasi Kolom Tabel (Dipercantik)
+// Konfigurasi Kolom Tabel (Menggunakan Computed)
 // ----------------------------------------------------
-const columns: TableColumn<Article>[] = [
+const columns = computed<TableColumn<Article>[]>(() => [
     {
-        id: "no", // Gunakan id alih-alih accessorKey karena datanya tidak ada di row.original
+        id: "no",
         header: "No",
         meta: {
             class: { th: "w-12 text-center", td: "text-center text-gray-500" },
         },
         cell: ({ row }) => {
-            // Asumsi items-per-page adalah 10 (sesuai dengan komponen UPagination Anda)
             const itemsPerPage = 10;
-
-            // Rumus: ((Halaman Saat Ini - 1) * Jumlah per Halaman) + Index Baris + 1
             const number = (page.value - 1) * itemsPerPage + row.index + 1;
-
             return h("span", {}, number);
         },
     },
     {
-        accessorKey: "title", // Menggunakan field title utama
+        accessorKey: "title",
         header: "Judul Artikel",
         meta: {
-            class: { th: "min-w-[300px]" }, // Memberikan ruang lebih agar tidak terpotong
+            class: { th: "min-w-[300px]" },
         },
         cell: ({ row }) => {
+            // 💡 PERBAIKAN: Kirim seluruh objek row.original (Article)
+            // agar fungsi coverOf bisa mengekstrak properti .image secara internal
+            const thumbnailSrc = coverOf(row.original) || undefined;
+
             return h("div", { class: "flex items-center gap-3 py-1" }, [
-                // Placeholder gambar/thumbnail artikel
                 h(UAvatar, {
-                    src: row.original.thumbnail || "",
+                    src: thumbnailSrc,
                     icon: "i-lucide-image",
                     size: "md",
                     alt: row.original.title_en || "Thumbnail",
-                    class: "rounded-md bg-gray-100 dark:bg-gray-800",
+                    class: "rounded-md bg-gray-100 dark:bg-gray-800 object-cover",
                 }),
-                // Susunan Judul ID & EN
                 h("div", { class: "flex flex-col" }, [
                     h(
                         "span",
                         {
                             class: "font-medium text-gray-900 dark:text-white line-clamp-1",
                         },
-                        row.original.title ||
-                            row.original.title_en ||
-                            "Tanpa Judul",
+                        titleOf(row.original) || "Tanpa Judul",
                     ),
                     h(
                         "span",
@@ -246,7 +244,7 @@ const columns: TableColumn<Article>[] = [
                 UBadge,
                 {
                     color: "primary",
-                    variant: "subtle", // subtle terlihat lebih modern di dalam tabel
+                    variant: "subtle",
                     class: "capitalize font-medium",
                 },
                 () => row.original.category || "Uncategorized",
@@ -317,7 +315,7 @@ const columns: TableColumn<Article>[] = [
                 },
                 () =>
                     h(UButton, {
-                        icon: "i-lucide-more-vertical", // Ikon ellipsis yang konsisten dengan lucide
+                        icon: "i-lucide-more-vertical",
                         color: "neutral",
                         variant: "ghost",
                         size: "sm",
@@ -327,7 +325,7 @@ const columns: TableColumn<Article>[] = [
             );
         },
     },
-];
+]);
 
 function getRowItems(row: Row<Article>) {
     return [
@@ -365,8 +363,8 @@ function getRowItems(row: Row<Article>) {
                 icon: "i-lucide-trash-2",
                 color: "error",
                 onSelect() {
-                    triggerDelete(row); // Menyambungkan aksi klik ke pemicu modal
-                }, // Beri warna merah untuk aksi destruktif (jika didukung)
+                    triggerDelete(row);
+                },
             },
         ],
     ];

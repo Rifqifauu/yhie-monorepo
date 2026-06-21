@@ -84,7 +84,7 @@
                         :src="
                             imagePreview ||
                             imageUrl(partner?.logo) ||
-                            '/placeholder.png'
+                            '/placeholder.jpg'
                         "
                         alt="Preview Partner"
                         class="w-full h-full object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.02]"

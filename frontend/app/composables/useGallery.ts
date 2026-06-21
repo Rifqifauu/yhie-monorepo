@@ -4,10 +4,13 @@ export interface GalleryMedia {
   id?: number | string;
   title_en: string;
   title_id: string;
+  slug_en?: string;
+  slug_id?: string;
   description_en: string;
   description_id: string;
   category: string;
   image?: string | string[] | { path?: string; [key: string]: any } | any;
+  images?: any[]; // <-- Tambahkan ini untuk menampung array dari relasi backend
   [key: string]: any;
 }
 
@@ -91,7 +94,7 @@ export const useGallery = () => {
 
   const buildImageUrl = (path?: string): string => {
     if (!path) return "";
-    if (path.startsWith("http")) return path;
+    if (path.startsWith("http") || path.startsWith("data:image")) return path;
 
     const base = backendUrl.endsWith("/")
       ? backendUrl.slice(0, -1)
@@ -101,44 +104,48 @@ export const useGallery = () => {
     return `${base}${cleanPath}`;
   };
 
+  // --- FUNGSI YANG DIPERBARUI ---
   const imagesOf = (item: GalleryMedia): string[] => {
     if (!item) return [];
-    const img = item.image;
-    if (!img) return [];
 
-    if (Array.isArray(img)) {
-      return img
-        .filter((p) => typeof p === "string")
-        .map((p: string) => buildImageUrl(p));
-    }
+    // Prioritaskan 'images' (array multiple upload) lalu fallback ke 'image' (single)
+    const rawImagesData = item.images || item.image;
+    if (!rawImagesData) return [];
 
-    if (typeof img === "object" && img.path) {
-      return [buildImageUrl(img.path)];
-    }
+    let rawArray: any[] = [];
 
-    if (typeof img === "string") {
+    if (Array.isArray(rawImagesData)) {
+      rawArray = rawImagesData;
+    } else if (typeof rawImagesData === "string") {
       try {
-        const parsed = JSON.parse(img);
-        if (Array.isArray(parsed)) {
-          return parsed
-            .filter((p) => typeof p === "string")
-            .map((p: string) => buildImageUrl(p));
-        }
-        if (typeof parsed === "object" && parsed.path) {
-          return [buildImageUrl(parsed.path)];
-        }
+        const parsed = JSON.parse(rawImagesData);
+        rawArray = Array.isArray(parsed) ? parsed : [parsed];
       } catch (e) {
-        return [buildImageUrl(img)];
+        rawArray = [rawImagesData];
       }
+    } else if (typeof rawImagesData === "object") {
+      rawArray = [rawImagesData];
     }
 
-    return [];
+    // Mapping array menjadi URL yang valid, mendukung string maupun object
+    return rawArray
+      .map((p) => {
+        if (typeof p === "string") return buildImageUrl(p);
+        if (typeof p === "object" && p !== null) {
+          // Sesuaikan ini dengan response dari tabel relation media Laravel-mu
+          const path = p.url || p.file_path || p.path;
+          return path ? buildImageUrl(path) : "";
+        }
+        return "";
+      })
+      .filter((url) => url !== ""); // Buang string kosong
   };
 
   const coverOf = (item: GalleryMedia): string => {
     const imgs = imagesOf(item);
     return imgs.length > 0 ? imgs[0] : "";
   };
+  // ------------------------------
 
   const pageItems = computed(() => {
     const last = totalPages.value;
@@ -204,22 +211,7 @@ export const useGallery = () => {
   };
 
   const createMedia = async (formData: FormData) => {
-    isSubmitting.value = true;
-    try {
-      const response = await client("/api/media", {
-        method: "POST",
-        body: formData,
-      });
-      return { success: true, data: response };
-    } catch (err: any) {
-      return {
-        success: false,
-        error:
-          err.data?.message || "Terjadi kesalahan saat menyimpan media baru.",
-      };
-    } finally {
-      isSubmitting.value = false;
-    }
+    return await storeMedia(formData); // Reusable karena fungsinya identik
   };
 
   const updateMedia = async (id: string | number, formData: FormData) => {

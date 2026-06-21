@@ -122,52 +122,7 @@
                     </NuxtLink>
                 </div>
             </div>
-            <div class="space-y-4">
-                <p
-                    class="text-center text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                    Silakan pilih mitra di bawah untuk melihat informasi detail:
-                </p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button
-                        v-for="partner in partners"
-                        :key="partner?.id"
-                        @click="selectedPartnerId = partner?.id"
-                        :class="[
-                            'flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300',
-                            selectedPartnerId === partner?.id
-                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-md scale-105 ring-2 ring-emerald-500/20'
-                                : 'bg-white dark:bg-gray-900 border-emerald-800/10 dark:border-emerald-500/10 text-gray-700 dark:text-gray-300 hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20',
-                        ]"
-                    >
-                        <img
-                            :src="getImageUrl(partner?.logo)"
-                            :alt="
-                                locale === 'id'
-                                    ? partner?.name_id
-                                    : partner?.name_en
-                            "
-                            class="w-6 h-6 object-contain rounded"
-                            :class="{
-                                'brightness-0 invert':
-                                    selectedPartnerId === partner?.id,
-                            }"
-                            @error="
-                                (e) =>
-                                    ((e.target as HTMLImageElement).src =
-                                        '/placeholder.jpg')
-                            "
-                        />
-                        <span class="text-xs md:text-sm font-semibold">
-                            {{
-                                locale === "id"
-                                    ? partner?.name_id
-                                    : partner?.name_en
-                            }}
-                        </span>
-                    </button>
-                </div>
-            </div>
+
             <div class="flex justify-center items-center pt-6">
                 <NuxtLink
                     :to="localePath('/partner')"

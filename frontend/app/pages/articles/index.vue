@@ -2,17 +2,14 @@
     <div
         class="bg-slate-50 dark:bg-emerald-950 text-slate-900 dark:text-white min-h-screen"
     >
-        <!-- Hero Section -->
         <section
-            class="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-emerald-950 dark:via-emerald-950 dark:to-amber-950/40 border-b border-emerald-100/70 dark:border-emerald-800/60 pt-20 pb-24 lg:pt-28 lg:pb-32"
+            class="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-emerald-950 dark:via-emerald-950 dark:to-amber-950/40 border-b border-emerald-100/70 dark:border-emerald-800/60 pt-12 pb-10"
         >
-            <!-- Background mosque shadow -->
             <img
                 src="/shadow-mosque.webp"
                 class="absolute bottom-0 left-1/2 -translate-x-1/2 w-auto h-full max-h-[85%] object-contain object-bottom pointer-events-none opacity-20 dark:opacity-35 dark:invert dark:brightness-150 transition-all duration-300"
                 alt=""
             />
-            <!-- Overlay -->
             <div
                 class="absolute inset-0 bg-gradient-to-br from-emerald-50/75 via-white/65 to-amber-50/55 dark:from-emerald-950/70 dark:via-emerald-950/65 dark:to-amber-950/40 transition-colors duration-300"
                 aria-hidden="true"
@@ -30,7 +27,7 @@
                 data-aos="fade-up"
             >
                 <span
-                    class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3.5 py-1.5 rounded-full border border-amber-200/50 dark:border-amber-900/40"
+                    class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200/50 dark:border-amber-900/40"
                 >
                     <UIcon name="i-lucide-newspaper" class="w-4 h-4" />
                     {{
@@ -40,7 +37,7 @@
                     }}
                 </span>
                 <h1
-                    class="mt-6 text-3xl md:text-5xl font-serif font-extrabold tracking-tight text-emerald-950 dark:text-emerald-50 leading-[1.15]"
+                    class="mt-4 text-3xl md:text-4xl lg:text-5xl font-serif font-extrabold tracking-tight text-emerald-950 dark:text-emerald-50 leading-[1.15]"
                 >
                     {{
                         locale === "en"
@@ -49,7 +46,7 @@
                     }}
                 </h1>
                 <p
-                    class="mt-4 text-base md:text-lg text-slate-600 dark:text-emerald-100/80 leading-relaxed max-w-2xl mx-auto font-light"
+                    class="mt-3 text-sm md:text-base text-slate-600 dark:text-emerald-100/80 leading-relaxed max-w-2xl mx-auto font-light"
                 >
                     {{
                         locale === "en"
@@ -58,16 +55,15 @@
                     }}
                 </p>
 
-                <!-- Search Bar Container -->
                 <div
-                    class="relative mt-8 max-w-2xl mx-auto"
+                    class="relative mt-6 max-w-2xl mx-auto"
                     data-aos="fade-up"
                     data-aos-delay="100"
                 >
                     <div
-                        class="bg-white/70 dark:bg-emerald-900/45 backdrop-blur-xl border border-emerald-200/60 dark:border-emerald-800/50 rounded-2xl p-3 shadow-lg"
+                        class="bg-white/70 dark:bg-emerald-900/45 backdrop-blur-xl border border-emerald-200/60 dark:border-emerald-800/50 rounded-2xl p-2 shadow-lg"
                     >
-                        <div class="flex flex-col sm:flex-row gap-2.5">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <UInput
                                 :model-value="searchInput"
                                 size="lg"
@@ -81,7 +77,7 @@
                                 @keyup.enter="applySearch"
                             />
                             <button
-                                class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold shadow-md hover:shadow-emerald-500/25 hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform active:scale-95"
+                                class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold shadow-md hover:shadow-emerald-500/25 hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform active:scale-95"
                                 @click="applySearch"
                             >
                                 {{ locale === "en" ? "Search" : "Cari" }}
@@ -89,7 +85,7 @@
                         </div>
                         <div
                             v-if="searchTerm"
-                            class="mt-2.5 flex items-center justify-between text-xs text-slate-500 dark:text-emerald-100/60 px-1"
+                            class="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-emerald-100/60 px-1"
                         >
                             <span>
                                 {{
@@ -111,14 +107,13 @@
             </div>
         </section>
 
-        <!-- Category Filter Section -->
         <section
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 flex flex-wrap justify-center gap-2.5"
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-wrap justify-center gap-2 z-20 relative"
         >
             <button
                 v-for="cat in categories"
                 :key="cat.value"
-                class="px-5 py-2 rounded-full border text-xs sm:text-sm font-semibold tracking-wide transition-all duration-300 transform active:scale-95"
+                class="px-4 py-1.5 rounded-full border text-xs sm:text-sm font-semibold tracking-wide transition-all duration-300 transform active:scale-95"
                 :class="
                     category === cat.value
                         ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-600/10 dark:bg-amber-500 dark:border-amber-500 dark:text-emerald-950 dark:shadow-amber-500/20'
@@ -130,19 +125,17 @@
             </button>
         </section>
 
-        <!-- Articles Content Grid -->
-        <section class="py-14 lg:py-20">
+        <section class="pb-12 lg:pb-16 pt-4">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Loading State -->
                 <div
                     v-if="pending"
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                    <div v-for="n in 6" :key="n" class="space-y-4">
-                        <USkeleton class="h-48 w-full rounded-2xl" />
-                        <USkeleton class="h-4 w-1/4 rounded" />
-                        <USkeleton class="h-6 w-3/4 rounded" />
-                        <USkeleton class="h-4 w-5/6 rounded" />
+                    <div v-for="n in 6" :key="n" class="space-y-3">
+                        <USkeleton class="h-44 w-full rounded-2xl" />
+                        <USkeleton class="h-3 w-1/4 rounded" />
+                        <USkeleton class="h-5 w-3/4 rounded" />
+                        <USkeleton class="h-3 w-5/6 rounded" />
                     </div>
                 </div>
 
@@ -170,29 +163,26 @@
                     </UAlert>
                 </div>
 
-                <div v-else-if="!articles.length" class="text-center py-20">
+                <div v-else-if="!articles.length" class="text-center py-12">
                     <EmptyData
                         title="Article"
                         description="Tidak ada artikel ditemukan."
                     />
                 </div>
 
-                <!-- Articles Grid -->
                 <div
                     v-else
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                     <NuxtLink
                         v-for="article in articles"
                         :key="article.id"
                         :to="`/articles/${slugOf(article)}`"
-                        class="group bg-white dark:bg-emerald-900/10 border border-emerald-100/40 dark:border-emerald-800/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300 flex flex-col h-full"
+                        class="group bg-white dark:bg-emerald-900/10 border border-emerald-100/40 dark:border-emerald-800/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300 flex flex-col h-full"
                     >
-                        <!-- Cover Image -->
                         <div
-                            class="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-emerald-950"
+                            class="relative h-44 sm:h-48 overflow-hidden bg-slate-100 dark:bg-emerald-950"
                         >
-                            <!-- Image element (using standard <img> tag for remote safety) -->
                             <img
                                 v-if="coverOf(article)"
                                 :src="coverOf(article)"
@@ -205,24 +195,21 @@
                             >
                                 <UIcon
                                     name="i-lucide-image"
-                                    class="w-12 h-12 text-emerald-300 dark:text-emerald-700"
+                                    class="w-10 h-10 text-emerald-300 dark:text-emerald-700"
                                 />
                             </div>
 
-                            <!-- Category Badge -->
                             <span
-                                class="absolute top-4 left-4 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg text-white shadow-sm"
+                                class="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg text-white shadow-sm"
                                 :class="getCategoryBg(article.category)"
                             >
                                 {{ getCategoryLabel(article.category) }}
                             </span>
                         </div>
 
-                        <!-- Card Content -->
-                        <div class="p-6 flex flex-col flex-1">
-                            <!-- Date -->
+                        <div class="p-4 sm:p-5 flex flex-col flex-1">
                             <div
-                                class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-emerald-100/40 mb-3"
+                                class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-emerald-100/40 mb-2"
                             >
                                 <UIcon
                                     name="i-lucide-calendar"
@@ -233,32 +220,28 @@
                                 }}</span>
                             </div>
 
-                            <!-- Title -->
                             <h3
-                                class="font-serif font-extrabold text-lg text-emerald-950 dark:text-emerald-50 leading-snug group-hover:text-emerald-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mb-2.5"
+                                class="font-serif font-extrabold text-base sm:text-lg text-emerald-950 dark:text-emerald-50 leading-snug group-hover:text-emerald-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mb-2"
                             >
                                 {{ titleOf(article) }}
                             </h3>
 
-                            <!-- Excerpt -->
                             <p
-                                class="text-slate-500 dark:text-emerald-100/60 text-sm leading-relaxed line-clamp-3 mb-6 flex-1"
+                                class="text-slate-500 dark:text-emerald-100/60 text-sm leading-relaxed line-clamp-2 mb-4 flex-1"
                             >
                                 {{ stripHtml(contentOf(article)) }}
                             </p>
 
-                            <!-- Card Footer -->
                             <div
-                                class="pt-4 border-t border-slate-100 dark:border-emerald-900/50 flex items-center justify-between mt-auto"
+                                class="pt-3 border-t border-slate-100 dark:border-emerald-900/50 flex items-center justify-between mt-auto"
                             >
-                                <!-- Author info -->
                                 <div class="flex items-center gap-2">
                                     <div
-                                        class="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-800/80 flex items-center justify-center"
+                                        class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-800/80 flex items-center justify-center"
                                     >
                                         <UIcon
                                             name="i-lucide-user"
-                                            class="w-3.5 h-3.5 text-emerald-700 dark:text-amber-400"
+                                            class="w-3 h-3 text-emerald-700 dark:text-amber-400"
                                         />
                                     </div>
                                     <span
@@ -270,7 +253,6 @@
                                     </span>
                                 </div>
 
-                                <!-- Read Button -->
                                 <span
                                     class="text-xs font-bold text-emerald-600 group-hover:text-emerald-700 dark:text-amber-400 dark:group-hover:text-amber-300 flex items-center gap-1"
                                 >
@@ -281,7 +263,7 @@
                                     }}
                                     <UIcon
                                         name="i-lucide-arrow-right"
-                                        class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform"
+                                        class="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
                                     />
                                 </span>
                             </div>
@@ -294,7 +276,7 @@
                     :page="page"
                     :total-pages="totalPages"
                     :page-items="pageItems"
-                    class="mt-14"
+                    class="mt-8"
                     @change-page="changePage"
                 />
             </div>
