@@ -2,8 +2,8 @@
     <HeroSection />
     <ProgramsSection />
     <BenefitSection />
-    <ScheduleSection />
     <GallerySection />
+    <ScheduleSection />
     <ArticlesSection />
     <PartnersSection />
     <CTASection />

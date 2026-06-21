@@ -80,10 +80,10 @@
             >
                 <!-- First Row (Moving Right to Left) -->
                 <div class="flex animate-marquee py-3 gap-0">
-                        <NuxtLink
+                        <button
                             v-for="partner in partners"
                             :key="partner.id"
-                            :to="localePath('/partner')"
+                            @click="openModal(partner)"
                             class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                         >
                             <!-- Decorative glow on hover -->
@@ -95,11 +95,11 @@
                                 class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
                                 @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
                             />
-                        </NuxtLink>
-                        <NuxtLink
+                        </button>
+                        <button
                             v-for="partner in partners"
                             :key="'dup-' + partner.id"
-                            :to="localePath('/partner')"
+                            @click="openModal(partner)"
                             class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                             aria-hidden="true"
                         >
@@ -111,15 +111,15 @@
                                 class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
                                 @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
                             />
-                        </NuxtLink>
+                        </button>
                 </div>
 
                 <!-- Second Row (Moving Left to Right) -->
                 <div class="flex animate-marquee-reverse py-3 gap-0 mt-2">
-                        <NuxtLink
+                        <button
                             v-for="partner in [...partners].reverse()"
                             :key="'rev-' + partner.id"
-                            :to="localePath('/partner')"
+                            @click="openModal(partner)"
                             class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                         >
                             <div class="absolute inset-0 bg-gradient-to-tr from-emerald-100/0 via-emerald-100/0 to-emerald-100/0 group-hover:from-emerald-100/60 group-hover:to-transparent dark:group-hover:from-emerald-700/30 transition-colors duration-500 z-0"></div>
@@ -130,11 +130,11 @@
                                 class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
                                 @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
                             />
-                        </NuxtLink>
-                        <NuxtLink
+                        </button>
+                        <button
                             v-for="partner in [...partners].reverse()"
                             :key="'rev-dup-' + partner.id"
-                            :to="localePath('/partner')"
+                            @click="openModal(partner)"
                             class="group flex items-center justify-center h-24 px-8 min-w-[180px] mx-3 md:mx-4 rounded-3xl border-2 border-emerald-200 dark:border-emerald-800/40 bg-white/70 dark:bg-emerald-950/50 backdrop-blur-md hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/80 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 shrink-0 relative overflow-hidden"
                             aria-hidden="true"
                         >
@@ -146,9 +146,45 @@
                                 class="h-12 max-w-[120px] object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"
                                 @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
                             />
-                        </NuxtLink>
+                        </button>
                 </div>
             </div>
+
+            <!-- Partner Detail Modal -->
+            <UModal v-model:open="isModalOpen">
+                <template #content>
+                    <UCard v-if="selectedPartner" class="!bg-white dark:!bg-emerald-950 ring-1 !ring-emerald-100 dark:!ring-emerald-900 divide-y !divide-emerald-100 dark:!divide-emerald-800/50">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-serif font-bold text-emerald-950 dark:text-emerald-50">
+                                    {{ locale === 'id' ? selectedPartner.name_id : selectedPartner.name_en }}
+                                </h3>
+                                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isModalOpen = false" />
+                            </div>
+                        </template>
+
+                        <div class="flex flex-col items-center p-4">
+                            <div class="w-32 h-32 rounded-2xl bg-white dark:bg-emerald-900/20 p-2 flex items-center justify-center border border-emerald-50 dark:border-emerald-900/20 mb-6 shrink-0">
+                                <img
+                                    v-if="selectedPartner.logo"
+                                    :src="getImageUrl(selectedPartner.logo)"
+                                    :alt="locale === 'id' ? selectedPartner.name_id : selectedPartner.name_en"
+                                    class="max-w-full max-h-full object-contain"
+                                    @error="(e) => ((e.target as HTMLImageElement).src = '/placeholder.jpg')"
+                                />
+                                <UIcon
+                                    v-else
+                                    name="i-lucide-building-2"
+                                    class="w-12 h-12 text-emerald-600 dark:text-emerald-400"
+                                />
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-emerald-100/80 leading-relaxed text-center whitespace-pre-line">
+                                {{ locale === 'id' ? selectedPartner.description_id : selectedPartner.description_en }}
+                            </p>
+                        </div>
+                    </UCard>
+                </template>
+            </UModal>
 
             <div class="flex justify-center items-center pt-6">
                 <NuxtLink
@@ -189,6 +225,14 @@ const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
 
 const client = useSanctumClient();
 const selectedPartnerId = ref<number | null>(null);
+
+const isModalOpen = ref(false);
+const selectedPartner = ref<any>(null);
+
+const openModal = (partner: any) => {
+    selectedPartner.value = partner;
+    isModalOpen.value = true;
+};
 
 const {
     data: apiResponse,
