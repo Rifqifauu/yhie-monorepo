@@ -76,12 +76,12 @@
 
             <div
                 v-if="pending"
-                class="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4"
+                class="columns-2 md:columns-3 lg:columns-4 gap-4"
             >
                 <div
                     v-for="n in 8"
                     :key="n"
-                    class="break-inside-avoid rounded-2xl overflow-hidden"
+                    class="break-inside-avoid inline-block w-full mb-4 rounded-2xl overflow-hidden transform-gpu"
                     :class="
                         n % 4 === 0
                             ? 'h-64'
@@ -130,12 +130,12 @@
                 v-else-if="previewItems.length > 0"
                 data-aos="fade-up"
                 data-aos-delay="100"
-                class="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4"
+                class="columns-2 md:columns-3 lg:columns-4 gap-4"
             >
                 <div
                     v-for="(item, index) in previewItems"
                     :key="item.id ?? index"
-                    class="break-inside-avoid group relative overflow-hidden rounded-2xl cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500"
+                    class="break-inside-avoid inline-block w-full mb-4 group relative overflow-hidden rounded-2xl cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500 transform-gpu"
                     :data-aos="'fade-up'"
                     :data-aos-delay="index * 60"
                     @click="openLightbox(item)"
