@@ -25,6 +25,7 @@ export interface PaginatedResponse<T> {
 
 export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
+  existingCategory?: string[];
 }
 
 export const useGallery = () => {
@@ -74,6 +75,9 @@ export const useGallery = () => {
   });
 
   const mediaItems = computed<GalleryMedia[]>(() => paginator.value.data);
+  const existingCategories = computed<string[]>(() => {
+    return apiResponse.value?.existingCategory ?? [];
+  });
   const totalPages = computed<number>(() => paginator.value.last_page);
   const totalItems = computed<number>(() => paginator.value.total);
   const fromItem = computed<number>(() => paginator.value.from ?? 0);
@@ -246,6 +250,7 @@ export const useGallery = () => {
     error,
     isSubmitting,
     mediaItems,
+    existingCategories,
     totalPages,
     totalItems,
     fromItem,

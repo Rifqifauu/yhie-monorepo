@@ -150,11 +150,11 @@
                             label="Kategori"
                             name="category"
                             required
-                            help="Gunakan koma untuk memisahkan kategori."
+                            help="Masukkan satu kategori utama."
                         >
                             <UInput
                                 v-model="form.category"
-                                placeholder="Contoh: galeri, edukasi, beranda"
+                                placeholder="Contoh: akademik, wisuda, sosial"
                                 icon="i-lucide-folder"
                                 size="lg"
                                 class="w-full"

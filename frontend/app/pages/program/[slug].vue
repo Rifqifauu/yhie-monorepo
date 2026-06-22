@@ -300,7 +300,7 @@
                                         class="flex justify-between font-semibold"
                                     >
                                         <span
-                                            >Bank Syariah Indonesia (BSI)</span
+                                            >{{ getSettingValue("bank_name", "Bank Syariah Indonesia (BSI)") }}</span
                                         >
                                     </div>
                                     <div
@@ -308,16 +308,16 @@
                                     >
                                         <span
                                             class="font-mono text-base tracking-wider text-emerald-950 dark:text-white font-bold"
-                                            >7123456789</span
+                                            >{{ getSettingValue("bank_account_number", "7123456789") }}</span
                                         >
                                         <button
                                             @click="
                                                 copyToClipboard(
-                                                    '7123456789',
+                                                    getSettingValue('bank_account_number', '7123456789'),
                                                     'account',
                                                 )
                                             "
-                                            class="text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 font-sans"
+                                            class="text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 font-sans cursor-pointer"
                                         >
                                             <UIcon
                                                 :name="
@@ -341,7 +341,7 @@
                                     <p
                                         class="text-xs text-slate-500 dark:text-emerald-200/50 mt-1"
                                     >
-                                        a.n. Yayasan Hafiz Indonesia Emas
+                                        a.n. {{ getSettingValue("bank_account_name", "Yayasan Hafiz Indonesia Emas") }}
                                     </p>
                                 </div>
                             </div>
@@ -401,11 +401,15 @@
 </template>
 
 <script setup lang="ts">
+import { useSettings } from "~/composables/useSettings";
+
 const config = useRuntimeConfig();
 const route = useRoute();
 const { locale, t } = useI18n();
 const localePath = useLocalePath();
 const client = useSanctumClient();
+
+const { getSettingValue } = useSettings();
 
 const slug = route.params.slug as string;
 const copied = ref(false);
