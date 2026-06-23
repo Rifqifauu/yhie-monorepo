@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Media;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str; // Tambahan untuk manipulasi string
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage; // Tambahkan ini untuk manajemen file
+use Illuminate\Support\Facades\Storage;
 
 class MediaController extends Controller
 {
@@ -15,6 +16,13 @@ class MediaController extends Controller
     {
         $search = $request->query("search");
         $category = $request->query("category");
+
+        // Menggunakan pluck() agar hasil berupa array of strings yang rapi: ["Berita", "Artikel"]
+        // Ditambah whereNotNull agar tidak mengambil kategori yang kosong (jika ada)
+        $existingCategory = Media::select("category")
+            ->whereNotNull("category")
+            ->distinct()
+            ->pluck("category");
 
         try {
             $media = Media::orderBy("created_at", "desc")
@@ -37,6 +45,7 @@ class MediaController extends Controller
                 [
                     "message" => "Media fetched successfully.",
                     "data" => $media,
+                    "existingCategory" => $existingCategory,
                 ],
                 200,
             );
@@ -64,24 +73,22 @@ class MediaController extends Controller
 
             // Validasi untuk file upload
             "image" => "required|array",
-            "image.*" => "required|image|mimes:jpeg,png,jpg,webp|max:2048", // Maksimal 2MB per gambar
+            "image.*" => "required|image|mimes:jpeg,png,jpg,webp|max:2048",
         ]);
+
+        // Format kategori agar seragam (Title Case, huruf kecil semua dulu, dan bersih dari spasi berlebih)
+        $data["category"] = Str::title(Str::lower(trim($data["category"])));
 
         try {
             $imagePaths = [];
 
-            // Proses upload file jika ada
             if ($request->hasFile("image")) {
                 foreach ($request->file("image") as $file) {
-                    // Simpan file ke folder storage/app/public/media
                     $path = $file->store("media", "public");
-
-                    // Simpan path-nya dengan awalan /storage/ agar mudah diakses frontend
                     $imagePaths[] = "/storage/" . $path;
                 }
             }
 
-            // Timpa array input 'image' dengan array path yang baru saja di-generate
             $data["image"] = $imagePaths;
 
             $media = Media::create($data);
@@ -159,28 +166,31 @@ class MediaController extends Controller
             "image.*" => "image|mimes:jpeg,png,jpg,webp|max:2048",
         ]);
 
+        // Format kategori jika diupdate agar seragam (Title Case, bersih dari spasi berlebih)
+        if (isset($validated["category"])) {
+            $validated["category"] = Str::title(
+                Str::lower(trim($validated["category"])),
+            );
+        }
+
         try {
             $media = Media::findOrFail($id);
 
-            // Cek apakah ada upload gambar baru
             if ($request->hasFile("image")) {
-                // 1. Hapus gambar lama dari storage server terlebih dahulu
+                // Hapus gambar lama dari storage server terlebih dahulu
                 if (is_array($media->image)) {
                     foreach ($media->image as $oldImage) {
-                        // Hilangkan '/storage/' untuk mendapatkan path asli 'media/namafile.jpg'
                         $oldPath = str_replace("/storage/", "", $oldImage);
                         Storage::disk("public")->delete($oldPath);
                     }
                 }
 
-                // 2. Upload gambar baru
+                // Upload gambar baru
                 $newImagePaths = [];
                 foreach ($request->file("image") as $file) {
                     $path = $file->store("media", "public");
                     $newImagePaths[] = "/storage/" . $path;
                 }
-
-                // Timpa data validasi dengan array path gambar yang baru
                 $validated["image"] = $newImagePaths;
             }
 
