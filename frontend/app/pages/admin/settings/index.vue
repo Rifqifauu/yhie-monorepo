@@ -1,219 +1,329 @@
 <template>
     <div class="space-y-6 flex flex-col h-full mx-auto w-full">
+        <!-- Page Header -->
         <AdminHeader
-            title="Pengaturan"
+            title="Pengaturan Website"
             icon="i-lucide-settings"
-            description="Kelola pengaturan aplikasi. Ubah, tambah, atau hapus pengaturan dari sini."
-            :showCreate="true"
-            createRoute="/admin/settings/create"
+            description="Kelola informasi kontak, rekening pembayaran, dan tautan media sosial untuk seluruh website dari satu tempat."
+            :showCreate="false"
         >
             <template #actions>
                 <div class="flex items-center gap-3">
-                    <UInput
-                        v-model="searchInput"
-                        icon="i-lucide-search"
-                        placeholder="Cari nama pengaturan..."
-                        size="lg"
-                        class="min-w-0 sm:w-72"
-                        @keyup.enter="applySearch"
-                    />
-
                     <UButton
                         color="neutral"
                         variant="soft"
                         icon="i-lucide-rotate-cw"
+                        :loading="pending"
                         @click="refresh"
-                        >Muat ulang</UButton
-                    >
-                    <UButton
-                        color="neutral"
-                        variant="ghost"
-                        icon="i-lucide-eraser"
-                        @click="clearSearch"
-                        >Reset</UButton
+                        >Muat Ulang</UButton
                     >
                 </div>
             </template>
         </AdminHeader>
 
-        <div
-            class="flex-1 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm overflow-hidden flex flex-col"
-        >
-            <div class="overflow-x-auto">
-                <UTable
-                    :data="settings"
-                    :columns="columns"
-                    :loading="pending"
-                    class="w-full"
-                />
+        <!-- Main Form Container -->
+        <div v-if="pending && !settings.length" class="space-y-6 p-6 bg-white dark:bg-gray-900 rounded-lg ring-1 ring-gray-200 dark:ring-gray-800 shadow-sm animate-pulse">
+            <div class="h-8 bg-gray-200 dark:bg-gray-800 rounded w-1/4"></div>
+            <div class="space-y-4 pt-4">
+                <div class="h-12 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                <div class="h-12 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                <div class="h-12 bg-gray-200 dark:bg-gray-800 rounded"></div>
             </div>
         </div>
 
-        <div
-            v-if="totalItems > 0"
-            class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2"
-        >
-            <span class="text-sm text-gray-500">
-                Menampilkan
-                <span class="font-medium text-gray-900 dark:text-white">{{
-                    fromItem
-                }}</span>
-                -
-                <span class="font-medium text-gray-900 dark:text-white">{{
-                    toItem
-                }}</span>
-                dari
-                <span class="font-medium text-gray-900 dark:text-white">{{
-                    totalItems
-                }}</span>
-                jadwal
-            </span>
-
-            <UPagination
-                v-model:page="page"
-                :total="totalItems"
-                :items-per-page="10"
-                @update:model-value="changePage"
-            />
+        <div v-else-if="error" class="max-w-xl mx-auto py-12">
+            <UAlert
+                icon="i-lucide-alert-triangle"
+                color="red"
+                variant="soft"
+                title="Gagal Memuat Pengaturan"
+                description="Terjadi kesalahan saat mengambil data pengaturan dari server. Silakan coba beberapa saat lagi."
+            >
+                <template #actions>
+                    <UButton size="sm" color="red" @click="refresh">Coba Lagi</UButton>
+                </template>
+            </UAlert>
         </div>
 
-        <div
-            v-if="!pending && totalItems === 0"
-            class="flex flex-col items-center justify-center py-12 text-center ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg bg-white dark:bg-gray-900"
-        >
-            <UIcon
-                name="i-lucide-file-search"
-                class="w-12 h-12 text-gray-400 mb-4"
-            />
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                Tidak ada pengaturan
-            </h3>
-            <p class="text-gray-500 mt-1 max-w-sm">
-                Coba ubah kata kunci pencarian atau tambahkan pengaturan baru.
-            </p>
-            <div class="mt-4 flex gap-3">
-                <UButton color="neutral" variant="soft" @click="clearSearch"
-                    >Bersihkan Filter</UButton
+        <UForm v-else :state="form" class="space-y-6 flex-1 flex flex-col" @submit="handleSubmit">
+            <!-- Tabs Navigation -->
+            <div class="flex gap-2 border-b border-gray-200 dark:border-gray-800 pb-px">
+                <button
+                    v-for="tab in tabs"
+                    :key="tab.key"
+                    type="button"
+                    @click="activeTab = tab.key"
+                    class="px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-all flex items-center gap-2 cursor-pointer focus:outline-none"
+                    :class="
+                        activeTab === tab.key
+                            ? 'border-emerald-600 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400 font-bold'
+                            : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                    "
                 >
+                    <UIcon :name="tab.icon" class="w-4 h-4" />
+                    <span>{{ tab.label }}</span>
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="flex-1 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6">
+                <!-- Tab 1: Umum & Kontak -->
+                <div v-show="activeTab === 'general'" class="space-y-6 max-w-3xl">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-850 pb-2">
+                        Kontak & Alamat Yayasan
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <UFormField
+                            label="Nomor WhatsApp"
+                            name="wa_number"
+                            help="Format internasional tanpa tanda plus (+). Contoh: 6281234567890"
+                            required
+                        >
+                            <UInput
+                                v-model="form.wa_number"
+                                placeholder="Contoh: 628123456789"
+                                icon="i-lucide-message-square"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField
+                            label="Alamat Email Kontak"
+                            name="contact_email"
+                            help="Email resmi yayasan untuk dihubungi pengunjung."
+                            required
+                        >
+                            <UInput
+                                v-model="form.contact_email"
+                                placeholder="Contoh: info@yhie.or.id"
+                                icon="i-lucide-mail"
+                                size="lg"
+                                type="email"
+                                class="w-full"
+                            />
+                        </UFormField>
+                    </div>
+
+                    <UFormField
+                        label="Alamat Kantor"
+                        name="office_address"
+                        help="Alamat lengkap lokasi sekretariat yayasan."
+                        required
+                    >
+                        <UTextarea
+                            v-model="form.office_address"
+                            placeholder="Tulis alamat kantor lengkap..."
+                            icon="i-lucide-map-pin"
+                            :rows="4"
+                            size="lg"
+                            class="w-full"
+                        />
+                    </UFormField>
+                </div>
+
+                <!-- Tab 2: Rekening Bank -->
+                <div v-show="activeTab === 'bank'" class="space-y-6 max-w-3xl">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-850 pb-2">
+                        Rekening Pembayaran Program
+                    </h3>
+                    
+                    <UFormField
+                        label="Nama Bank"
+                        name="bank_name"
+                        help="Nama bank resmi untuk tujuan transfer. Contoh: Bank Syariah Indonesia (BSI)"
+                        required
+                    >
+                        <UInput
+                            v-model="form.bank_name"
+                            placeholder="Contoh: Bank Syariah Indonesia (BSI)"
+                            icon="i-lucide-landmark"
+                            size="lg"
+                            class="w-full"
+                        />
+                    </UFormField>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <UFormField
+                            label="Nomor Rekening"
+                            name="bank_account_number"
+                            help="Nomor rekening bank tanpa tanda strip atau titik."
+                            required
+                        >
+                            <UInput
+                                v-model="form.bank_account_number"
+                                placeholder="Contoh: 7123456789"
+                                icon="i-lucide-credit-card"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField
+                            label="Nama Pemilik Rekening (Atas Nama)"
+                            name="bank_account_name"
+                            help="Nama resmi pemilik rekening sesuai buku tabungan."
+                            required
+                        >
+                            <UInput
+                                v-model="form.bank_account_name"
+                                placeholder="Contoh: Yayasan Hafiz Indonesia Emas"
+                                icon="i-lucide-user"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Media Sosial -->
+                <div v-show="activeTab === 'social'" class="space-y-6 max-w-3xl">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-850 pb-2">
+                        Tautan Media Sosial Yayasan
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <UFormField label="Link Facebook" name="social_facebook">
+                            <UInput
+                                v-model="form.social_facebook"
+                                placeholder="Contoh: https://facebook.com/nama-page"
+                                icon="i-lucide-facebook"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField label="Link Instagram" name="social_instagram">
+                            <UInput
+                                v-model="form.social_instagram"
+                                placeholder="Contoh: https://instagram.com/username"
+                                icon="i-lucide-instagram"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField label="Link YouTube" name="social_youtube">
+                            <UInput
+                                v-model="form.social_youtube"
+                                placeholder="Contoh: https://youtube.com/c/nama-channel"
+                                icon="i-lucide-youtube"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField label="Link Twitter/X" name="social_twitter">
+                            <UInput
+                                v-model="form.social_twitter"
+                                placeholder="Contoh: https://x.com/username"
+                                icon="i-lucide-twitter"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+                    </div>
+
+                    <UFormField label="Link TikTok" name="social_tiktok">
+                        <UInput
+                            v-model="form.social_tiktok"
+                            placeholder="Contoh: https://tiktok.com/@username"
+                            icon="i-lucide-music-2"
+                            size="lg"
+                            class="w-full"
+                        />
+                    </UFormField>
+                </div>
+            </div>
+
+            <!-- Form Action Footer -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
                 <UButton
+                    type="submit"
                     color="primary"
-                    icon="i-lucide-plus"
-                    to="/admin/settings/create"
-                    >Tambah Pengaturan
+                    size="lg"
+                    icon="i-lucide-save"
+                    :loading="isSubmitting"
+                >
+                    Simpan Perubahan
                 </UButton>
             </div>
-        </div>
+        </UForm>
     </div>
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
-import type { TableColumn } from "@nuxt/ui";
-import type { Row } from "@tanstack/vue-table";
-import { useClipboard } from "@vueuse/core";
-import type { Setting } from "~/composables/useSettings";
+import { ref, reactive, watch } from "vue";
+import { useSettings } from "~/composables/useSettings";
 
 definePageMeta({
     layout: "admin",
 });
 
-const UButton = resolveComponent("UButton");
-const UDropdownMenu = resolveComponent("UDropdownMenu");
-
 const toast = useToast();
-const { copy } = useClipboard();
+const { settings, pending, error, refresh, isSubmitting, getSettingValue, saveAllSettings } = useSettings();
 
-const {
-    schedules,
-    pending,
-    page,
-    totalItems,
-    fromItem,
-    toItem,
-    searchInput,
-    applySearch,
-    clearSearch,
-    changePage,
-    refresh,
-    titleOf,
-    descOf,
-} = useSchedules();
-
-const columns: TableColumn<Schedule>[] = [
-    {
-        id: "no",
-        header: "No",
-        meta: {
-            class: { th: "w-12 text-center", td: "text-center text-gray-500" },
-        },
-        cell: ({ row }) => {
-            const itemsPerPage = 10;
-            const number = (page.value - 1) * itemsPerPage + row.index + 1;
-            return h("span", {}, number);
-        },
-    },
-    {
-        id: "key",
-        header: "Nama Pengaturan",
-    },
-    {
-        id: "value",
-        header: "Nilai",
-    },
-
-    {
-        id: "actions",
-        header: "",
-        meta: { class: { th: "w-16", td: "text-right" } },
-        cell: ({ row }) => {
-            return h(
-                UDropdownMenu,
-                {
-                    content: { align: "end" },
-                    items: getRowItems(row),
-                    "aria-label": "Actions dropdown",
-                },
-                () =>
-                    h(UButton, {
-                        icon: "i-lucide-more-vertical",
-                        color: "neutral",
-                        variant: "ghost",
-                        size: "sm",
-                        class: "text-gray-400 hover:text-gray-900 dark:hover:text-white",
-                        "aria-label": "Actions dropdown",
-                    }),
-            );
-        },
-    },
+// Tabs Config
+const activeTab = ref("general");
+const tabs = [
+    { key: "general", label: "Umum & Kontak", icon: "i-lucide-contact" },
+    { key: "bank", label: "Rekening Bank", icon: "i-lucide-landmark" },
+    { key: "social", label: "Media Sosial", icon: "i-lucide-share-2" },
 ];
 
-function getRowItems(row: Row<Setting>) {
-    return [
-        [
-            {
-                label: "Copy ID Jadwal",
-                icon: "i-lucide-copy",
-                onSelect() {
-                    const id = row.original.id ? String(row.original.id) : "";
-                    if (id) {
-                        copy(id);
-                        toast.add({
-                            title: "ID berhasil disalin!",
-                            description: `ID: ${id}`,
-                            color: "success",
-                            icon: "i-lucide-circle-check",
-                        });
-                    }
-                },
-            },
-        ],
-        [
-            {
-                label: "Hapus Pengaturan",
-                icon: "i-lucide-trash-2",
-                color: "error" as const,
-            },
-        ],
-    ];
-}
+// Form Reactive State
+const form = reactive({
+    wa_number: "",
+    contact_email: "",
+    office_address: "",
+    bank_name: "",
+    bank_account_number: "",
+    bank_account_name: "",
+    social_facebook: "",
+    social_instagram: "",
+    social_youtube: "",
+    social_twitter: "",
+    social_tiktok: "",
+});
+
+// Watch settings and fill form when data arrives
+watch(
+    settings,
+    (newVal) => {
+        if (newVal && newVal.length > 0) {
+            form.wa_number = getSettingValue("wa_number");
+            form.contact_email = getSettingValue("contact_email");
+            form.office_address = getSettingValue("office_address");
+            form.bank_name = getSettingValue("bank_name");
+            form.bank_account_number = getSettingValue("bank_account_number");
+            form.bank_account_name = getSettingValue("bank_account_name");
+            form.social_facebook = getSettingValue("social_facebook");
+            form.social_instagram = getSettingValue("social_instagram");
+            form.social_youtube = getSettingValue("social_youtube");
+            form.social_twitter = getSettingValue("social_twitter");
+            form.social_tiktok = getSettingValue("social_tiktok");
+        }
+    },
+    { immediate: true },
+);
+
+const handleSubmit = async () => {
+    const res = await saveAllSettings(form);
+    if (res.success) {
+        toast.add({
+            title: "Pengaturan Disimpan!",
+            description: "Semua data pengaturan situs berhasil diperbarui.",
+            color: "success",
+            icon: "i-lucide-circle-check",
+        });
+    } else {
+        toast.add({
+            title: "Gagal Menyimpan",
+            description: res.error,
+            color: "error",
+            icon: "i-lucide-alert-triangle",
+        });
+    }
+};
 </script>

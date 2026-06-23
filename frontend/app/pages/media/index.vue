@@ -267,6 +267,7 @@ const {
     page,
     category,
     mediaItems,
+    existingCategories,
     totalPages,
     pending,
     error,
@@ -280,16 +281,35 @@ const {
 } = useGallery();
 
 // --- Filter categories list ---
-const filters = [
-    { value: "", labelId: "Semua", labelEn: "All" },
-    { value: "graduation", labelId: "Wisuda", labelEn: "Graduation" },
-    { value: "academic", labelId: "Akademik", labelEn: "Academic" },
-    { value: "tourism", labelId: "Wisata Alam", labelEn: "Tourism" },
-    { value: "social", labelId: "Kegiatan Sosial", labelEn: "Social" },
-];
+const categoryTranslations: Record<string, { labelId: string; labelEn: string }> = {
+    graduation: { labelId: "Wisuda", labelEn: "Graduation" },
+    wisuda: { labelId: "Wisuda", labelEn: "Graduation" },
+    academic: { labelId: "Akademik", labelEn: "Academic" },
+    akademik: { labelId: "Akademik", labelEn: "Academic" },
+    tourism: { labelId: "Wisata Alam", labelEn: "Tourism" },
+    social: { labelId: "Kegiatan Sosial", labelEn: "Social" },
+    sosial: { labelId: "Kegiatan Sosial", labelEn: "Social" },
+};
+
+const filters = computed(() => {
+    const list = [{ value: "", labelId: "Semua", labelEn: "All" }];
+    existingCategories.value.forEach((cat) => {
+        if (!cat) return;
+        const trans = categoryTranslations[cat.toLowerCase()] || {
+            labelId: cat.charAt(0).toUpperCase() + cat.slice(1),
+            labelEn: cat.charAt(0).toUpperCase() + cat.slice(1),
+        };
+        list.push({
+            value: cat.toLowerCase(),
+            labelId: trans.labelId,
+            labelEn: trans.labelEn,
+        });
+    });
+    return list;
+});
 
 const getCategoryBorder = (cat?: string) => {
-    switch (cat) {
+    switch (cat?.toLowerCase()) {
         case "graduation":
             return "border-t-2 border-amber-500 dark:border-amber-400";
         case "academic":
@@ -305,7 +325,7 @@ const getCategoryBorder = (cat?: string) => {
 
 const getCategoryLabel = (cat?: string) => {
     if (!cat) return "";
-    const found = filters.find((f) => f.value === cat);
+    const found = filters.value.find((f) => f.value === cat.toLowerCase());
     if (!found) return cat;
     return locale.value === "en" ? found.labelEn : found.labelId;
 };
