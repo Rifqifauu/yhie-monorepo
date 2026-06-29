@@ -117,11 +117,14 @@ class SettingController extends Controller
     public function update(Request $request, string $key): JsonResponse
     {
         $data = $request->validate([
-            'value' => 'required|string',
+            'value' => 'nullable|string',
         ]);
 
         try {
-            $setting = Setting::updateOrCreate(['key' => $key], ['value' => $data['value']]);
+            $setting = Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $data['value'] ?? '']
+            );
 
             return response()->json([
                 'message' => 'Setting updated successfully.',
