@@ -16,9 +16,9 @@
                         ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-600/20 dark:bg-amber-500 dark:border-amber-500 dark:text-emerald-950 dark:shadow-amber-500/25 scale-105'
                         : 'border-slate-200 dark:border-emerald-800/80 text-slate-600 dark:text-emerald-200/80 hover:border-emerald-500 dark:hover:border-amber-500 hover:text-emerald-600 dark:hover:text-amber-400 bg-white/80 dark:bg-emerald-950/40 backdrop-blur-sm'
                 "
-                @click="category = filter.value"
+                @click="handleCategoryChange(filter.value)"
             >
-                {{ locale === "en" ? filter.labelEn : filter.labelId }}
+                {{ filter.label }}
             </button>
         </section>
 
@@ -280,33 +280,37 @@ const {
     refresh,
 } = useGallery();
 
-// --- Filter categories list ---
-const categoryTranslations: Record<string, { labelId: string; labelEn: string }> = {
-    graduation: { labelId: "Wisuda", labelEn: "Graduation" },
-    wisuda: { labelId: "Wisuda", labelEn: "Graduation" },
-    academic: { labelId: "Akademik", labelEn: "Academic" },
-    akademik: { labelId: "Akademik", labelEn: "Academic" },
-    tourism: { labelId: "Wisata Alam", labelEn: "Tourism" },
-    social: { labelId: "Kegiatan Sosial", labelEn: "Social" },
-    sosial: { labelId: "Kegiatan Sosial", labelEn: "Social" },
+const handleCategoryChange = async (newCategory: string) => {
+    category.value = newCategory;
+    page.value = 1; // Reset ke halaman pertama setiap kali filter diganti
+
+    // Panggil refresh() untuk memaksa fetch ulang data
+    await refresh();
 };
 
 const filters = computed(() => {
-    const list = [{ value: "", labelId: "Semua", labelEn: "All" }];
+    const list = [
+        {
+            value: "",
+            label: locale.value === "en" ? "All" : "Semua",
+        },
+    ];
+
     existingCategories.value.forEach((cat) => {
         if (!cat) return;
-        const trans = categoryTranslations[cat.toLowerCase()] || {
-            labelId: cat.charAt(0).toUpperCase() + cat.slice(1),
-            labelEn: cat.charAt(0).toUpperCase() + cat.slice(1),
-        };
         list.push({
             value: cat.toLowerCase(),
-            labelId: trans.labelId,
-            labelEn: trans.labelEn,
+            label: cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase(),
         });
     });
+
     return list;
 });
+
+const getCategoryLabel = (cat?: string) => {
+    if (!cat) return "";
+    return cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+};
 
 const getCategoryBorder = (cat?: string) => {
     switch (cat?.toLowerCase()) {
@@ -323,14 +327,6 @@ const getCategoryBorder = (cat?: string) => {
     }
 };
 
-const getCategoryLabel = (cat?: string) => {
-    if (!cat) return "";
-    const found = filters.value.find((f) => f.value === cat.toLowerCase());
-    if (!found) return cat;
-    return locale.value === "en" ? found.labelEn : found.labelId;
-};
-
-// --- Masonry height variation ---
 const getCardHeight = (index: number) => {
     const pattern = index % 6;
     switch (pattern) {
@@ -351,12 +347,10 @@ const getCardHeight = (index: number) => {
     }
 };
 
-// --- CONTROLLER LOGIKA BARU LIGHTBOX (ARRAY FOTO BERDASARKAN ID ALBUM) ---
 const lightboxOpen = ref(false);
-const activeItem = ref<any>(null); // Menyimpan objek data album utuh yang sedang aktif dibuka
-const imageIndex = ref(0); // Menyimpan indeks gambar internal aktif di dalam album tersebut
+const activeItem = ref<any>(null);
+const imageIndex = ref(0);
 
-// Mengambil list seluruh foto khusus milik album aktif
 const activeAlbumImages = computed<string[]>(() => {
     if (!activeItem.value) return [];
     return imagesOf(activeItem.value);
@@ -370,7 +364,7 @@ const currentImageSrc = computed(() => {
 
 const openLightbox = (item: any) => {
     activeItem.value = item;
-    imageIndex.value = 0; // Mulai dari foto pertama di dalam album ini
+    imageIndex.value = 0;
     lightboxOpen.value = true;
     document.body.style.overflow = "hidden";
 };
@@ -381,7 +375,6 @@ const closeLightbox = () => {
     document.body.style.overflow = "";
 };
 
-// --- HELPER PENANGANAN TRANSLASI MULTI-BAHASA LARAVEL FILLABLE DATA ---
 const getDynamicTitle = (item: any): string => {
     if (!item) return "";
     return (
@@ -400,7 +393,6 @@ const getDynamicDesc = (item: any): string => {
     );
 };
 
-// Navigasi Menggunakan Keyboard panah kiri kanan
 const handleKeydown = (e: KeyboardEvent) => {
     if (!lightboxOpen.value) return;
     if (e.key === "Escape") closeLightbox();
@@ -420,7 +412,6 @@ onUnmounted(() => {
     window.removeEventListener("keydown", handleKeydown);
 });
 
-// SEO Meta setup
 useSeoMeta({
     title: () => (locale.value === "en" ? "Gallery - YHIE" : "Galeri - YHIE"),
     description: () =>
@@ -445,7 +436,6 @@ useSeoMeta({
     opacity: 0;
 }
 
-/* Kustomisasi Scrollbar Mini untuk Box Deskripsi */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
 }
