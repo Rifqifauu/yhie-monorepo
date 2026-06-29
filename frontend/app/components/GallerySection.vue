@@ -135,7 +135,7 @@
                 <div
                     v-for="(item, index) in previewItems"
                     :key="item.id ?? index"
-                    class="safari-masonry-item mb-4 group relative overflow-hidden rounded-2xl cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500"
+                    class="safari-masonry-item isolate mb-4 group relative overflow-hidden rounded-2xl cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500"
                     @click="openLightbox(item)"
                 >
                     <div
@@ -159,7 +159,7 @@
                             format="webp"
                             width="600"
                             height="600"
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 transform-gpu"
                         />
                         <div
                             v-else
@@ -402,10 +402,15 @@ const getDynamicDesc = (item: any): string => {
     -webkit-column-break-inside: avoid;
     page-break-inside: avoid;
     break-inside: avoid;
+
+    /* Hardware Acceleration Fixes */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform, opacity;
 }
 
 /* Desain Scrollbar Halus untuk teks Deskripsi Panjang */
