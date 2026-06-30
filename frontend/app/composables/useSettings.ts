@@ -45,10 +45,10 @@ export const useSettings = () => {
   const saveAllSettings = async (formState: Record<string, string>) => {
     isSubmitting.value = true;
     try {
-      const promises = Object.entries(formState).map(([key, value]) => {
-        return updateSetting(key, value);
-      });
-      await Promise.all(promises);
+      // Mengirim request satu per satu (berurutan) agar tidak membebani server / memicu rate-limit
+      for (const [key, value] of Object.entries(formState)) {
+        await updateSetting(key, value);
+      }
       await refresh();
       return { success: true };
     } catch (err: any) {

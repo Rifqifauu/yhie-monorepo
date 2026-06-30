@@ -139,6 +139,36 @@ class SettingController extends Controller
     }
 
     /**
+     * POST /api/admin/settings/bulk
+     * Update multiple settings at once.
+     */
+    public function bulkUpdate(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'settings' => 'required|array',
+            'settings.*' => 'nullable|string',
+        ]);
+
+        try {
+            foreach ($data['settings'] as $key => $value) {
+                Setting::updateOrCreate(
+                    ['key' => $key],
+                    ['value' => $value ?? '']
+                );
+            }
+
+            return response()->json([
+                'message' => 'Settings updated successfully.'
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error('Error bulk updating settings: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to bulk update settings.'
+            ], 500);
+        }
+    }
+
+    /**
      * DELETE /api/admin/settings/{key}
      */
     public function destroy(string $id): JsonResponse

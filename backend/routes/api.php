@@ -94,6 +94,7 @@ Route::middleware("auth:sanctum")->group(function () {
         "show",
         "index",
     ]);
+    Route::post("settings-bulk", [SettingController::class, "bulkUpdate"]);
     Route::apiResource("settings", SettingController::class)->except([
         "show",
         "index",
