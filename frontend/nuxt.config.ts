@@ -54,8 +54,6 @@ export default defineNuxtConfig({
       onGuestOnly: "/admin",
     },
   },
-
-  // ✨ INI BAGIAN PALING PENTING ✨
   // Menyalin trik Proxy dari project yang works
   routeRules: {
     "/sanctum/**": {
