@@ -13,15 +13,35 @@
                 >
                     {{ t("registration.success") }}
                 </h3>
-                <p class="text-slate-600 dark:text-emerald-100/70 mb-8">
+                <p class="text-slate-600 dark:text-emerald-100/70 mb-2">
                     {{ t("registration.successDesc") }}
                 </p>
-                <button
-                    @click="closeAndReset"
-                    class="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
+                <p
+                    v-if="referenceId"
+                    class="text-sm text-slate-500 dark:text-emerald-200/60 mb-8"
                 >
-                    {{ t("registration.close") }}
-                </button>
+                    {{ t("registration.invoiceNumber") }}:
+                    <span
+                        class="font-mono font-bold text-emerald-800 dark:text-emerald-300"
+                        >{{ referenceId }}</span
+                    >
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button
+                        @click="closeAndReset"
+                        class="px-8 py-3 rounded-xl border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 font-bold transition-all duration-300"
+                    >
+                        {{ t("registration.close") }}
+                    </button>
+                    <NuxtLink
+                        v-if="referenceId"
+                        :to="localePath(`/invoice/${referenceId}`)"
+                        @click="closeAndReset"
+                        class="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
+                    >
+                        {{ t("registration.uploadReceiptCta") }}
+                    </NuxtLink>
+                </div>
             </div>
 
             <!-- Form state -->
@@ -346,6 +366,76 @@
                         </div>
                     </div>
 
+                    <!-- Divider -->
+                    <hr
+                        class="border-emerald-200/40 dark:border-emerald-800/40"
+                    />
+
+                    <!-- Document Upload Section -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <div
+                                class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center"
+                            >
+                                <UIcon
+                                    name="i-lucide-file-image"
+                                    class="w-4 h-4 text-emerald-600 dark:text-emerald-400"
+                                />
+                            </div>
+                            <h3
+                                class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider"
+                            >
+                                {{ t("registration.documents") }}
+                            </h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- ID Card -->
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-600 dark:text-emerald-200/70 mb-1.5"
+                                >
+                                    {{ t("registration.idCard") }}
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/webp"
+                                    @change="onIdCardChange"
+                                    class="block w-full text-sm text-slate-600 dark:text-emerald-100/70 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-emerald-100 dark:file:bg-emerald-900/50 file:text-emerald-700 dark:file:text-emerald-300 file:font-semibold cursor-pointer"
+                                />
+                                <p
+                                    v-if="errors.id_card"
+                                    class="mt-1 text-xs text-red-500"
+                                >
+                                    {{ errors.id_card[0] }}
+                                </p>
+                            </div>
+
+                            <!-- Photo -->
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-slate-600 dark:text-emerald-200/70 mb-1.5"
+                                >
+                                    {{ t("registration.photo") }}
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/webp"
+                                    @change="onPhotoChange"
+                                    class="block w-full text-sm text-slate-600 dark:text-emerald-100/70 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-emerald-100 dark:file:bg-emerald-900/50 file:text-emerald-700 dark:file:text-emerald-300 file:font-semibold cursor-pointer"
+                                />
+                                <p
+                                    v-if="errors.photo"
+                                    class="mt-1 text-xs text-red-500"
+                                >
+                                    {{ errors.photo[0] }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- General Error -->
                     <div
                         v-if="generalError"
@@ -397,18 +487,23 @@ const props = defineProps<{
     programId: number | string;
     programTitle: string;
     programPrice: string;
+    amount?: number | string;
 }>();
 
 const isOpen = defineModel<boolean>({ default: false });
 const { t } = useI18n(); // Tetap diperlukan di komponen jika <template> memakai `t()`
+const localePath = useLocalePath();
 
 // Gunakan composable
 const {
     form,
+    idCard,
+    photo,
     errors,
     generalError,
     isSubmitting,
     submitSuccess,
+    referenceId,
     resetForm,
     submitForm,
 } = useProgramRegistration();
@@ -421,9 +516,17 @@ const closeAndReset = () => {
     }, 300);
 };
 
-// Wrapper function untuk submit agar otomatis mengirim programId dari props
+const onIdCardChange = (e: Event) => {
+    idCard.value = (e.target as HTMLInputElement).files?.[0] || null;
+};
+
+const onPhotoChange = (e: Event) => {
+    photo.value = (e.target as HTMLInputElement).files?.[0] || null;
+};
+
+// Wrapper function untuk submit agar otomatis mengirim programId & amount dari props
 const handleSubmit = async () => {
-    await submitForm(props.programId);
+    await submitForm(props.programId, props.amount ?? 0);
 };
 </script>
 

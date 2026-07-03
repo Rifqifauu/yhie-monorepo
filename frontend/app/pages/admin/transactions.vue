@@ -81,13 +81,25 @@ const {
 
 const toast = useToast();
 const client = useSanctumClient();
+const config = useRuntimeConfig();
 
 export interface TransactionRow {
   id?: number | string;
   amount: number;
   payment_status?: string;
+  transaction_receipt?: string | null;
   created_at?: string;
   programRegistration?: any;
+}
+
+function viewReceipt(row: Row<TransactionRow>) {
+  const path = row.original.transaction_receipt;
+  if (!path) {
+    toast.add({ title: "Belum ada bukti transfer", description: "Pendaftar belum mengunggah bukti transfer.", color: "warning" });
+    return;
+  }
+  const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
+  window.open(path.startsWith("http") ? path : `${backendUrl}${path}`, "_blank");
 }
 
 const columns: TableColumn<TransactionRow>[] = [
@@ -160,7 +172,11 @@ const columns: TableColumn<TransactionRow>[] = [
 function getRowItems(row: Row<TransactionRow>) {
   return [
     [
-      { label: "Lihat", icon: "i-lucide-eye" },
+      {
+        label: "Lihat Bukti Transfer",
+        icon: "i-lucide-eye",
+        onSelect: () => viewReceipt(row),
+      },
       {
         label: "Tandai Selesai",
         icon: "i-lucide-check",
