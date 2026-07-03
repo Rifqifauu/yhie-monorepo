@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     },
   },
 
+  // Konfigurasi Lokalisasi Bahasa (i18n)
   i18n: {
     lazy: true,
     langDir: "locales/",
@@ -53,7 +54,7 @@ export default defineNuxtConfig({
       onGuestOnly: "/admin",
     },
   },
-  
+  // Menyalin trik Proxy dari project yang works
   routeRules: {
     "/sanctum/**": {
       proxy: "https://api.sertifikasihafizh.xyz/sanctum/**",

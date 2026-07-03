@@ -59,16 +59,6 @@ Route::post("program-registrations", [
     "store",
 ]);
 
-// Tracking invoice & upload bukti transfer manual, publik (tanpa login)
-Route::get("transactions/track/{reference_id}", [
-    TransactionController::class,
-    "showByReference",
-]);
-Route::post("transactions/track/{reference_id}/receipt", [
-    TransactionController::class,
-    "uploadReceipt",
-]);
-
 /*
 |--------------------------------------------------------------------------
 | PROTECTED ROUTES (Butuh cookie Sanctum)
