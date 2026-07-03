@@ -23,7 +23,14 @@ class ProgramRegistrationController extends Controller
             "address" => "nullable|string|max:1000",
             "notes" => "nullable|string|max:1000",
             "amount" => "required|numeric|min:0", // Ambil nominal harga program dari frontend/database
+            "id_card" => "required|image|mimes:jpeg,png,jpg,webp|max:2048",
+            "photo" => "required|image|mimes:jpeg,png,jpg,webp|max:2048",
         ]);
+
+        $data["id_card"] =
+            "/storage/" . $request->file("id_card")->store("registrations", "public");
+        $data["photo"] =
+            "/storage/" . $request->file("photo")->store("registrations", "public");
 
         // Bungkus dengan DB::transaction demi keamanan data jikalau salah satu query fail
         DB::beginTransaction();

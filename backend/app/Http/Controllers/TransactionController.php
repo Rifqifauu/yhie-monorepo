@@ -59,7 +59,7 @@ class TransactionController extends Controller
             "program_registration_id" =>
                 "required|exists:program_registrations,id",
             "amount" => "required|numeric|min:0",
-            "payment_status" => "required|in:pending,completed,failed",
+            "payment_status" => "required|in:pending,completed,failed,expired",
         ]);
 
         try {
@@ -101,6 +101,83 @@ class TransactionController extends Controller
     }
 
     /**
+     * GET /api/transactions/track/{referenceId}
+     * Public - cek status invoice via nomor invoice (untuk halaman upload bukti transfer).
+     */
+    public function showByReference(string $referenceId): JsonResponse
+    {
+        $transaction = Transaction::with("programRegistration.program")
+            ->where("reference_id", $referenceId)
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(["message" => "Invoice not found."], 404);
+        }
+
+        return response()->json(
+            [
+                "message" => "Transaction fetched successfully.",
+                "data" => $transaction,
+            ],
+            200,
+        );
+    }
+
+    /**
+     * POST /api/transactions/track/{referenceId}/receipt
+     * Public - upload bukti transfer manual selama invoice masih pending.
+     */
+    public function uploadReceipt(
+        Request $request,
+        string $referenceId,
+    ): JsonResponse {
+        $data = $request->validate([
+            "receipt" => "required|image|mimes:jpeg,png,jpg,webp|max:2048",
+        ]);
+
+        $transaction = Transaction::where(
+            "reference_id",
+            $referenceId,
+        )->first();
+
+        if (!$transaction) {
+            return response()->json(["message" => "Invoice not found."], 404);
+        }
+
+        if ($transaction->payment_status !== "pending") {
+            return response()->json(
+                ["message" => "Invoice is no longer awaiting payment."],
+                422,
+            );
+        }
+
+        try {
+            $transaction->update([
+                "transaction_receipt" =>
+                    "/storage/" .
+                    $data["receipt"]->store("receipts", "public"),
+            ]);
+
+            return response()->json(
+                [
+                    "message" =>
+                        "Receipt uploaded successfully. Please wait for admin verification.",
+                    "data" => $transaction
+                        ->fresh()
+                        ->load("programRegistration.program"),
+                ],
+                200,
+            );
+        } catch (\Throwable $e) {
+            Log::error("Error uploading transaction receipt: " . $e->getMessage());
+            return response()->json(
+                ["message" => "Failed to upload receipt."],
+                500,
+            );
+        }
+    }
+
+    /**
      * PUT /api/transactions/{transaction}
      */
     public function update(
@@ -109,7 +186,7 @@ class TransactionController extends Controller
     ): JsonResponse {
         $data = $request->validate([
             "amount" => "sometimes|numeric|min:0",
-            "payment_status" => "sometimes|in:pending,completed,failed",
+            "payment_status" => "sometimes|in:pending,completed,failed,expired",
         ]);
 
         try {
