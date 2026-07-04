@@ -6,7 +6,7 @@ export interface InvoiceTransaction {
   amount: number;
   payment_status: "pending" | "completed" | "failed" | "expired";
   transaction_receipt: string | null;
-  programRegistration?: any;
+  program_registration?: any;
 }
 
 export const useInvoice = (referenceId: string) => {

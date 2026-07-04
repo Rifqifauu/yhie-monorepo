@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProgramRegistrationController extends Controller
 {
@@ -63,6 +64,14 @@ class ProgramRegistrationController extends Controller
             );
         } catch (\Throwable $e) {
             DB::rollBack();
+
+            // Bersihkan file yang sudah terlanjur tersimpan sebelum transaksi gagal.
+            foreach (["id_card", "photo"] as $file) {
+                Storage::disk("public")->delete(
+                    str_replace("/storage/", "", $data[$file]),
+                );
+            }
+
             Log::error(
                 "Error creating program registration: " . $e->getMessage(),
             );

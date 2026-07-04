@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TransactionController extends Controller
 {
@@ -106,9 +107,10 @@ class TransactionController extends Controller
      */
     public function showByReference(string $referenceId): JsonResponse
     {
-        $transaction = Transaction::with("programRegistration.program")
-            ->where("reference_id", $referenceId)
-            ->first();
+        $transaction = Transaction::where(
+            "reference_id",
+            $referenceId,
+        )->first();
 
         if (!$transaction) {
             return response()->json(["message" => "Invoice not found."], 404);
@@ -117,10 +119,40 @@ class TransactionController extends Controller
         return response()->json(
             [
                 "message" => "Transaction fetched successfully.",
-                "data" => $transaction,
+                "data" => $this->invoicePayload($transaction),
             ],
             200,
         );
+    }
+
+    /**
+     * Bentuk data invoice yang aman untuk endpoint PUBLIK.
+     * Hanya field yang dibutuhkan halaman invoice; tidak membocorkan data
+     * pribadi pendaftar (KTP, foto, email, telepon, alamat).
+     */
+    private function invoicePayload(Transaction $transaction): array
+    {
+        $transaction->loadMissing("programRegistration.program");
+        $registration = $transaction->programRegistration;
+        $program = $registration?->program;
+
+        return [
+            "reference_id" => $transaction->reference_id,
+            "amount" => $transaction->amount,
+            "payment_status" => $transaction->payment_status,
+            "transaction_receipt" => $transaction->transaction_receipt,
+            "program_registration" => $registration
+                ? [
+                    "full_name" => $registration->full_name,
+                    "program" => $program
+                        ? [
+                            "title_id" => $program->title_id,
+                            "title_en" => $program->title_en,
+                        ]
+                        : null,
+                ]
+                : null,
+        ];
     }
 
     /**
@@ -152,6 +184,13 @@ class TransactionController extends Controller
         }
 
         try {
+            // Hapus bukti lama agar file tidak menumpuk saat pendaftar upload ulang.
+            if ($transaction->transaction_receipt) {
+                Storage::disk("public")->delete(
+                    str_replace("/storage/", "", $transaction->transaction_receipt),
+                );
+            }
+
             $transaction->update([
                 "transaction_receipt" =>
                     "/storage/" .
@@ -162,9 +201,7 @@ class TransactionController extends Controller
                 [
                     "message" =>
                         "Receipt uploaded successfully. Please wait for admin verification.",
-                    "data" => $transaction
-                        ->fresh()
-                        ->load("programRegistration.program"),
+                    "data" => $this->invoicePayload($transaction->fresh()),
                 ],
                 200,
             );

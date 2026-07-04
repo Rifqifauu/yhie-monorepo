@@ -23,51 +23,41 @@
             >
                 <!-- Column 1: Organization Bio -->
                 <div class="space-y-5 lg:col-span-1">
-                    <div class="flex items-center gap-4">
-                        <!-- Glassmorphism Wrapper untuk Logo (efek kaca putih transparan dengan sudut melengkung khas kubah/arsitektur Islam) -->
-                        <div
-                            class="bg-white/10 dark:bg-emerald-900/40 backdrop-blur-md p-2.5 rounded-t-2xl rounded-b-lg shadow-sm border border-white/20 dark:border-emerald-800/30"
-                        >
-                            <NuxtImg
-                                src="/logo.png"
-                                alt="Logo YHIE"
-                                class="w-11 h-auto object-contain"
-                            />
-                        </div>
-                        <div>
+                    <div>
+                        <div class="flex items-center gap-4">
+                            <!-- Glassmorphism Wrapper untuk Logo -->
+                            <div
+                                class="bg-white/10 dark:bg-emerald-900/40 backdrop-blur-md p-2.5 rounded-t-2xl rounded-b-lg shadow-sm border border-white/20 dark:border-emerald-800/30"
+                            >
+                                <img
+                                    :src="logoUrl"
+                                    alt="Logo YHIE"
+                                    class="w-11 h-auto object-contain"
+                                    @error="onLogoError"
+                                />
+                            </div>
                             <h3
                                 class="font-serif font-bold text-amber-500 text-xl leading-tight"
                             >
-                                Yayasan Hafizh
+                                {{ siteName }}
                             </h3>
-                            <span
-                                class="text-[11px] uppercase tracking-[0.25em] text-emerald-300/80 font-bold"
-                            >
-                                Indonesia Emas
-                            </span>
                         </div>
+                        <span
+                            v-if="tagline"
+                            class="block mt-3 text-[11px] uppercase tracking-[0.2em] text-emerald-300/80 font-bold"
+                        >
+                            {{ tagline }}
+                        </span>
                     </div>
                     <p class="text-sm text-emerald-100/70 leading-relaxed">
                         {{ siteDescription }}
                     </p>
-
-                    <div
-                        class="inline-flex items-center gap-3 px-3 py-2 rounded-xl bg-white/10 dark:bg-emerald-950/40 backdrop-blur-md border border-white/10 dark:border-emerald-800/30 shadow-sm"
+                    <p
+                        v-if="aboutHistory"
+                        class="text-xs text-emerald-100/50 leading-relaxed"
                     >
-                        <span
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-900/60 text-amber-400 shrink-0 shadow-inner border border-white/10"
-                        >
-                            <UIcon
-                                name="i-lucide-shield-check"
-                                class="w-4 h-4"
-                            />
-                        </span>
-                        <span
-                            class="text-xs text-emerald-50 font-semibold tracking-wide"
-                        >
-                            Kemenkumham RI Registered
-                        </span>
-                    </div>
+                        {{ aboutHistory }}
+                    </p>
                 </div>
 
                 <!-- Column 2: Quick Navigation Links -->
@@ -175,6 +165,42 @@
                                 <span class="font-medium">WhatsApp Kami</span>
                             </a>
                         </li>
+                        <li v-if="instagramUrl">
+                            <a
+                                :href="instagramUrl"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-3 group text-emerald-100/70 hover:text-amber-400 transition-colors"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 dark:bg-emerald-900/40 backdrop-blur-md border border-white/10 group-hover:bg-amber-400 group-hover:text-emerald-900 transition-all shrink-0 shadow-sm"
+                                >
+                                    <UIcon
+                                        name="i-lucide-instagram"
+                                        class="w-4 h-4 text-amber-400 group-hover:text-emerald-900"
+                                    />
+                                </div>
+                                <span class="font-medium">Instagram</span>
+                            </a>
+                        </li>
+                        <li v-if="facebookUrl">
+                            <a
+                                :href="facebookUrl"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-3 group text-emerald-100/70 hover:text-amber-400 transition-colors"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 dark:bg-emerald-900/40 backdrop-blur-md border border-white/10 group-hover:bg-amber-400 group-hover:text-emerald-900 transition-all shrink-0 shadow-sm"
+                                >
+                                    <UIcon
+                                        name="i-lucide-facebook"
+                                        class="w-4 h-4 text-amber-400 group-hover:text-emerald-900"
+                                    />
+                                </div>
+                                <span class="font-medium">Facebook</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
@@ -200,15 +226,47 @@
                                 class="w-4 h-4 text-amber-400"
                             />
                         </div>
-                        <p
-                            class="text-sm text-emerald-100/70 leading-relaxed pt-1 font-medium"
+                        <div>
+                            <p
+                                class="text-sm text-emerald-100/70 leading-relaxed pt-1 font-medium"
+                            >
+                                {{
+                                    address ||
+                                    (locale === "en"
+                                        ? "Jakarta, Indonesia. Official accreditation from Kemenkumham RI and International Accreditation Organization (IAO)."
+                                        : "Jakarta, Indonesia. Berizin resmi Kemenkumham RI & Terakreditasi International Accreditation Organization (IAO).")
+                                }}
+                            </p>
+                            <p
+                                v-if="operatingHours"
+                                class="text-xs text-emerald-100/50 mt-1.5"
+                            >
+                                {{ operatingHours }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Embed Google Maps -->
+                    <div
+                        v-if="mapEmbed"
+                        class="mt-4 rounded-xl overflow-hidden border border-white/10 dark:border-emerald-800/30 [&_iframe]:w-full [&_iframe]:h-36 [&_iframe]:block"
+                        v-html="mapEmbed"
+                    ></div>
+
+                    <!-- Badge Legalitas (dipindah dari kolom kiri) -->
+                    <div
+                        class="inline-flex items-center gap-3 mt-5 px-3 py-2 rounded-xl bg-white/10 dark:bg-emerald-950/40 backdrop-blur-md border border-white/10 dark:border-emerald-800/30 shadow-sm"
+                    >
+                        <span
+                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-900/60 text-amber-400 shrink-0 shadow-inner border border-white/10"
                         >
-                            {{
-                                locale === "en"
-                                    ? "Jakarta, Indonesia. Official accreditation from Kemenkumham RI and International Accreditation Organization (IAO)."
-                                    : "Jakarta, Indonesia. Berizin resmi Kemenkumham RI & Terakreditasi International Accreditation Organization (IAO)."
-                            }}
-                        </p>
+                            <UIcon name="i-lucide-shield-check" class="w-4 h-4" />
+                        </span>
+                        <span
+                            class="text-xs text-emerald-50 font-semibold tracking-wide"
+                        >
+                            Kemenkumham RI Registered
+                        </span>
                     </div>
                 </div>
             </div>
@@ -255,5 +313,26 @@ const {
     contactPhone,
     waLink,
     address,
+    tagline,
+    logoUrl,
+    instagramUrl,
+    facebookUrl,
+    mapEmbed,
+    operatingHours,
+    getSettingValue,
 } = useSettings();
+
+// Sejarah singkat (ikut bahasa aktif) untuk ditampilkan ringkas di footer.
+const aboutHistory = computed(() =>
+    getSettingValue(`about_history_${locale.value}`),
+);
+
+// Fallback jika logo_url (URL eksternal) gagal dimuat.
+const onLogoError = (e: Event) => {
+    const img = e.target as HTMLImageElement;
+    if (!img.dataset.fallback) {
+        img.dataset.fallback = "1";
+        img.src = "/logo.png";
+    }
+};
 </script>

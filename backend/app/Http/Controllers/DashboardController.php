@@ -31,7 +31,7 @@ class DashboardController extends Controller
             // Ambil statistik transaksi secara efisien dalam satu query
             $transactionStats = Transaction::selectRaw("
                 COUNT(CASE WHEN payment_status = 'pending' THEN 1 END) as pending,
-                SUM(CASE WHEN payment_status = 'success' THEN amount ELSE 0 END) as revenue
+                SUM(CASE WHEN payment_status = 'completed' THEN amount ELSE 0 END) as revenue
             ")->first();
 
             $pendingTransaction = (int) ($transactionStats->pending ?? 0);

@@ -99,6 +99,151 @@
                 >
             </div>
         </div>
+
+        <!-- Detail Modal -->
+        <UModal v-model:open="isDetailOpen" title="Detail Pendaftaran">
+            <template #body>
+                <div v-if="selectedRegistration" class="space-y-5 text-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                        <div>
+                            <p class="text-gray-500">Nama Lengkap</p>
+                            <p class="font-medium">
+                                {{ selectedRegistration.full_name }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Status</p>
+                            <UBadge
+                                :color="statusColor(selectedRegistration.status)"
+                                variant="subtle"
+                                class="capitalize"
+                                >{{ selectedRegistration.status || "pending" }}</UBadge
+                            >
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Email</p>
+                            <p class="font-medium break-all">
+                                {{ selectedRegistration.email }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Telepon</p>
+                            <p class="font-medium">
+                                {{ selectedRegistration.phone }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Jenis Kelamin</p>
+                            <p class="font-medium capitalize">
+                                {{ selectedRegistration.gender || "-" }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Umur</p>
+                            <p class="font-medium">
+                                {{ selectedRegistration.age || "-" }}
+                            </p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-gray-500">Program</p>
+                            <p class="font-medium">
+                                {{
+                                    selectedRegistration.program?.title_id ||
+                                    selectedRegistration.program?.title_en ||
+                                    "-"
+                                }}
+                            </p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-gray-500">Alamat</p>
+                            <p class="font-medium">
+                                {{ selectedRegistration.address || "-" }}
+                            </p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-gray-500">Catatan</p>
+                            <p class="font-medium">
+                                {{ selectedRegistration.notes || "-" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dokumen -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-500 mb-1.5">Foto KTP/Identitas</p>
+                            <a
+                                v-if="selectedRegistration.id_card"
+                                :href="fileUrl(selectedRegistration.id_card)"
+                                target="_blank"
+                            >
+                                <img
+                                    :src="fileUrl(selectedRegistration.id_card)"
+                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800"
+                                />
+                            </a>
+                            <p v-else class="text-gray-400">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 mb-1.5">Pas Foto</p>
+                            <a
+                                v-if="selectedRegistration.photo"
+                                :href="fileUrl(selectedRegistration.photo)"
+                                target="_blank"
+                            >
+                                <img
+                                    :src="fileUrl(selectedRegistration.photo)"
+                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800"
+                                />
+                            </a>
+                            <p v-else class="text-gray-400">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Pembayaran -->
+                    <div
+                        v-if="selectedRegistration.transactions?.length"
+                        class="border-t border-gray-200 dark:border-gray-800 pt-4 space-y-1"
+                    >
+                        <p class="font-semibold text-gray-900 dark:text-white">
+                            Pembayaran
+                        </p>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">No. Invoice</span>
+                            <span class="font-mono">{{
+                                selectedRegistration.transactions[0].reference_id
+                            }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Status Pembayaran</span>
+                            <span class="capitalize">{{
+                                selectedRegistration.transactions[0]
+                                    .payment_status
+                            }}</span>
+                        </div>
+                        <div
+                            v-if="
+                                selectedRegistration.transactions[0]
+                                    .transaction_receipt
+                            "
+                            class="pt-1"
+                        >
+                            <a
+                                :href="
+                                    fileUrl(
+                                        selectedRegistration.transactions[0]
+                                            .transaction_receipt,
+                                    )
+                                "
+                                target="_blank"
+                                class="text-primary-600 dark:text-primary-400 hover:underline"
+                                >Lihat Bukti Transfer</a
+                            >
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </UModal>
     </div>
 </template>
 
@@ -127,6 +272,21 @@ const {
     refresh,
 } = useProgramRegistrations();
 
+const fileUrl = useFileUrl();
+
+const isDetailOpen = ref(false);
+const selectedRegistration = ref<any>(null);
+
+function viewDetail(row: Row<RegistrationRow>) {
+    selectedRegistration.value = row.original;
+    isDetailOpen.value = true;
+}
+
+const statusColor = (status?: string) =>
+    ({ pending: "warning", approved: "success", rejected: "error" })[
+        status || "pending"
+    ] || "neutral";
+
 const toast = useToast();
 const client = useSanctumClient();
 
@@ -135,9 +295,16 @@ export interface RegistrationRow {
     full_name: string;
     email: string;
     phone: string;
+    gender?: string;
+    age?: number | null;
+    address?: string | null;
+    notes?: string | null;
     status?: string;
+    id_card?: string | null;
+    photo?: string | null;
     created_at?: string;
     program?: any;
+    transactions?: any[];
 }
 
 const columns: TableColumn<RegistrationRow>[] = [
@@ -259,7 +426,11 @@ const columns: TableColumn<RegistrationRow>[] = [
 function getRowItems(row: Row<RegistrationRow>) {
     return [
         [
-            { label: "Lihat", icon: "i-lucide-eye" },
+            {
+                label: "Lihat",
+                icon: "i-lucide-eye",
+                onSelect: () => viewDetail(row),
+            },
             {
                 label: "Setujui",
                 icon: "i-lucide-check",

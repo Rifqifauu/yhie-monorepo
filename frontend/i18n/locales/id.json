@@ -155,6 +155,8 @@
     "statusFailed": "Pembayaran Gagal",
     "statusExpired": "Invoice Kedaluwarsa",
     "transferInfo": "Transfer Ke Rekening Berikut",
+    "pgTitle": "Pembayaran Otomatis (Virtual Account, E-Wallet, QRIS)",
+    "pgComingSoon": "Segera hadir. Untuk saat ini, silakan gunakan transfer manual di atas.",
     "uploadTitle": "Upload Bukti Transfer",
     "uploadDesc": "Sudah melakukan transfer? Upload bukti transfer di bawah ini agar tim kami dapat memverifikasi pembayaran Anda.",
     "uploadButton": "Kirim Bukti Transfer",

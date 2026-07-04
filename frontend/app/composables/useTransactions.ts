@@ -2,9 +2,9 @@ export interface TransactionItem {
   id?: number | string;
   program_registration_id?: number | string;
   amount: number;
-  payment_status?: 'pending' | 'completed' | 'failed';
+  payment_status?: 'pending' | 'completed' | 'failed' | 'expired';
   created_at?: string;
-  programRegistration?: any;
+  program_registration?: any;
   [key: string]: any;
 }
 

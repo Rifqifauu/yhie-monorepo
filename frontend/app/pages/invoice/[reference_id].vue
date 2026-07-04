@@ -51,7 +51,7 @@
                             >{{ t("invoice.registrant") }}</span
                         >
                         <span class="font-semibold">{{
-                            transaction.programRegistration?.full_name
+                            transaction.program_registration?.full_name || "-"
                         }}</span>
                     </div>
                     <div class="flex justify-between text-sm gap-4">
@@ -126,6 +126,20 @@
                     </div>
                 </div>
 
+                <!-- Payment Gateway - belum tersedia, placeholder saja -->
+                <div
+                    v-if="transaction.payment_status === 'pending'"
+                    class="flex items-center gap-3 p-4 rounded-2xl border border-dashed border-slate-300 dark:border-emerald-800/60 text-slate-400 dark:text-emerald-200/40"
+                >
+                    <UIcon name="i-lucide-credit-card" class="w-5 h-5 shrink-0" />
+                    <div class="text-sm">
+                        <p class="font-semibold">
+                            {{ t("invoice.pgTitle") }}
+                        </p>
+                        <p class="text-xs">{{ t("invoice.pgComingSoon") }}</p>
+                    </div>
+                </div>
+
                 <div
                     v-if="transaction.payment_status === 'pending'"
                     class="bg-white/80 dark:bg-emerald-900/40 border border-emerald-200/70 dark:border-emerald-800/60 rounded-3xl p-6 shadow-xl space-y-4"
@@ -184,7 +198,6 @@
 const route = useRoute();
 const { t, locale } = useI18n();
 const localePath = useLocalePath();
-const config = useRuntimeConfig();
 const toast = useToast();
 const { getSettingValue } = useSettings();
 
@@ -214,7 +227,7 @@ const handleUpload = async () => {
 };
 
 const programTitle = computed(() => {
-    const program = transaction.value?.programRegistration?.program;
+    const program = transaction.value?.program_registration?.program;
     if (!program) return "-";
     return locale.value === "en" ? program.title_en : program.title_id;
 });
@@ -234,12 +247,10 @@ const statusColor = computed(() => {
     return colorMap[transaction.value?.payment_status || "pending"];
 });
 
-const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
-const receiptUrl = computed(() => {
-    const path = transaction.value?.transaction_receipt;
-    if (!path) return "";
-    return path.startsWith("http") ? path : `${backendUrl}${path}`;
-});
+const fileUrl = useFileUrl();
+const receiptUrl = computed(() =>
+    fileUrl(transaction.value?.transaction_receipt),
+);
 
 const formatIDR = (price?: number | string) => {
     const numericPrice =
