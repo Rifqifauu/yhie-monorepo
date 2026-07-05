@@ -4,7 +4,7 @@
       title="Transaksi"
       icon="i-lucide-credit-card"
       description="Kelola transaksi pembayaran pendaftaran program."
-      showCreate="false"
+      :showCreate="false"
     >
       <template #actions>
         <div class="flex items-center gap-3">

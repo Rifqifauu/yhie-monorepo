@@ -27,4 +27,9 @@ class Program extends Model
     {
         return $this->hasMany(ProgramRegistration::class);
     }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
 }
