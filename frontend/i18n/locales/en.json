@@ -126,6 +126,9 @@
     "addressPlaceholder": "Enter your full address",
     "notes": "Additional Notes",
     "notesPlaceholder": "Write any additional notes or questions (optional)",
+    "documents": "Required Documents",
+    "idCard": "ID Card Photo",
+    "photo": "Portrait Photo",
     "submit": "Submit Registration",
     "submitting": "Submitting...",
     "cancel": "Cancel",
@@ -133,6 +136,32 @@
     "success": "Registration Submitted Successfully!",
     "successDesc": "Thank you for registering. Our team will contact you soon via email or WhatsApp.",
     "error": "Failed to submit registration. Please try again.",
-    "required": "This field is required."
+    "required": "This field is required.",
+    "invoiceNumber": "Invoice Number",
+    "uploadReceiptCta": "Upload Payment Receipt"
+  },
+  "invoice": {
+    "title": "Registration Invoice",
+    "backHome": "Back to Home",
+    "notFoundTitle": "Invoice Not Found",
+    "notFoundDesc": "The invoice number you're looking for was not found or is no longer valid.",
+    "registrant": "Registrant",
+    "program": "Program",
+    "amount": "Total Amount",
+    "status": "Payment Status",
+    "statusPending": "Awaiting Payment",
+    "statusCompleted": "Payment Verified",
+    "statusFailed": "Payment Failed",
+    "statusExpired": "Invoice Expired",
+    "transferInfo": "Transfer To This Account",
+    "pgTitle": "Automatic Payment (Virtual Account, E-Wallet, QRIS)",
+    "pgComingSoon": "Coming soon. For now, please use the manual transfer above.",
+    "uploadTitle": "Upload Payment Receipt",
+    "uploadDesc": "Already made the transfer? Upload your payment receipt below so our team can verify your payment.",
+    "uploadButton": "Submit Receipt",
+    "uploading": "Uploading...",
+    "uploadSuccess": "Receipt uploaded successfully. Please wait for verification from our admin.",
+    "alreadyUploaded": "You've already uploaded a receipt. You may re-upload while it's still awaiting verification.",
+    "viewReceipt": "View Uploaded Receipt"
   }
 }

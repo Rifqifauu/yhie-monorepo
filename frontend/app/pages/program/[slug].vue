@@ -396,6 +396,7 @@
             :program-id="program.id"
             :program-title="titleOf(program)"
             :program-price="formatPrice(priceOf(program))"
+            :amount="priceOf(program) || 0"
         />
     </div>
 </template>

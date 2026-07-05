@@ -86,8 +86,19 @@ export interface TransactionRow {
   id?: number | string;
   amount: number;
   payment_status?: string;
+  transaction_receipt?: string | null;
   created_at?: string;
-  programRegistration?: any;
+  program_registration?: any;
+}
+
+const fileUrl = useFileUrl();
+function viewReceipt(row: Row<TransactionRow>) {
+  const path = row.original.transaction_receipt;
+  if (!path) {
+    toast.add({ title: "Belum ada bukti transfer", description: "Pendaftar belum mengunggah bukti transfer.", color: "warning" });
+    return;
+  }
+  window.open(fileUrl(path), "_blank");
 }
 
 const columns: TableColumn<TransactionRow>[] = [
@@ -106,7 +117,7 @@ const columns: TableColumn<TransactionRow>[] = [
     header: "Pendaftar",
     meta: { class: { th: "min-w-[240px]" } },
     cell: ({ row }) => {
-      const reg = row.original.programRegistration || {};
+      const reg = row.original.program_registration || {};
       return h("div", { class: "flex flex-col" }, [
         h("span", { class: "font-medium text-gray-900 dark:text-white line-clamp-1" }, reg.full_name || "-"),
         h("span", { class: "text-xs text-gray-500 line-clamp-1" }, reg.email || ""),
@@ -117,7 +128,7 @@ const columns: TableColumn<TransactionRow>[] = [
     id: "program",
     header: "Program",
     meta: { class: { th: "min-w-[200px]" } },
-    cell: ({ row }) => h("span", { class: "text-sm text-gray-700 line-clamp-1" }, row.original.programRegistration?.program?.title_id || "-"),
+    cell: ({ row }) => h("span", { class: "text-sm text-gray-700 line-clamp-1" }, row.original.program_registration?.program?.title_id || "-"),
   },
   {
     accessorKey: "amount",
@@ -160,7 +171,11 @@ const columns: TableColumn<TransactionRow>[] = [
 function getRowItems(row: Row<TransactionRow>) {
   return [
     [
-      { label: "Lihat", icon: "i-lucide-eye" },
+      {
+        label: "Lihat Bukti Transfer",
+        icon: "i-lucide-eye",
+        onSelect: () => viewReceipt(row),
+      },
       {
         label: "Tandai Selesai",
         icon: "i-lucide-check",

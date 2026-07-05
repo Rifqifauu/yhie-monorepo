@@ -33,6 +33,27 @@ export const useSettings = () => {
     return found ? found.value : defaultValue;
   };
 
+  // Nilai siap-pakai untuk komponen publik (Footer, CTA, dsb).
+  const siteName = computed(() =>
+    getSettingValue("site_name", "Yayasan Hafizh Indonesia Emas"),
+  );
+  const siteDescription = computed(() => getSettingValue("site_description"));
+  const contactEmail = computed(() => getSettingValue("contact_email"));
+  const contactPhone = computed(() => getSettingValue("contact_phone"));
+  const address = computed(() => getSettingValue("office_address"));
+  const tagline = computed(() => getSettingValue("tagline"));
+  const logoUrl = computed(() => getSettingValue("logo_url", "/logo.png"));
+  const faviconUrl = computed(() => getSettingValue("favicon_url"));
+  const metaDescription = computed(() => getSettingValue("meta_description"));
+  const instagramUrl = computed(() => getSettingValue("instagram_account"));
+  const facebookUrl = computed(() => getSettingValue("facebook_account"));
+  const mapEmbed = computed(() => getSettingValue("gmap_embed_map"));
+  const operatingHours = computed(() => getSettingValue("operating_hours"));
+  const waLink = computed(() => {
+    const number = getSettingValue("wa_number").replace(/[^0-9]/g, "");
+    return number ? `https://wa.me/${number}` : "#";
+  });
+
   // Update a single setting
   const updateSetting = async (key: string, value: string) => {
     return await client(`/api/settings/${key}`, {
@@ -47,9 +68,7 @@ export const useSettings = () => {
     try {
       // Mengirim request satu per satu (berurutan) agar tidak membebani server / memicu rate-limit
       for (const [key, value] of Object.entries(formState)) {
-        // Trik sementara: Jika kosong, kirim spasi agar lolos validasi "required" di server produksi
-        const safeValue = value === "" || value === null ? " " : value;
-        await updateSetting(key, safeValue);
+        await updateSetting(key, value ?? "");
       }
       await refresh();
       return { success: true };
@@ -72,5 +91,19 @@ export const useSettings = () => {
     getSettingValue,
     updateSetting,
     saveAllSettings,
+    siteName,
+    siteDescription,
+    contactEmail,
+    contactPhone,
+    address,
+    tagline,
+    logoUrl,
+    faviconUrl,
+    metaDescription,
+    instagramUrl,
+    facebookUrl,
+    mapEmbed,
+    operatingHours,
+    waLink,
   };
 };

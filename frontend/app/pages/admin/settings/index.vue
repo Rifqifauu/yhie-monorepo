@@ -87,35 +87,46 @@ interface Tab { key: string; label: string; icon: string; title: string; fields:
 
 const bankOptions = ["Bank Syariah Indonesia (BSI)", "BCA", "BCA Syariah", "BNI", "BNI Syariah", "BRI", "BRI Syariah", "Mandiri", "Mandiri Syariah", "CIMB Niaga", "BTPN", "Bank Muamalat", "Bank Mega", "Lainnya"];
 
+// Field mengikuti key yang ada di API (settings). Semua tampil di footer.
 const tabs: Tab[] = [
     {
         key: "general", label: "Informasi Umum", icon: "i-lucide-globe", title: "Informasi Dasar Website",
         fields: [
-            { key: "site_name", label: "Nama Website", placeholder: "Contoh: Yayasan Hafiz Indonesia Emas", icon: "i-lucide-type", required: true },
-            { key: "tagline", label: "Slogan / Tagline", placeholder: "Contoh: Mencetak Generasi Qurani", icon: "i-lucide-quote" },
-            { key: "meta_description", label: "Deskripsi Website (SEO)", placeholder: "Deskripsi singkat untuk mesin pencari Google...", type: "textarea", rows: 2, full: true, help: "Tampil di hasil pencarian Google. Maks. 160 karakter." },
-            { key: "logo_url", label: "URL Logo Website", placeholder: "https://... atau /images/logo.png", icon: "i-lucide-image", full: true, help: "Link gambar logo utama website." },
-            { key: "favicon_url", label: "URL Favicon", placeholder: "https://... atau /favicon.ico", icon: "i-lucide-app-window", help: "Ikon kecil di tab browser." },
+            { key: "site_name", label: "Nama Website", placeholder: "Yayasan Hafizh Indonesia Emas", icon: "i-lucide-type", required: true },
+            { key: "tagline", label: "Slogan / Tagline", placeholder: "Membangun Generasi Hafizh Berakhlak Mulia", icon: "i-lucide-quote", full: true, help: "Tampil di bawah nama di footer." },
+            { key: "site_description", label: "Deskripsi Singkat", placeholder: "Deskripsi singkat yayasan...", type: "textarea", rows: 2, full: true, help: "Tampil sebagai bio singkat di footer." },
+            { key: "meta_description", label: "Deskripsi SEO", placeholder: "Deskripsi untuk mesin pencari Google...", type: "textarea", rows: 2, full: true, help: "Tampil di hasil pencarian Google (<head>). Maks. ~160 karakter." },
+            { key: "logo_url", label: "URL Logo", placeholder: "https://.../logo.png", icon: "i-lucide-image", full: true, help: "Logo utama (header & footer)." },
+            { key: "favicon_url", label: "URL Favicon", placeholder: "https://.../favicon.ico", icon: "i-lucide-app-window", full: true, help: "Ikon kecil di tab browser." },
         ],
     },
     {
-        key: "contact", label: "Kontak & Sosial", icon: "i-lucide-contact", title: "Kontak & Media Sosial",
+        key: "contact", label: "Kontak", icon: "i-lucide-contact", title: "Kontak",
         fields: [
-            { key: "wa_number", label: "No. WhatsApp", placeholder: "628123456789", icon: "i-lucide-message-square", required: true, help: "Format internasional tanpa +." },
             { key: "contact_email", label: "Alamat Email", placeholder: "info@yhie.or.id", icon: "i-lucide-mail", type: "email", required: true },
-            { key: "social_instagram", label: "Instagram", placeholder: "https://instagram.com/username", icon: "i-lucide-instagram" },
-            { key: "social_facebook", label: "Facebook", placeholder: "https://facebook.com/page", icon: "i-lucide-facebook" },
-            { key: "social_tiktok", label: "TikTok", placeholder: "https://tiktok.com/@username", icon: "i-lucide-music-2" },
-            { key: "social_youtube", label: "YouTube", placeholder: "https://youtube.com/c/channel", icon: "i-lucide-youtube" },
-            { key: "social_linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/company/...", icon: "i-lucide-linkedin" },
+            { key: "contact_phone", label: "No. Telepon", placeholder: "+62 812-3456-7890", icon: "i-lucide-phone" },
+            { key: "wa_number", label: "No. WhatsApp", placeholder: "628123456789", icon: "i-lucide-message-square", required: true, help: "Format internasional tanpa +, misal 628xxx." },
+            { key: "instagram_account", label: "Instagram", placeholder: "https://instagram.com/username", icon: "i-lucide-instagram", full: true, help: "Kosongkan jika belum ada akun." },
+            { key: "facebook_account", label: "Facebook", placeholder: "https://facebook.com/page", icon: "i-lucide-facebook", full: true, help: "Kosongkan jika belum ada akun." },
         ],
     },
     {
-        key: "location", label: "Lokasi", icon: "i-lucide-map-pin", title: "Lokasi & Operasional",
+        key: "location", label: "Lokasi", icon: "i-lucide-map-pin", title: "Lokasi Kantor",
         fields: [
-            { key: "office_address", label: "Alamat Kantor", placeholder: "Jl. Contoh No. 123, Kota, Provinsi", type: "textarea", rows: 3, full: true, required: true },
-            { key: "map_embed", label: "Embed Google Maps", placeholder: '<iframe src="https://maps.google.com/..."></iframe>', type: "textarea", rows: 3, full: true, help: "Salin kode <iframe> dari Google Maps → Bagikan → Sematkan peta." },
-            { key: "operating_hours", label: "Jam Operasional", placeholder: "Senin - Jumat: 08.00 - 17.00 WIB", icon: "i-lucide-clock", full: true, help: "Jam buka kantor/sekretariat." },
+            { key: "office_address", label: "Alamat Kantor", placeholder: "Jl. Contoh No. 123, Kota, Provinsi", type: "textarea", rows: 3, full: true, required: true, help: "Tampil di footer." },
+            { key: "operating_hours", label: "Jam Operasional", placeholder: "Senin - Jumat: 08.00 - 17.00 WIB", icon: "i-lucide-clock", full: true },
+            { key: "gmap_embed_map", label: "Embed Google Maps", placeholder: '<iframe src="https://maps.google.com/..."></iframe>', type: "textarea", rows: 3, full: true, help: "Salin kode <iframe> dari Google Maps → Bagikan → Sematkan peta." },
+        ],
+    },
+    {
+        key: "about", label: "Tentang", icon: "i-lucide-info", title: "Konten Tentang (ringkas, untuk footer)",
+        fields: [
+            { key: "about_history_id", label: "Sejarah (Indonesia)", type: "textarea", rows: 3, full: true },
+            { key: "about_history_en", label: "Sejarah (English)", type: "textarea", rows: 3, full: true },
+            { key: "about_vision_id", label: "Visi (Indonesia)", type: "textarea", rows: 2, full: true },
+            { key: "about_vision_en", label: "Visi (English)", type: "textarea", rows: 2, full: true },
+            { key: "about_mission_id", label: "Misi (Indonesia)", type: "textarea", rows: 3, full: true },
+            { key: "about_mission_en", label: "Misi (English)", type: "textarea", rows: 3, full: true },
         ],
     },
     {
@@ -123,7 +134,7 @@ const tabs: Tab[] = [
         fields: [
             { key: "bank_name", label: "Nama Bank", type: "select", options: bankOptions, required: true, full: true, help: "Pilih bank tujuan transfer." },
             { key: "bank_account_number", label: "No. Rekening", placeholder: "7123456789", icon: "i-lucide-credit-card", required: true, help: "Tanpa strip atau titik." },
-            { key: "bank_account_name", label: "Nama Pemilik (a.n.)", placeholder: "Yayasan Hafiz Indonesia Emas", icon: "i-lucide-user", required: true },
+            { key: "bank_account_name", label: "Nama Pemilik (a.n.)", placeholder: "Yayasan Hafizh Indonesia Emas", icon: "i-lucide-user", required: true },
         ],
     },
 ];

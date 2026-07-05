@@ -127,7 +127,11 @@
                             </div>
 
                             <NuxtLink
-                                :to="`/programs/${program.id}`"
+                                :to="
+                                    localePath(
+                                        `/program/${locale === 'id' ? program.slug_id : program.slug_en}`,
+                                    )
+                                "
                                 class="block w-full"
                             >
                                 <button
@@ -161,7 +165,7 @@
                         color="white"
                         variant="solid"
                         class="rounded-full px-10 py-4 text-sm font-semibold shadow-lg hover:shadow-xl text-gray-900 bg-white/80 dark:bg-white/10 dark:text-white backdrop-blur-md hover:bg-white dark:hover:bg-white/20 transition-all duration-300 border border-white/50 dark:border-white/10"
-                        to="/programs"
+                        :to="localePath('/program')"
                     >
                         {{
                             locale === "id"
@@ -188,12 +192,14 @@ interface Program {
     description_en: string;
     price_id: number | string;
     price_en: number | string;
+    slug_id: string;
+    slug_en: string;
 }
 
 const { t, locale } = useI18n();
-const config = useRuntimeConfig();
-const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
+const localePath = useLocalePath();
 const client = useSanctumClient();
+const fileUrl = useFileUrl();
 
 // Fetch Data
 const { data, status, error, refresh } = await useAsyncData<Program[]>(
@@ -216,11 +222,7 @@ const getLocalizedData = (
     return program[key];
 };
 
-const getImageUrl = (path: string) => {
-    if (!path) return "/placeholder.jpg";
-    if (path.startsWith("http")) return path;
-    return `${backendUrl}/${path.startsWith("/") ? path.substring(1) : path}`;
-};
+const getImageUrl = (path: string) => (path ? fileUrl(path) : "/placeholder.jpg");
 
 const handleImageError = (e: Event) => {
     const target = e.target as HTMLImageElement;

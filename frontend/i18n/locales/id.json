@@ -127,6 +127,9 @@
     "addressPlaceholder": "Masukkan alamat lengkap Anda",
     "notes": "Catatan Tambahan",
     "notesPlaceholder": "Tulis catatan atau pertanyaan tambahan (opsional)",
+    "documents": "Dokumen Persyaratan",
+    "idCard": "Foto KTP/Identitas",
+    "photo": "Pas Foto",
     "submit": "Kirim Pendaftaran",
     "submitting": "Mengirim...",
     "cancel": "Batal",
@@ -134,6 +137,32 @@
     "success": "Pendaftaran Berhasil Terkirim!",
     "successDesc": "Terima kasih telah mendaftar. Tim kami akan segera menghubungi Anda melalui email atau WhatsApp.",
     "error": "Gagal mengirim pendaftaran. Silakan coba lagi.",
-    "required": "Field ini wajib diisi."
+    "required": "Field ini wajib diisi.",
+    "invoiceNumber": "Nomor Invoice",
+    "uploadReceiptCta": "Upload Bukti Transfer"
+  },
+  "invoice": {
+    "title": "Invoice Pendaftaran",
+    "backHome": "Kembali ke Beranda",
+    "notFoundTitle": "Invoice Tidak Ditemukan",
+    "notFoundDesc": "Nomor invoice yang Anda cari tidak ditemukan atau sudah tidak berlaku.",
+    "registrant": "Pendaftar",
+    "program": "Program",
+    "amount": "Total Tagihan",
+    "status": "Status Pembayaran",
+    "statusPending": "Menunggu Pembayaran",
+    "statusCompleted": "Pembayaran Terverifikasi",
+    "statusFailed": "Pembayaran Gagal",
+    "statusExpired": "Invoice Kedaluwarsa",
+    "transferInfo": "Transfer Ke Rekening Berikut",
+    "pgTitle": "Pembayaran Otomatis (Virtual Account, E-Wallet, QRIS)",
+    "pgComingSoon": "Segera hadir. Untuk saat ini, silakan gunakan transfer manual di atas.",
+    "uploadTitle": "Upload Bukti Transfer",
+    "uploadDesc": "Sudah melakukan transfer? Upload bukti transfer di bawah ini agar tim kami dapat memverifikasi pembayaran Anda.",
+    "uploadButton": "Kirim Bukti Transfer",
+    "uploading": "Mengunggah...",
+    "uploadSuccess": "Bukti transfer berhasil diunggah. Silakan tunggu verifikasi dari admin kami.",
+    "alreadyUploaded": "Anda sudah mengunggah bukti transfer. Anda bisa mengunggah ulang selama status masih menunggu verifikasi.",
+    "viewReceipt": "Lihat Bukti Transfer Terunggah"
   }
 }

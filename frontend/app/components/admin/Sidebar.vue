@@ -242,6 +242,11 @@ const navigation = [
         to: "/admin/registrations",
         icon: "i-lucide-folders",
     },
+    {
+        label: "Transactions",
+        to: "/admin/transactions",
+        icon: "i-lucide-receipt",
+    },
     { label: "Programs", to: "/admin/programs", icon: "i-lucide-book" },
     { label: "Articles", to: "/admin/articles", icon: "i-lucide-file-text" },
     { label: "Media", to: "/admin/media", icon: "i-lucide-image" },
