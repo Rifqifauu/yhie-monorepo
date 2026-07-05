@@ -11,6 +11,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FlipPaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ use App\Http\Controllers\DashboardController;
 | dan menerima *submit* form pendaftaran awal.
 */
 
-
+Route::post("/create-bill", [FlipPaymentController::class, "createBill"]);
 
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);
