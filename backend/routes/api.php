@@ -83,6 +83,11 @@ Route::get("certificates/verify/{certificate_number}", [
     "verify",
 ]);
 
+// SEMENTARA (atas instruksi senior): dikeluarkan dari auth:sanctum khusus
+// selama masa testing, supaya gampang dites tanpa perlu login dulu.
+// TODO: pindahkan lagi ke dalam grup auth:sanctum sebelum rilis produksi.
+Route::apiResource("certificates", CertificateController::class);
+
 /*
 |--------------------------------------------------------------------------
 | PROTECTED ROUTES (Butuh cookie Sanctum)
@@ -126,9 +131,6 @@ Route::middleware("auth:sanctum")->group(function () {
 
     // Transaksi biasanya membutuhkan user untuk login
     Route::apiResource("transactions", TransactionController::class);
-
-    // Penerbitan & manajemen sertifikat oleh Admin
-    Route::apiResource("certificates", CertificateController::class);
 
     // Manajemen pendaftaran program (index, show, update, destroy) oleh Admin
     Route::apiResource(

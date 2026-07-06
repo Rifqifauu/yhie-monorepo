@@ -19,6 +19,7 @@ class ProgramRegistration extends Model
         "status",
         "id_card",
         "photo",
+        "moodle_user_id",
     ];
 
     protected $casts = [
