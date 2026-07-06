@@ -163,6 +163,15 @@
     "uploading": "Mengunggah...",
     "uploadSuccess": "Bukti transfer berhasil diunggah. Silakan tunggu verifikasi dari admin kami.",
     "alreadyUploaded": "Anda sudah mengunggah bukti transfer. Anda bisa mengunggah ulang selama status masih menunggu verifikasi.",
-    "viewReceipt": "Lihat Bukti Transfer Terunggah"
+    "viewReceipt": "Lihat Bukti Transfer Terunggah",
+    "searchCta": "Lupa nomor invoice? Cari di sini",
+    "searchTitle": "Cari Invoice/Tagihan",
+    "searchDesc": "Masukkan email dan nomor WhatsApp yang sama dengan yang digunakan saat mendaftar untuk menemukan invoice Anda.",
+    "searchEmailLabel": "Email",
+    "searchPhoneLabel": "Nomor WhatsApp",
+    "searchButton": "Cari Invoice",
+    "searching": "Mencari...",
+    "searchNoResults": "Tidak ditemukan invoice dengan email dan nomor WhatsApp tersebut.",
+    "searchResultsTitle": "Invoice Ditemukan"
   }
 }

@@ -162,6 +162,15 @@
     "uploading": "Uploading...",
     "uploadSuccess": "Receipt uploaded successfully. Please wait for verification from our admin.",
     "alreadyUploaded": "You've already uploaded a receipt. You may re-upload while it's still awaiting verification.",
-    "viewReceipt": "View Uploaded Receipt"
+    "viewReceipt": "View Uploaded Receipt",
+    "searchCta": "Forgot your invoice number? Search here",
+    "searchTitle": "Search Invoice",
+    "searchDesc": "Enter the email and WhatsApp number you used when registering to find your invoice.",
+    "searchEmailLabel": "Email",
+    "searchPhoneLabel": "WhatsApp Number",
+    "searchButton": "Search Invoice",
+    "searching": "Searching...",
+    "searchNoResults": "No invoice found with that email and WhatsApp number.",
+    "searchResultsTitle": "Invoices Found"
   }
 }

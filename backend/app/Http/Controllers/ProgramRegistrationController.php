@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProgramRegistration;
 use App\Models\Transaction;
+use App\Services\MailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ProgramRegistrationController extends Controller
 {
+    public function __construct(private MailService $mailService)
+    {
+    }
+
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -41,7 +46,7 @@ class ProgramRegistrationController extends Controller
             $registration = ProgramRegistration::create($data);
 
             // 2. Otomatis Buat Data Transaksi Awal (Pending)
-            $registration->transactions()->create([
+            $transaction = $registration->transactions()->create([
                 "reference_id" =>
                     "INV-" .
                     date("Ymd") .
@@ -53,6 +58,9 @@ class ProgramRegistrationController extends Controller
             ]);
 
             DB::commit();
+
+            // Email invoice - dikirim setelah commit, kegagalan kirim tidak menggagalkan pendaftaran
+            $this->mailService->sendInvoice($transaction);
 
             return response()->json(
                 [

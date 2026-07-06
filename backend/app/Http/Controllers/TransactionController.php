@@ -126,6 +126,39 @@ class TransactionController extends Controller
     }
 
     /**
+     * POST /api/transactions/search
+     * Publik - cari invoice pakai kombinasi email & telepon (untuk yang lupa
+     * link/reference_id invoice-nya). Wajib keduanya sekaligus supaya tidak
+     * mudah dipakai menebak data orang lain.
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            "email" => "required|email",
+            "phone" => "required|string",
+        ]);
+
+        $transactions = Transaction::whereHas("programRegistration", function (
+            $q,
+        ) use ($data) {
+            $q->where("email", $data["email"])->where("phone", $data["phone"]);
+        })
+            ->with(["programRegistration.program"])
+            ->orderBy("created_at", "desc")
+            ->get();
+
+        return response()->json(
+            [
+                "message" => "Transactions fetched successfully.",
+                "data" => $transactions
+                    ->map(fn($transaction) => $this->invoicePayload($transaction))
+                    ->values(),
+            ],
+            200,
+        );
+    }
+
+    /**
      * Bentuk data invoice yang aman untuk endpoint PUBLIK.
      * Hanya field yang dibutuhkan halaman invoice; tidak membocorkan data
      * pribadi pendaftar (KTP, foto, email, telepon, alamat).
