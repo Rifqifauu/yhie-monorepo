@@ -25,6 +25,14 @@
                     >
                         {{ t("invoice.backHome") }}
                     </UButton>
+                    <UButton
+                        size="sm"
+                        color="red"
+                        variant="soft"
+                        :to="localePath('/invoice/search')"
+                    >
+                        {{ t("invoice.searchCta") }}
+                    </UButton>
                 </template>
             </UAlert>
 

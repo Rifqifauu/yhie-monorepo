@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProgramController;
@@ -70,6 +71,19 @@ Route::post("transactions/track/{reference_id}/receipt", [
     "uploadReceipt",
 ]);
 
+// Cari invoice tanpa reference_id (pakai kombinasi email+telepon), publik,
+// dibatasi rate limit karena tidak butuh token rahasia seperti reference_id.
+Route::post("transactions/search", [
+    TransactionController::class,
+    "search",
+])->middleware("throttle:10,1");
+
+// Verifikasi keaslian sertifikat, publik (tanpa login)
+Route::get("certificates/verify/{certificate_number}", [
+    CertificateController::class,
+    "verify",
+]);
+
 /*
 |--------------------------------------------------------------------------
 | PROTECTED ROUTES (Butuh cookie Sanctum)
@@ -113,6 +127,9 @@ Route::middleware("auth:sanctum")->group(function () {
 
     // Transaksi biasanya membutuhkan user untuk login
     Route::apiResource("transactions", TransactionController::class);
+
+    // Penerbitan & manajemen sertifikat oleh Admin
+    Route::apiResource("certificates", CertificateController::class);
 
     // Manajemen pendaftaran program (index, show, update, destroy) oleh Admin
     Route::apiResource(

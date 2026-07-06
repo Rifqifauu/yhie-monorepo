@@ -94,6 +94,24 @@
                                 >
                             </NuxtLink>
                         </li>
+                        <li>
+                            <NuxtLink
+                                :to="localePath('/invoice/search')"
+                                class="text-emerald-100/70 hover:text-amber-400 transition-all duration-300 flex items-center gap-3 group"
+                            >
+                                <span
+                                    class="w-1.5 h-1.5 bg-emerald-900/60 group-hover:bg-amber-400 rotate-45 transition-all duration-300 shrink-0 border border-white/10 relative flex items-center justify-center"
+                                >
+                                    <span
+                                        class="absolute w-1.5 h-1.5 bg-inherit border border-white/10 rotate-45 group-hover:bg-amber-400"
+                                    ></span>
+                                </span>
+                                <span
+                                    class="group-hover:translate-x-1 transition-transform duration-300 font-medium pl-1"
+                                    >{{ t("invoice.searchCta") }}</span
+                                >
+                            </NuxtLink>
+                        </li>
                     </ul>
                 </div>
 
@@ -303,7 +321,7 @@
 <script setup lang="ts">
 import { useSettings } from "~/composables/useSettings";
 
-const { locale, tm, rt } = useI18n();
+const { t, locale, tm, rt } = useI18n();
 const localePath = useLocalePath();
 
 const {

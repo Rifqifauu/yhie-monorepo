@@ -37,4 +37,9 @@ class ProgramRegistration extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
 }
