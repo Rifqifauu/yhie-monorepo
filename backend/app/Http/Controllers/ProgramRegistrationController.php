@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ProgramRegistration;
 use App\Models\Transaction;
 use App\Services\MailService;
+use App\Services\MoodleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +14,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ProgramRegistrationController extends Controller
 {
-    public function __construct(private MailService $mailService)
-    {
+    public function __construct(
+        private MailService $mailService,
+        private MoodleService $moodleService,
+    ) {
     }
 
     public function store(Request $request): JsonResponse
@@ -161,8 +164,19 @@ class ProgramRegistrationController extends Controller
             "status" => "sometimes|in:pending,approved,rejected",
         ]);
 
+        $wasApproved = $programRegistration->status === "approved";
+
         try {
             $programRegistration->update($data);
+
+            // Provisikan akun Moodle sekali saja, tepat saat status baru berubah jadi approved.
+            if (
+                $programRegistration->status === "approved" &&
+                !$wasApproved &&
+                !$programRegistration->moodle_user_id
+            ) {
+                $this->provisionMoodleAccount($programRegistration);
+            }
 
             return response()->json(
                 [
@@ -182,6 +196,30 @@ class ProgramRegistrationController extends Controller
                 ],
                 500,
             );
+        }
+    }
+
+    /**
+     * Buat akun Moodle + kirim emailnya. Dibungkus try/catch supaya kegagalan
+     * di sini (mis. Moodle API belum siap) tidak menggagalkan proses approve.
+     */
+    private function provisionMoodleAccount(
+        ProgramRegistration $registration,
+    ): void {
+        try {
+            $result = $this->moodleService->createUser($registration);
+
+            $registration->update([
+                "moodle_user_id" => $result["moodle_user_id"],
+            ]);
+
+            $this->mailService->sendMoodleAccount(
+                $registration,
+                $result["username"],
+                $result["password"],
+            );
+        } catch (\Throwable $e) {
+            Log::error("Error provisioning Moodle account: " . $e->getMessage());
         }
     }
 

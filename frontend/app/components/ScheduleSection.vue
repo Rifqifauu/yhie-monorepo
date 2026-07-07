@@ -58,9 +58,9 @@
             <!-- Data State -->
             <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
                 <!-- Left Column: Highlight & Countdown -->
-                <div class="lg:col-span-2 relative bg-emerald-50 dark:bg-slate-900 rounded-[2rem] p-8 md:p-12 overflow-hidden shadow-[0_20px_50px_rgba(16,185,129,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-emerald-200 dark:border-white/10 group flex flex-col justify-between min-h-[500px]">
+                <div class="lg:col-span-2 relative bg-emerald-50 dark:bg-emerald-950 rounded-[2rem] p-8 md:p-12 overflow-hidden shadow-[0_20px_50px_rgba(16,185,129,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-emerald-200 dark:border-white/10 group flex flex-col justify-between min-h-[500px]">
                     <!-- Dark background decorative elements -->
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-[80px] pointer-events-none"></div>
                     <div class="absolute bottom-0 left-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
                     <div v-if="closestSchedule" class="relative z-10 flex flex-col h-full">
@@ -72,7 +72,7 @@
                                 {{ locale === 'id' ? 'Menuju' : 'Launching in..' }}
                                 <span class="relative whitespace-nowrap mt-2 block w-max max-w-full">
                                     <span class="relative z-10 break-words whitespace-normal block">{{ titleOf(closestSchedule) }}</span>
-                                    <span class="absolute bottom-1 left-0 w-full h-3 bg-emerald-400/30 dark:bg-blue-500/50 -z-10 rounded-full"></span>
+                                    <span class="absolute bottom-1 left-0 w-full h-3 bg-emerald-400/30 dark:bg-emerald-500/50 -z-10 rounded-full"></span>
                                 </span>
                             </h3>
                         </div>
@@ -85,7 +85,7 @@
                                     <div class="absolute inset-0 bg-gradient-to-b from-emerald-100/50 dark:from-white/10 to-transparent"></div>
                                     <span class="text-4xl md:text-6xl font-bold text-emerald-950 dark:text-white tracking-tighter relative z-10">{{ days }}</span>
                                 </div>
-                                <div class="flex items-center gap-2 mt-4 opacity-50 dark:opacity-50 opacity-70">
+                                <div class="flex items-center gap-2 mt-4 opacity-70 dark:opacity-80">
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
                                     <span class="text-emerald-900 dark:text-white text-xs font-bold uppercase tracking-widest">{{ locale === 'id' ? 'Hari' : 'Days' }}</span>
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
@@ -97,7 +97,7 @@
                                     <div class="absolute inset-0 bg-gradient-to-b from-emerald-100/50 dark:from-white/10 to-transparent"></div>
                                     <span class="text-4xl md:text-6xl font-bold text-emerald-950 dark:text-white tracking-tighter relative z-10">{{ hours }}</span>
                                 </div>
-                                <div class="flex items-center gap-2 mt-4 opacity-50 dark:opacity-50 opacity-70">
+                                <div class="flex items-center gap-2 mt-4 opacity-70 dark:opacity-80">
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
                                     <span class="text-emerald-900 dark:text-white text-xs font-bold uppercase tracking-widest">{{ locale === 'id' ? 'Jam' : 'Hours' }}</span>
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
@@ -109,7 +109,7 @@
                                     <div class="absolute inset-0 bg-gradient-to-b from-emerald-100/50 dark:from-white/10 to-transparent"></div>
                                     <span class="text-4xl md:text-6xl font-bold text-emerald-950 dark:text-white tracking-tighter relative z-10">{{ minutes }}</span>
                                 </div>
-                                <div class="flex items-center gap-2 mt-4 opacity-50 dark:opacity-50 opacity-70">
+                                <div class="flex items-center gap-2 mt-4 opacity-70 dark:opacity-80">
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
                                     <span class="text-emerald-900 dark:text-white text-xs font-bold uppercase tracking-widest">{{ locale === 'id' ? 'Menit' : 'Minutes' }}</span>
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
@@ -121,7 +121,7 @@
                                     <div class="absolute inset-0 bg-gradient-to-b from-emerald-100/50 dark:from-white/10 to-transparent"></div>
                                     <span class="text-4xl md:text-6xl font-bold text-emerald-950 dark:text-white tracking-tighter relative z-10">{{ seconds }}</span>
                                 </div>
-                                <div class="flex items-center gap-2 mt-4 opacity-50 dark:opacity-50 opacity-70">
+                                <div class="flex items-center gap-2 mt-4 opacity-70 dark:opacity-80">
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
                                     <span class="text-emerald-900 dark:text-white text-xs font-bold uppercase tracking-widest">{{ locale === 'id' ? 'Detik' : 'Seconds' }}</span>
                                     <div class="h-px w-3 bg-emerald-900 dark:bg-white"></div>
@@ -131,9 +131,9 @@
 
                         <!-- Schedule Detail Box -->
                         <div class="mt-12 bg-white/40 dark:bg-white/5 backdrop-blur-md border border-emerald-900/10 dark:border-white/10 rounded-2xl p-5 md:p-6 w-full max-w-2xl relative overflow-hidden group-hover:border-emerald-900/20 dark:group-hover:border-white/20 transition-colors">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 dark:bg-blue-500 rounded-l-2xl"></div>
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 dark:bg-emerald-400 rounded-l-2xl"></div>
                             <div class="flex flex-col gap-3">
-                                <div class="flex items-center gap-2 text-emerald-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider">
+                                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
                                     <UIcon name="i-lucide-calendar-clock" class="w-4 h-4" />
                                     <span>{{ formatDate(closestSchedule.start_date) }}</span>
                                     <span v-if="formatDate(closestSchedule.start_date) !== formatDate(closestSchedule.end_date)"> - {{ formatDate(closestSchedule.end_date) }}</span>
