@@ -92,48 +92,43 @@ Route::get("certificates/verify/{certificate_number}", [
 | yang mewajibkan user login.
 */
 
-Route::middleware("auth:sanctum")->group(function () {
-    Route::get("/user", function (Request $request) {
-        return $request->user();
-    });
-
-    Route::get("dashboard", [DashboardController::class, "index"]);
-
-    Route::apiResource("articles", ArticleController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("programs", ProgramController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("schedules", ScheduleController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("media", MediaController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::apiResource("partners", PartnerController::class)->except([
-        "show",
-        "index",
-    ]);
-    Route::post("settings-bulk", [SettingController::class, "bulkUpdate"]);
-    Route::apiResource("settings", SettingController::class)->except([
-        "show",
-        "index",
-    ]);
-
-    // Transaksi biasanya membutuhkan user untuk login
-    Route::apiResource("transactions", TransactionController::class);
-
-    // Penerbitan & manajemen sertifikat oleh Admin
-    Route::apiResource("certificates", CertificateController::class);
-
-    // Manajemen pendaftaran program (index, show, update, destroy) oleh Admin
-    Route::apiResource(
-        "program-registrations",
-        ProgramRegistrationController::class,
-    )->except(["store"]);
+Route::get("/user", function (Request $request) {
+    return $request->user();
 });
+
+Route::get("dashboard", [DashboardController::class, "index"]);
+
+Route::apiResource("articles", ArticleController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("programs", ProgramController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("schedules", ScheduleController::class)->except([
+    "show",
+    "index",
+]);
+Route::apiResource("media", MediaController::class)->except(["show", "index"]);
+Route::apiResource("partners", PartnerController::class)->except([
+    "show",
+    "index",
+]);
+Route::post("settings-bulk", [SettingController::class, "bulkUpdate"]);
+Route::apiResource("settings", SettingController::class)->except([
+    "show",
+    "index",
+]);
+
+// Transaksi biasanya membutuhkan user untuk login
+Route::apiResource("transactions", TransactionController::class);
+
+// Penerbitan & manajemen sertifikat oleh Admin
+Route::apiResource("certificates", CertificateController::class);
+
+// Manajemen pendaftaran program (index, show, update, destroy) oleh Admin
+Route::apiResource(
+    "program-registrations",
+    ProgramRegistrationController::class,
+)->except(["store"]);
