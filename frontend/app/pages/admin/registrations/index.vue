@@ -450,7 +450,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                     } catch (e: any) {
                         toast.add({
                             title: "Gagal",
-                            description: e?.message || "Error",
+                            description: e?.data?.message || e?.message || "Error",
                             color: "red",
                             icon: "i-lucide-triangle-alert",
                         });
@@ -476,7 +476,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                     } catch (e: any) {
                         toast.add({
                             title: "Gagal",
-                            description: e?.message || "Error",
+                            description: e?.data?.message || e?.message || "Error",
                             color: "red",
                             icon: "i-lucide-triangle-alert",
                         });

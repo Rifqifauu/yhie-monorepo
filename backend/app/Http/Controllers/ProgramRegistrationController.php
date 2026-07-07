@@ -164,6 +164,23 @@ class ProgramRegistrationController extends Controller
             "status" => "sometimes|in:pending,approved,rejected",
         ]);
 
+        // Pendaftaran hanya boleh disetujui kalau pembayarannya sudah completed.
+        if (
+            ($data["status"] ?? null) === "approved" &&
+            !$programRegistration
+                ->transactions()
+                ->where("payment_status", "completed")
+                ->exists()
+        ) {
+            return response()->json(
+                [
+                    "message" =>
+                        "Pendaftaran tidak bisa disetujui karena pembayaran belum selesai (completed).",
+                ],
+                422,
+            );
+        }
+
         $wasApproved = $programRegistration->status === "approved";
 
         try {
