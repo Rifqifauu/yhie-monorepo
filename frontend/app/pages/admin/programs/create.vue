@@ -120,6 +120,19 @@
                     </div>
 
                     <UFormField
+                        label="Moodle Course ID"
+                        name="moodle_course_id"
+                        hint="Opsional - ID course di Moodle untuk auto-enrollment peserta"
+                    >
+                        <UInput
+                            v-model="form.moodle_course_id"
+                            type="number"
+                            placeholder="Contoh: 3"
+                            size="lg"
+                        />
+                    </UFormField>
+
+                    <UFormField
                         label="Gambar Program"
                         name="image_path"
                         required
@@ -171,6 +184,7 @@ const form = reactive({
     slug_en: "",
     price_id: "",
     price_en: "",
+    moodle_course_id: "",
 });
 
 function onFileChange(event: Event) {

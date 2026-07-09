@@ -195,6 +195,24 @@
                         </UFormField>
                     </div>
 
+                    <!-- Baris 3.5: Moodle Course ID -->
+                    <div class="grid grid-cols-1 gap-6">
+                        <UFormField
+                            label="Moodle Course ID"
+                            name="moodle_course_id"
+                            help="Opsional - ID course di Moodle untuk auto-enrollment peserta"
+                        >
+                            <UInput
+                                v-model="form.moodle_course_id"
+                                type="number"
+                                placeholder="Contoh: 3"
+                                icon="i-lucide-graduation-cap"
+                                size="lg"
+                                class="w-full"
+                            />
+                        </UFormField>
+                    </div>
+
                     <!-- Baris 4: File Upload Gambar -->
                     <div class="grid grid-cols-1 gap-6">
                         <UFormField
@@ -338,6 +356,19 @@
                         </div>
                     </div>
 
+                    <div>
+                        <h3
+                            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                        >
+                            Moodle Course ID
+                        </h3>
+                        <p
+                            class="text-base font-medium text-gray-900 dark:text-white"
+                        >
+                            {{ program?.moodle_course_id || "Belum dipetakan" }}
+                        </p>
+                    </div>
+
                     <hr class="border-gray-100 dark:border-gray-800" />
 
                     <div class="grid grid-cols-1 gap-6">
@@ -421,6 +452,7 @@ const form = reactive({
     slug_en: "",
     price_id: "",
     price_en: "",
+    moodle_course_id: "",
 });
 
 function startEdit() {
@@ -435,6 +467,7 @@ function startEdit() {
     form.slug_en = program.value.slug_en || "";
     form.price_id = program.value.price_id?.toString() || "";
     form.price_en = program.value.price_en?.toString() || "";
+    form.moodle_course_id = program.value.moodle_course_id?.toString() || "";
 
     selectedFile.value = null;
     imagePreview.value = null;
@@ -480,6 +513,8 @@ const handleUpdate = async () => {
 
     if (form.price_id) formData.append("price_id", form.price_id);
     if (form.price_en) formData.append("price_en", form.price_en);
+    if (form.moodle_course_id)
+        formData.append("moodle_course_id", form.moodle_course_id);
 
     if (selectedFile.value) {
         // 3. Ubah key "image" menjadi "image_path" sesuai permintaan backend

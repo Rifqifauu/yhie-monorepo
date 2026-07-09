@@ -56,6 +56,38 @@ class MoodleService
     }
 
     /**
+     * Daftarkan user ke course Moodle via enrol_manual_enrol_users.
+     * Dipanggil setelah createUser() sukses, memakai moodle_user_id yang baru dibuat.
+     */
+    public function enrollUser(int $moodleUserId, int $courseId): void
+    {
+        $response = Http::asForm()->post(
+            rtrim(config("services.moodle.url"), "/") . "/webservice/rest/server.php",
+            [
+                "wstoken" => config("services.moodle.token"),
+                "wsfunction" => "enrol_manual_enrol_users",
+                "moodlewsrestformat" => "json",
+                "enrolments" => [
+                    [
+                        "roleid" => config("services.moodle.student_role_id"),
+                        "userid" => $moodleUserId,
+                        "courseid" => $courseId,
+                    ],
+                ],
+            ],
+        );
+
+        $data = $response->json();
+
+        // Sukses = response kosong/null. Gagal = object berisi "exception".
+        if (!$response->successful() || (is_array($data) && isset($data["exception"]))) {
+            throw new \RuntimeException(
+                $data["message"] ?? "Gagal mendaftarkan user ke course Moodle.",
+            );
+        }
+    }
+
+    /**
      * Moodle wajib firstname & lastname terpisah, form pendaftaran kita cuma
      * punya full_name - split sederhana, kata pertama jadi firstname.
      */

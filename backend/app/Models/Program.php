@@ -16,6 +16,7 @@ class Program extends Model
         "price_en",
         "slug_id",
         "slug_en",
+        "moodle_course_id", // ID course Moodle tujuan enrollment - null berarti belum dipetakan
     ];
 
     protected $casts = [

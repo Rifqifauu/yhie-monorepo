@@ -102,6 +102,7 @@ class ProgramController extends Controller
             "price_en" => "required|numeric|min:0",
             "slug_id" => "required|string|unique:programs,slug_id",
             "slug_en" => "required|string|unique:programs,slug_en",
+            "moodle_course_id" => "nullable|integer",
         ];
 
         if ($request->hasFile("image_path")) {
@@ -160,6 +161,7 @@ class ProgramController extends Controller
                 "string",
                 Rule::unique("programs")->ignore($program->id),
             ],
+            "moodle_course_id" => "nullable|integer",
         ];
 
         if ($request->hasFile("image_path")) {

@@ -38,6 +38,8 @@ return [
     'moodle' => [
         'url' => env('MOODLE_URL'),
         'token' => env('MOODLE_TOKEN'),
+        // ID role "Student" default Moodle = 5, ubah lewat .env kalau instance-nya beda.
+        'student_role_id' => env('MOODLE_STUDENT_ROLE_ID', 5),
     ],
 
 ];
