@@ -44,6 +44,11 @@ export const useArticles = () => {
     page.value = 1;
   });
 
+  // Kolom search dikosongkan (backspace) -> otomatis tampilkan semua data lagi
+  watch(searchInput, (val) => {
+    if (!val.trim()) search.value = "";
+  });
+
   const {
     data: apiResponse,
     status,

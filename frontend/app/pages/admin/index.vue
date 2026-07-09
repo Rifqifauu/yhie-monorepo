@@ -33,10 +33,15 @@
                             icon="i-heroicons-arrow-down-tray"
                             color="gray"
                             variant="ghost"
+                            @click="downloadReport"
                         >
                             Unduh Laporan
                         </UButton>
-                        <UButton icon="i-heroicons-plus" color="emerald">
+                        <UButton
+                            icon="i-heroicons-plus"
+                            color="emerald"
+                            to="/admin/schedules/create"
+                        >
                             Agenda Baru
                         </UButton>
                     </div>
@@ -116,7 +121,11 @@
                             >
                                 Rekap Pendaftaran
                             </h3>
-                            <UButton variant="link" color="emerald" class="px-0"
+                            <UButton
+                                variant="link"
+                                color="emerald"
+                                class="px-0"
+                                to="/admin/registrations"
                                 >Kelola</UButton
                             >
                         </div>
@@ -278,6 +287,7 @@
                                         color="gray"
                                         icon="i-heroicons-arrow-right"
                                         trailing
+                                        to="/admin/schedules"
                                     >
                                         Lihat Kalender Penuh
                                     </UButton>
@@ -307,8 +317,8 @@ interface DashboardData {
     pendingTransaction: number;
     totalRevenue: number;
     pendingRegistrations: number;
-    acceptedRegistrations: number;
-    rejectedRegistrations: number;
+    approvedRegistration: number;
+    rejectedRegistration: number;
     upcomingSchedule: Schedule[];
 }
 
@@ -332,6 +342,28 @@ const formatCurrency = (val: number) => {
         currency: "IDR",
         maximumFractionDigits: 0,
     }).format(val);
+};
+
+const downloadReport = () => {
+    if (!import.meta.client || !dashboard.value) return;
+
+    const rows = [
+        ["Metrik", "Nilai"],
+        ["Artikel Terbit", dashboard.value.articles],
+        ["Transaksi Pending", dashboard.value.pendingTransaction],
+        ["Total Pendapatan", dashboard.value.totalRevenue],
+        ["Pendaftaran Menunggu", dashboard.value.pendingRegistrations],
+        ["Pendaftaran Diterima", dashboard.value.approvedRegistration],
+        ["Pendaftaran Ditolak", dashboard.value.rejectedRegistration],
+    ];
+    const csv = rows.map((row) => row.join(",")).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `laporan-dashboard-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
 };
 
 const formatDate = (date: string) => {
@@ -383,7 +415,7 @@ const registrationStats = computed(() => [
     {
         label: "Pendaftaran Diterima",
         description: "Selesai diproses",
-        value: dashboard.value?.acceptedRegistrations ?? 0,
+        value: dashboard.value?.approvedRegistration ?? 0,
         icon: "i-heroicons-check-circle",
         bgClass: "bg-emerald-50/50 dark:bg-emerald-950/20",
         ringClass: "ring-1 ring-emerald-200 dark:ring-emerald-900/50",
@@ -394,7 +426,7 @@ const registrationStats = computed(() => [
     {
         label: "Pendaftaran Ditolak",
         description: "Tidak memenuhi syarat",
-        value: dashboard.value?.rejectedRegistrations ?? 0,
+        value: dashboard.value?.rejectedRegistration ?? 0,
         icon: "i-heroicons-x-circle",
         bgClass: "bg-red-50/50 dark:bg-red-950/20",
         ringClass: "ring-1 ring-red-200 dark:ring-red-900/50",

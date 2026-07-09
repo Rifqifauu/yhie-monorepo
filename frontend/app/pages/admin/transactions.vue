@@ -51,11 +51,21 @@
         <UButton color="neutral" variant="soft" @click="clearSearch">Bersihkan Filter</UButton>
       </div>
     </div>
+
+    <AdminDeleteModal
+      v-model:open="isDeleteOpen"
+      :id="selectedForDelete?.id"
+      :title="selectedForDelete?.id ? `Transaksi #${selectedForDelete.id}` : undefined"
+      endpoint="api/transactions"
+      @success="handleDeleteSuccess"
+      @error="handleDeleteError"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { h, resolveComponent } from "vue";
+import { useClipboard } from "@vueuse/core";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 
@@ -89,6 +99,25 @@ export interface TransactionRow {
   transaction_receipt?: string | null;
   created_at?: string;
   program_registration?: any;
+}
+
+const { copy } = useClipboard();
+
+const isDeleteOpen = ref(false);
+const selectedForDelete = ref<TransactionRow | null>(null);
+
+function triggerDelete(row: Row<TransactionRow>) {
+  selectedForDelete.value = row.original;
+  isDeleteOpen.value = true;
+}
+
+function handleDeleteSuccess() {
+  toast.add({ title: "Terhapus", description: "Transaksi dihapus", color: "success" });
+  refresh();
+}
+
+function handleDeleteError(message: string) {
+  toast.add({ title: "Gagal", description: message || "Error", color: "red", icon: "i-lucide-triangle-alert" });
 }
 
 const fileUrl = useFileUrl();
@@ -210,7 +239,7 @@ function getRowItems(row: Row<TransactionRow>) {
         onSelect: () => {
           const id = row.original.id ? String(row.original.id) : "";
           if (id) {
-            useClipboard().copy(id);
+            copy(id);
             toast.add({ title: "ID disalin", description: `ID: ${id}`, color: "success" });
           }
         },
@@ -221,16 +250,7 @@ function getRowItems(row: Row<TransactionRow>) {
         label: "Hapus",
         icon: "i-lucide-trash-2",
         color: "error",
-        onSelect: async () => {
-          if (!confirm("Hapus transaksi ini?")) return;
-          try {
-            await client(`/api/transactions/${row.original.id}`, { method: "DELETE" });
-            toast.add({ title: "Terhapus", description: "Transaksi dihapus", color: "success" });
-            refresh();
-          } catch (e: any) {
-            toast.add({ title: "Gagal", description: e?.message || "Error", color: "red", icon: "i-lucide-triangle-alert" });
-          }
-        },
+        onSelect: () => triggerDelete(row),
       },
     ],
   ];

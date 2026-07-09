@@ -244,11 +244,21 @@
                 </div>
             </template>
         </UModal>
+
+        <AdminDeleteModal
+            v-model:open="isDeleteOpen"
+            :id="selectedForDelete?.id"
+            :title="selectedForDelete?.full_name"
+            endpoint="api/program-registrations"
+            @success="handleDeleteSuccess"
+            @error="handleDeleteError"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { h, resolveComponent } from "vue";
+import { useClipboard } from "@vueuse/core";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 
@@ -281,6 +291,34 @@ function viewDetail(row: Row<RegistrationRow>) {
     selectedRegistration.value = row.original;
     isDetailOpen.value = true;
 }
+
+const isDeleteOpen = ref(false);
+const selectedForDelete = ref<RegistrationRow | null>(null);
+
+function triggerDelete(row: Row<RegistrationRow>) {
+    selectedForDelete.value = row.original;
+    isDeleteOpen.value = true;
+}
+
+function handleDeleteSuccess() {
+    toast.add({
+        title: "Terhapus",
+        description: "Pendaftaran dihapus",
+        color: "success",
+    });
+    refresh();
+}
+
+function handleDeleteError(message: string) {
+    toast.add({
+        title: "Gagal",
+        description: message || "Error",
+        color: "red",
+        icon: "i-lucide-triangle-alert",
+    });
+}
+
+const { copy } = useClipboard();
 
 const statusColor = (status?: string) =>
     ({ pending: "warning", approved: "success", rejected: "error" })[
@@ -434,6 +472,7 @@ function getRowItems(row: Row<RegistrationRow>) {
             {
                 label: "Setujui",
                 icon: "i-lucide-check",
+                disabled: row.original.status !== "pending",
                 onSelect: async () => {
                     try {
                         await client(
@@ -460,6 +499,7 @@ function getRowItems(row: Row<RegistrationRow>) {
             {
                 label: "Tolak",
                 icon: "i-lucide-x",
+                disabled: row.original.status !== "pending",
                 onSelect: async () => {
                     try {
                         await client(
@@ -491,7 +531,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                 onSelect: () => {
                     const id = row.original.id ? String(row.original.id) : "";
                     if (id) {
-                        useClipboard().copy(id);
+                        copy(id);
                         toast.add({
                             title: "ID disalin",
                             description: `ID: ${id}`,
@@ -506,28 +546,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                 label: "Hapus",
                 icon: "i-lucide-trash-2",
                 color: "error",
-                onSelect: async () => {
-                    if (!confirm("Hapus pendaftaran ini?")) return;
-                    try {
-                        await client(
-                            `/api/program-registrations/${row.original.id}`,
-                            { method: "DELETE" },
-                        );
-                        toast.add({
-                            title: "Terhapus",
-                            description: "Pendaftaran dihapus",
-                            color: "success",
-                        });
-                        refresh();
-                    } catch (e: any) {
-                        toast.add({
-                            title: "Gagal",
-                            description: e?.message || "Error",
-                            color: "red",
-                            icon: "i-lucide-triangle-alert",
-                        });
-                    }
-                },
+                onSelect: () => triggerDelete(row),
             },
         ],
     ];

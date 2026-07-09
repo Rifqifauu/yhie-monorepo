@@ -3,6 +3,7 @@
         <AdminHeader
             title="Media"
             icon="i-lucide-images"
+            parentRoute="/admin/media"
             :childTitle="isEditing ? 'Edit Media' : 'Lihat Media'"
             :description="
                 isEditing

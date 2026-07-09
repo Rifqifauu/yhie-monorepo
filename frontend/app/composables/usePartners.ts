@@ -46,6 +46,14 @@ export const usePartners = () => {
 
   const searchTerm = computed(() => search.value.trim());
 
+  // Kolom search dikosongkan (backspace) -> otomatis tampilkan semua data lagi
+  watch(searchInput, (val) => {
+    if (!val.trim()) {
+      search.value = "";
+      page.value = 1;
+    }
+  });
+
   // Fetching Data List (Paginasi & Pencarian)
   const {
     data: apiResponse,

@@ -39,6 +39,14 @@ export const useSchedules = () => {
   const searchTerm = computed(() => search.value.trim());
   const isSubmitting = ref(false);
 
+  // Kolom search dikosongkan (backspace) -> otomatis tampilkan semua data lagi
+  watch(searchInput, (val) => {
+    if (!val.trim()) {
+      search.value = "";
+      page.value = 1;
+    }
+  });
+
   // Fetching Data
   const {
     data: apiResponse,
