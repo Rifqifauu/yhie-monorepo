@@ -226,19 +226,30 @@
                                 selectedRegistration.transactions[0]
                                     .transaction_receipt
                             "
-                            class="pt-1"
+                            class="pt-2"
                         >
-                            <a
-                                :href="
-                                    fileUrl(
+                            <p class="text-gray-500 mb-1.5">Bukti Transfer</p>
+                            <button
+                                type="button"
+                                class="block w-full"
+                                @click="
+                                    openReceiptPreview(
                                         selectedRegistration.transactions[0]
                                             .transaction_receipt,
                                     )
                                 "
-                                target="_blank"
-                                class="text-primary-600 dark:text-primary-400 hover:underline"
-                                >Lihat Bukti Transfer</a
                             >
+                                <img
+                                    :src="
+                                        fileUrl(
+                                            selectedRegistration
+                                                .transactions[0]
+                                                .transaction_receipt,
+                                        )
+                                    "
+                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-primary-400 transition-all"
+                                />
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -252,6 +263,12 @@
             endpoint="api/program-registrations"
             @success="handleDeleteSuccess"
             @error="handleDeleteError"
+        />
+
+        <AdminImagePreviewModal
+            v-model:open="isReceiptPreviewOpen"
+            :src="receiptPreviewSrc"
+            title="Bukti Transfer"
         />
     </div>
 </template>
@@ -290,6 +307,14 @@ const selectedRegistration = ref<any>(null);
 function viewDetail(row: Row<RegistrationRow>) {
     selectedRegistration.value = row.original;
     isDetailOpen.value = true;
+}
+
+const isReceiptPreviewOpen = ref(false);
+const receiptPreviewSrc = ref("");
+
+function openReceiptPreview(path: string) {
+    receiptPreviewSrc.value = fileUrl(path);
+    isReceiptPreviewOpen.value = true;
 }
 
 const isDeleteOpen = ref(false);

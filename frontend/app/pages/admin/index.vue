@@ -319,8 +319,11 @@ interface Schedule {
 
 interface DashboardData {
     articles: number;
+    articlesTrend: number;
     pendingTransaction: number;
+    pendingTransactionTrend: number;
     totalRevenue: number;
+    revenueTrend: number;
     pendingRegistrations: number;
     approvedRegistration: number;
     rejectedRegistration: number;
@@ -386,24 +389,24 @@ const stats = computed(() => [
         title: "Artikel Terbit",
         value: dashboard.value?.articles ?? 0,
         icon: "i-heroicons-document-text",
-        trend: 12,
-        detail: "Dibandingkan dengan 30 hari terakhir",
+        trend: dashboard.value?.articlesTrend ?? 0,
+        detail: "Artikel terbit baru, 30 hari terakhir vs 30 hari sebelumnya",
         to: "/admin/articles",
     },
     {
         title: "Transaksi Pending",
         value: dashboard.value?.pendingTransaction ?? 0,
         icon: "i-heroicons-clock",
-        trend: -5,
-        detail: "Sistem merespon lebih cepat dari biasanya",
+        trend: dashboard.value?.pendingTransactionTrend ?? 0,
+        detail: "Transaksi pending baru, 30 hari terakhir vs 30 hari sebelumnya",
         to: "/admin/transactions",
     },
     {
         title: "Total Pendapatan",
         value: formatCurrency(dashboard.value?.totalRevenue ?? 0),
         icon: "i-heroicons-banknotes",
-        trend: 8,
-        detail: "Total akumulasi bulan ini",
+        trend: dashboard.value?.revenueTrend ?? 0,
+        detail: "Pendapatan selesai, 30 hari terakhir vs 30 hari sebelumnya",
         to: "/admin/transactions",
     },
 ]);

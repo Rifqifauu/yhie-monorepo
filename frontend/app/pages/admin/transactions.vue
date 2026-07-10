@@ -60,6 +60,12 @@
       @success="handleDeleteSuccess"
       @error="handleDeleteError"
     />
+
+    <AdminImagePreviewModal
+      v-model:open="isReceiptPreviewOpen"
+      :src="receiptPreviewSrc"
+      title="Bukti Transfer"
+    />
   </div>
 </template>
 
@@ -121,13 +127,17 @@ function handleDeleteError(message: string) {
 }
 
 const fileUrl = useFileUrl();
+const isReceiptPreviewOpen = ref(false);
+const receiptPreviewSrc = ref("");
+
 function viewReceipt(row: Row<TransactionRow>) {
   const path = row.original.transaction_receipt;
   if (!path) {
     toast.add({ title: "Belum ada bukti transfer", description: "Pendaftar belum mengunggah bukti transfer.", color: "warning" });
     return;
   }
-  window.open(fileUrl(path), "_blank");
+  receiptPreviewSrc.value = fileUrl(path);
+  isReceiptPreviewOpen.value = true;
 }
 
 const columns: TableColumn<TransactionRow>[] = [
