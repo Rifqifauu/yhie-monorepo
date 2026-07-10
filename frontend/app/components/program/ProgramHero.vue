@@ -108,6 +108,16 @@
                         </button>
                     </div>
                 </div>
+
+                <div class="mt-3 text-center">
+                    <NuxtLink
+                        :to="localePath('/invoice/search')"
+                        class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 dark:text-emerald-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+                    >
+                        <UIcon name="i-lucide-receipt-text" class="w-4 h-4" />
+                        {{ t("invoice.searchCta") }}
+                    </NuxtLink>
+                </div>
             </div>
         </div>
     </section>
@@ -115,6 +125,7 @@
 
 <script setup lang="ts">
 const { t, locale } = useI18n();
+const localePath = useLocalePath();
 
 defineProps<{
     page: number;

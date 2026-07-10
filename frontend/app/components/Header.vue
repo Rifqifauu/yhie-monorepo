@@ -60,6 +60,14 @@
 
                 <div class="hidden md:flex gap-3 items-center">
                     <NuxtLink
+                        :to="localePath('/invoice/search')"
+                        class="flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 hover:border-amber-500 dark:hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-300 text-sm font-semibold"
+                    >
+                        <UIcon name="i-lucide-receipt-text" class="w-4 h-4" />
+                        <span>{{ t("invoice.searchCta") }}</span>
+                    </NuxtLink>
+
+                    <NuxtLink
                         v-if="isAuthenticated"
                         :to="localePath('/admin')"
                         class="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-800 dark:bg-amber-400 text-white dark:text-emerald-950 transition-all duration-300 hover:scale-105 hover:shadow-md focus:ring-2 focus:ring-amber-500"
@@ -170,6 +178,17 @@
                     </NuxtLink>
                 </div>
 
+                <div class="mb-4">
+                    <NuxtLink
+                        :to="localePath('/invoice/search')"
+                        @click="isMobileMenuOpen = false"
+                        class="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 font-semibold"
+                    >
+                        <UIcon name="i-lucide-receipt-text" class="w-4.5 h-4.5" />
+                        <span>{{ t("invoice.searchCta") }}</span>
+                    </NuxtLink>
+                </div>
+
                 <hr class="border-emerald-500/10 mb-4" />
 
                 <div class="space-y-4">
@@ -203,7 +222,7 @@
 </template>
 
 <script setup lang="ts">
-const { locale, tm, rt } = useI18n();
+const { t, locale, tm, rt } = useI18n();
 const switchLocalePath = useSwitchLocalePath();
 const router = useRouter();
 const localePath = useLocalePath();
