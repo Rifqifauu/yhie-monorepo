@@ -26,7 +26,7 @@ class DashboardController extends Controller
             $approvedRegistration = (int) ($registrationStats->approved ?? 0);
             $rejectedRegistration = (int) ($registrationStats->rejected ?? 0);
 
-            $articles = Article::where('is_published', 'true')->count();
+            $articles = Article::where('is_published', true)->count();
 
             // Ambil statistik transaksi secara efisien dalam satu query
             $transactionStats = Transaction::selectRaw("
