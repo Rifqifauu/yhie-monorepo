@@ -218,6 +218,7 @@ function getRowItems(row: Row<TransactionRow>) {
       {
         label: "Tandai Selesai",
         icon: "i-lucide-check",
+        disabled: row.original.payment_status !== "pending",
         onSelect: async () => {
           try {
             await client(`/api/transactions/${row.original.id}`, { method: "PUT", body: { payment_status: "completed" } });
@@ -231,6 +232,7 @@ function getRowItems(row: Row<TransactionRow>) {
       {
         label: "Tandai Gagal",
         icon: "i-lucide-x",
+        disabled: row.original.payment_status !== "pending",
         onSelect: async () => {
           try {
             await client(`/api/transactions/${row.original.id}`, { method: "PUT", body: { payment_status: "failed" } });

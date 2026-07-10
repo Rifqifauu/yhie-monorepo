@@ -192,6 +192,7 @@ export const useGallery = () => {
   const clearSearch = () => {
     searchInput.value = "";
     search.value = "";
+    category.value = "";
   };
 
   const fetchDetail = async (id: string | number) => {

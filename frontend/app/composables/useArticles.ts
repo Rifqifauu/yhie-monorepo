@@ -177,6 +177,7 @@ export const useArticles = () => {
   const clearSearch = () => {
     searchInput.value = "";
     search.value = "";
+    category.value = "";
   };
 
   const changePage = (target: number) => {
