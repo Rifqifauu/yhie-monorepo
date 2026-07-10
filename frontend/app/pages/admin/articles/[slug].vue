@@ -206,11 +206,12 @@
                         <UFormField
                             label="Kategori"
                             name="category"
-                            help="Gunakan koma untuk memisahkan jika lebih dari satu."
+                            required
                         >
-                            <UInput
+                            <USelect
                                 v-model="form.category"
-                                placeholder="Contoh: berita, edukasi, pengumuman"
+                                :items="categoryOptions"
+                                placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
                                 size="lg"
                                 class="w-full"
@@ -516,6 +517,16 @@ const form = reactive({
     category: "",
     is_published: false,
 });
+
+// Kategori tetap (ENUM di database) - harus sinkron dengan App\Enums\ContentCategory di backend.
+const categoryOptions = [
+    "Umum",
+    "Edukasi",
+    "Akademik",
+    "Berita",
+    "Pengumuman",
+    "Kegiatan",
+];
 
 function startEdit() {
     if (!article.value) return;

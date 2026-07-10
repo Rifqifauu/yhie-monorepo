@@ -157,9 +157,10 @@
                             required
                             class="w-full"
                         >
-                            <UInput
+                            <USelect
                                 v-model="form.category"
-                                placeholder="Tulis kategori..."
+                                :items="categoryOptions"
+                                placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
                                 size="lg"
                                 class="w-full"
@@ -283,6 +284,16 @@ const statusItem = ref<SelectItem[]>([
     { label: "Published", value: 1 },
     { label: "Draft", value: 0 },
 ]);
+
+// Kategori tetap (ENUM di database) - harus sinkron dengan App\Enums\ContentCategory di backend.
+const categoryOptions = [
+    "Umum",
+    "Edukasi",
+    "Akademik",
+    "Berita",
+    "Pengumuman",
+    "Kegiatan",
+];
 
 interface ImageFile {
     id: string;

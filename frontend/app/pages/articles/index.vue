@@ -121,7 +121,7 @@
                 "
                 @click="category = cat.value"
             >
-                {{ locale === "en" ? cat.labelEn : cat.labelId }}
+                {{ cat.label }}
             </button>
         </section>
 
@@ -295,6 +295,7 @@ const {
     searchTerm,
     category,
     articles,
+    existingCategories,
     totalPages,
     pending,
     error,
@@ -309,36 +310,35 @@ const {
     refresh,
 } = useArticles();
 
-// Filter categories
-const categories = [
-    { value: "", labelId: "Semua", labelEn: "All" },
-    { value: "news", labelId: "Berita", labelEn: "News" },
-    { value: "announcement", labelId: "Pengumuman", labelEn: "Announcement" },
-    { value: "event", labelId: "Kegiatan", labelEn: "Event" },
-    { value: "education", labelId: "Edukasi", labelEn: "Education" },
+// Filter categories - dibangun dari kategori yang benar-benar ada di data,
+// bukan daftar tetap, supaya selalu cocok dengan apa yang diinput admin.
+const categories = computed(() => {
+    const list = [
+        { value: "", label: locale.value === "en" ? "All" : "Semua" },
+    ];
+    existingCategories.value.forEach((cat) => {
+        if (!cat) return;
+        list.push({ value: cat, label: cat });
+    });
+    return list;
+});
+
+const getCategoryLabel = (cat?: string) => cat || "";
+
+// Warna badge kategori diputar dari daftar warna tetap (bukan berdasarkan nama
+// kategori tertentu, karena kategori sekarang bebas diisi admin).
+const categoryBgColors = [
+    "bg-emerald-600 dark:bg-emerald-500",
+    "bg-amber-500 dark:bg-amber-600",
+    "bg-teal-600 dark:bg-teal-500",
+    "bg-emerald-700 dark:bg-emerald-600",
 ];
 
-const getCategoryLabel = (cat?: string) => {
-    if (!cat) return "";
-    const found = categories.find((c) => c.value === cat);
-    if (!found) return cat;
-    return locale.value === "en" ? found.labelEn : found.labelId;
-};
-
-// Dynamic Category colors
 const getCategoryBg = (cat?: string) => {
-    switch (cat) {
-        case "news":
-            return "bg-emerald-600 dark:bg-emerald-500";
-        case "announcement":
-            return "bg-amber-500 dark:bg-amber-600";
-        case "event":
-            return "bg-teal-600 dark:bg-teal-500";
-        case "education":
-            return "bg-emerald-700 dark:bg-emerald-600";
-        default:
-            return "bg-emerald-600 dark:bg-emerald-500";
-    }
+    if (!cat) return categoryBgColors[0];
+    let hash = 0;
+    for (let i = 0; i < cat.length; i++) hash = (hash + cat.charCodeAt(i)) % categoryBgColors.length;
+    return categoryBgColors[hash];
 };
 
 // Format Date

@@ -18,6 +18,15 @@
                         @keyup.enter="applySearch"
                     />
 
+                    <USelect
+                        v-model="category"
+                        :items="categoryOptions"
+                        value-key="value"
+                        placeholder="Semua Kategori"
+                        size="lg"
+                        class="w-48"
+                    />
+
                     <UButton
                         color="neutral"
                         variant="soft"
@@ -141,6 +150,7 @@ const {
     page,
     totalItems,
     category,
+    existingCategories,
     changePage,
     coverOf, // Gunakan helper ini untuk mengambil thumbnail
     searchInput,
@@ -148,6 +158,11 @@ const {
     clearSearch,
     refresh,
 } = useGallery();
+
+const categoryOptions = computed(() => [
+    { label: "Semua Kategori", value: "" },
+    ...existingCategories.value.map((c) => ({ label: c, value: c })),
+]);
 
 // 2. Kalkulasi fromItem dan toItem secara lokal
 const fromItem = computed(() => {

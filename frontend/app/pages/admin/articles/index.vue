@@ -18,6 +18,15 @@
                         @keyup.enter="applySearch"
                     />
 
+                    <USelect
+                        v-model="category"
+                        :items="categoryOptions"
+                        value-key="value"
+                        placeholder="Semua Kategori"
+                        size="lg"
+                        class="w-48"
+                    />
+
                     <UButton
                         color="neutral"
                         variant="soft"
@@ -146,7 +155,14 @@ const {
     refresh,
     coverOf,
     titleOf,
+    category,
+    existingCategories,
 } = useArticles();
+
+const categoryOptions = computed(() => [
+    { label: "Semua Kategori", value: "" },
+    ...existingCategories.value.map((c) => ({ label: c, value: c })),
+]);
 
 const isDeleteModalOpen = ref(false);
 const selectedArticle = ref<{ id: number | string; title: string } | null>(

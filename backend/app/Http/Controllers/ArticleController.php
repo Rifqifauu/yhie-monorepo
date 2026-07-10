@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ContentCategory;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ArticleController extends Controller
 {
@@ -16,12 +18,22 @@ class ArticleController extends Controller
         $search = $request->query("search");
         $category = $request->query("category");
 
+        // Sama seperti MediaController: daftar kategori nyata yang ada di data,
+        // dipakai frontend untuk membangun tombol/dropdown filter secara dinamis.
+        $existingCategory = Article::select("category")
+            ->whereNotNull("category")
+            ->distinct()
+            ->pluck("category");
+
         try {
             $articles = Article::with("author")
                 ->orderBy("created_at", "desc")
                 ->orderBy("id", "desc")
                 ->when($category, function ($query, $category) {
-                    return $query->where("category", $category);
+                    // Case-insensitive supaya filter tetap cocok walau beda kapitalisasi
+                    return $query->whereRaw("LOWER(category) = ?", [
+                        Str::lower($category),
+                    ]);
                 })
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
@@ -38,6 +50,7 @@ class ArticleController extends Controller
                 [
                     "message" => "Articles fetched successfully.",
                     "data" => $articles,
+                    "existingCategory" => $existingCategory,
                 ],
                 200,
             );
@@ -63,7 +76,7 @@ class ArticleController extends Controller
             "slug_en" => "nullable|string|max:255",
             "is_published" => "required|boolean",
             "author_id" => "nullable|integer|exists:users,id",
-            "category" => "required|string|max:255",
+            "category" => ["required", Rule::in(ContentCategory::values())],
         ];
 
         if ($request->hasFile("image")) {
@@ -153,7 +166,11 @@ class ArticleController extends Controller
             "slug_en" => "nullable|string|max:255",
             "is_published" => "sometimes|required|boolean",
             "author_id" => "sometimes|nullable|integer|exists:users,id",
-            "category" => "sometimes|required|string|max:255",
+            "category" => [
+                "sometimes",
+                "required",
+                Rule::in(ContentCategory::values()),
+            ],
         ];
 
         if ($request->hasFile("image")) {

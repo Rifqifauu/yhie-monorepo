@@ -204,11 +204,11 @@
                             label="Kategori"
                             name="category"
                             required
-                            help="Masukkan satu kategori utama."
                         >
-                            <UInput
+                            <USelect
                                 v-model="form.category"
-                                placeholder="Contoh: akademik, wisuda, sosial"
+                                :items="categoryOptions"
+                                placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
                                 size="lg"
                                 class="w-full"
@@ -476,6 +476,16 @@ const form = reactive({
     description_id: "",
     description_en: "",
 });
+
+// Kategori tetap (ENUM di database) - harus sinkron dengan App\Enums\ContentCategory di backend.
+const categoryOptions = [
+    "Umum",
+    "Edukasi",
+    "Akademik",
+    "Berita",
+    "Pengumuman",
+    "Kegiatan",
+];
 
 function startEdit() {
     if (!media.value) return;
