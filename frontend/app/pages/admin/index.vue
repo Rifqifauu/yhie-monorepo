@@ -52,10 +52,14 @@
         <UContainer class="py-8">
             <div class="space-y-8">
                 <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    <UCard
+                    <NuxtLink
                         v-for="stat in stats"
                         :key="stat.title"
-                        class="group transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5 dark:hover:shadow-emerald-400/5"
+                        :to="stat.to"
+                        class="block"
+                    >
+                    <UCard
+                        class="group transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5 dark:hover:shadow-emerald-400/5 cursor-pointer"
                         :ui="{ body: { padding: 'p-6' } }"
                     >
                         <div class="flex items-start justify-between">
@@ -111,6 +115,7 @@
                             </p>
                         </div>
                     </UCard>
+                    </NuxtLink>
                 </div>
 
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -383,6 +388,7 @@ const stats = computed(() => [
         icon: "i-heroicons-document-text",
         trend: 12,
         detail: "Dibandingkan dengan 30 hari terakhir",
+        to: "/admin/articles",
     },
     {
         title: "Transaksi Pending",
@@ -390,6 +396,7 @@ const stats = computed(() => [
         icon: "i-heroicons-clock",
         trend: -5,
         detail: "Sistem merespon lebih cepat dari biasanya",
+        to: "/admin/transactions",
     },
     {
         title: "Total Pendapatan",
@@ -397,6 +404,7 @@ const stats = computed(() => [
         icon: "i-heroicons-banknotes",
         trend: 8,
         detail: "Total akumulasi bulan ini",
+        to: "/admin/transactions",
     },
 ]);
 
