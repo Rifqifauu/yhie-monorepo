@@ -30,32 +30,57 @@
                 <ul
                     class="hidden lg:flex items-center gap-1 font-medium text-sm text-gray-700 dark:text-emerald-100"
                 >
-                    <NuxtLink
-                        v-for="(item, index) in tm('nav.menu')"
-                        :key="index"
-                        :to="localePath(rt(item.path))"
-                        class="relative px-4 py-2 rounded-full cursor-pointer transition-all duration-300 group block"
-                        #default="{ isActive }"
-                    >
-                        <span
-                            class="relative z-10"
-                            :class="
-                                isActive
-                                    ? 'text-white dark:text-emerald-950 font-bold'
-                                    : 'group-hover:text-emerald-700 dark:group-hover:text-amber-300'
-                            "
+                    <template v-for="(item, index) in tm('nav.menu')" :key="index">
+                        <!-- Grup dropdown (mis. Tentang+Partner, Galeri+Artikel) -->
+                        <UDropdownMenu
+                            v-if="item.items"
+                            :items="groupMenuItems(item.items)"
+                            :content="{ align: 'center' }"
                         >
-                            {{ rt(item.name) }}
-                        </span>
-                        <span
-                            class="absolute inset-0 rounded-full transition-all duration-300"
-                            :class="
-                                isActive
-                                    ? 'bg-emerald-800 dark:bg-amber-400 scale-100 opacity-100'
-                                    : 'bg-emerald-50/60 dark:bg-emerald-900/40 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100'
-                            "
-                        ></span>
-                    </NuxtLink>
+                            <button
+                                type="button"
+                                class="relative px-4 py-2 rounded-full cursor-pointer transition-all duration-300 group flex items-center gap-1"
+                                :class="
+                                    isGroupActive(item.items)
+                                        ? 'text-white dark:text-emerald-950 font-bold bg-emerald-800 dark:bg-amber-400'
+                                        : 'hover:bg-emerald-50/60 dark:hover:bg-emerald-900/40 group-hover:text-emerald-700 dark:group-hover:text-amber-300'
+                                "
+                            >
+                                {{ rt(item.name) }}
+                                <UIcon
+                                    name="i-lucide-chevron-down"
+                                    class="w-3.5 h-3.5"
+                                />
+                            </button>
+                        </UDropdownMenu>
+
+                        <!-- Link biasa -->
+                        <NuxtLink
+                            v-else
+                            :to="localePath(rt(item.path))"
+                            class="relative px-4 py-2 rounded-full cursor-pointer transition-all duration-300 group block"
+                            #default="{ isActive }"
+                        >
+                            <span
+                                class="relative z-10"
+                                :class="
+                                    isActive
+                                        ? 'text-white dark:text-emerald-950 font-bold'
+                                        : 'group-hover:text-emerald-700 dark:group-hover:text-amber-300'
+                                "
+                            >
+                                {{ rt(item.name) }}
+                            </span>
+                            <span
+                                class="absolute inset-0 rounded-full transition-all duration-300"
+                                :class="
+                                    isActive
+                                        ? 'bg-emerald-800 dark:bg-amber-400 scale-100 opacity-100'
+                                        : 'bg-emerald-50/60 dark:bg-emerald-900/40 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100'
+                                "
+                            ></span>
+                        </NuxtLink>
+                    </template>
                 </ul>
 
                 <div class="hidden md:flex gap-3 items-center">
@@ -68,7 +93,7 @@
                     </NuxtLink>
 
                     <NuxtLink
-                        v-if="isAuthenticated"
+                        v-if="isAdmin"
                         :to="localePath('/admin')"
                         class="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-800 dark:bg-amber-400 text-white dark:text-emerald-950 transition-all duration-300 hover:scale-105 hover:shadow-md focus:ring-2 focus:ring-amber-500"
                     >
@@ -139,32 +164,66 @@
                 class="md:hidden absolute mt-3 inset-x-4 backdrop-blur-xl bg-white/95 dark:bg-gray-950/95 border border-emerald-500/20 rounded-3xl p-5 shadow-2xl overflow-hidden"
             >
                 <div class="flex flex-col gap-1.5 mb-4">
-                    <NuxtLink
-                        v-for="(item, index) in tm('nav.menu')"
-                        :key="index"
-                        :to="localePath(rt(item.path))"
-                        @click="isMobileMenuOpen = false"
-                        class="flex items-center px-5 py-3.5 rounded-2xl transition-all"
-                        #default="{ isActive }"
-                        :class="
-                            isActive
-                                ? 'bg-emerald-50 dark:bg-emerald-900/30'
-                                : 'active:bg-gray-100 dark:active:bg-gray-900'
-                        "
-                    >
-                        <span
+                    <template v-for="(item, index) in tm('nav.menu')" :key="index">
+                        <!-- Grup (mis. Tentang+Partner, Galeri+Artikel) -->
+                        <div v-if="item.items" class="pt-1">
+                            <p
+                                class="px-5 pb-1 text-[11px] font-bold text-gray-400 uppercase tracking-wider"
+                            >
+                                {{ rt(item.name) }}
+                            </p>
+                            <NuxtLink
+                                v-for="(sub, subIndex) in item.items"
+                                :key="subIndex"
+                                :to="localePath(rt(sub.path))"
+                                @click="isMobileMenuOpen = false"
+                                class="flex items-center px-5 py-3.5 rounded-2xl transition-all"
+                                #default="{ isActive }"
+                                :class="
+                                    isActive
+                                        ? 'bg-emerald-50 dark:bg-emerald-900/30'
+                                        : 'active:bg-gray-100 dark:active:bg-gray-900'
+                                "
+                            >
+                                <span
+                                    :class="
+                                        isActive
+                                            ? 'text-emerald-700 dark:text-amber-400 font-bold'
+                                            : 'text-gray-600 dark:text-emerald-100/70'
+                                    "
+                                >
+                                    {{ rt(sub.name) }}
+                                </span>
+                            </NuxtLink>
+                        </div>
+
+                        <!-- Link biasa -->
+                        <NuxtLink
+                            v-else
+                            :to="localePath(rt(item.path))"
+                            @click="isMobileMenuOpen = false"
+                            class="flex items-center px-5 py-3.5 rounded-2xl transition-all"
+                            #default="{ isActive }"
                             :class="
                                 isActive
-                                    ? 'text-emerald-700 dark:text-amber-400 font-bold'
-                                    : 'text-gray-600 dark:text-emerald-100/70'
+                                    ? 'bg-emerald-50 dark:bg-emerald-900/30'
+                                    : 'active:bg-gray-100 dark:active:bg-gray-900'
                             "
                         >
-                            {{ rt(item.name) }}
-                        </span>
-                    </NuxtLink>
+                            <span
+                                :class="
+                                    isActive
+                                        ? 'text-emerald-700 dark:text-amber-400 font-bold'
+                                        : 'text-gray-600 dark:text-emerald-100/70'
+                                "
+                            >
+                                {{ rt(item.name) }}
+                            </span>
+                        </NuxtLink>
+                    </template>
                 </div>
 
-                <div v-if="isAuthenticated" class="mb-4">
+                <div v-if="isAdmin" class="mb-4">
                     <NuxtLink
                         :to="localePath('/admin')"
                         @click="isMobileMenuOpen = false"
@@ -231,7 +290,15 @@ const switchLocalePath = useSwitchLocalePath();
 const router = useRouter();
 const localePath = useLocalePath();
 const route = useRoute();
-const { isAuthenticated } = useSanctumAuth();
+interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+}
+
+const { user, isAuthenticated } = useSanctumAuth<AuthUser>();
+const isAdmin = computed(() => isAuthenticated.value && user.value?.role === "admin");
 
 const isMobileMenuOpen = ref(false);
 const isScrolled = ref(false);
@@ -243,6 +310,15 @@ const goToHome = () => {
     isMobileMenuOpen.value = false;
     router.push(localePath("/"));
 };
+
+const groupMenuItems = (items: any[]) =>
+    items.map((sub) => ({
+        label: rt(sub.name),
+        to: localePath(rt(sub.path)),
+    }));
+
+const isGroupActive = (items: any[]) =>
+    items.some((sub: any) => route.path === localePath(rt(sub.path)));
 
 let ticking = false;
 

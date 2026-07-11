@@ -99,6 +99,52 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * PUT /api/account
+     * Update profil akun admin yang sedang login (nama, email, password).
+     */
+    public function updateAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            "name" => "sometimes|string|max:255",
+            "email" => "sometimes|string|email|max:255|unique:users,email," . $user->id,
+            "current_password" => "required_with:password|string",
+            "password" => "sometimes|string|min:8|confirmed",
+        ]);
+
+        if (isset($data["password"])) {
+            if (!Hash::check($data["current_password"] ?? "", $user->password)) {
+                return response()->json(
+                    ["message" => "Password saat ini tidak sesuai."],
+                    422,
+                );
+            }
+            $data["password"] = Hash::make($data["password"]);
+        }
+        unset($data["current_password"]);
+
+        try {
+            $user->update($data);
+
+            return response()->json(
+                [
+                    "message" => "Akun berhasil diperbarui.",
+                    "data" => $user->fresh(),
+                ],
+                200,
+            );
+        } catch (\Throwable $e) {
+            Log::error("Error updating admin account: " . $e->getMessage());
+
+            return response()->json(
+                ["message" => "Gagal memperbarui akun. Silakan coba lagi."],
+                500,
+            );
+        }
+    }
+
     public function logout(Request $request): JsonResponse
     {
         try {
