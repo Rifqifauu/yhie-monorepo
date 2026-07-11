@@ -195,7 +195,9 @@
                     <div class="flex items-center justify-between px-2">
                         <span
                             class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter"
-                            >Pilih Bahasa</span
+                            >{{
+                                locale === "en" ? "Choose Language" : "Pilih Bahasa"
+                            }}</span
                         >
                         <USelect
                             v-model="currentLocale"
@@ -206,7 +208,9 @@
                     <div class="flex items-center justify-between px-2">
                         <span
                             class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter"
-                            >Mode Tampilan</span
+                            >{{
+                                locale === "en" ? "Display Mode" : "Mode Tampilan"
+                            }}</span
                         >
                         <button
                             @click="toggleTheme"
@@ -240,8 +244,15 @@ const goToHome = () => {
     router.push(localePath("/"));
 };
 
+let ticking = false;
+
 const handleScroll = () => {
-    isScrolled.value = window.scrollY > 20;
+    if (ticking) return;
+    window.requestAnimationFrame(() => {
+        isScrolled.value = window.scrollY > 20;
+        ticking = false;
+    });
+    ticking = true;
 };
 
 const toggleTheme = () => {

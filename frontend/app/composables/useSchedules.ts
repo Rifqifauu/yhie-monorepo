@@ -1,5 +1,3 @@
-import { is } from "@nuxt/ui/runtime/locale/index.js";
-
 export interface Schedule {
   id: number | string;
   title_id: string;

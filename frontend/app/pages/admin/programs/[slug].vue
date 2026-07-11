@@ -22,7 +22,7 @@
                             >Edit Program</UButton
                         >
                         <UButton
-                            color="danger"
+                            color="error"
                             variant="solid"
                             icon="i-lucide-trash"
                             @click="triggerDelete"
@@ -99,9 +99,11 @@
                 class="lg:col-span-2 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6"
             >
                 <!-- MODE EDIT -->
-                <form
+                <UForm
                     v-if="isEditing"
-                    @submit.prevent="handleUpdate"
+                    :schema="schema"
+                    :state="form"
+                    @submit="handleUpdate"
                     class="space-y-6"
                 >
                     <!-- Baris 1: Judul Program (ID & EN) -->
@@ -171,6 +173,7 @@
                         <UFormField
                             label="Harga (Bahasa Indonesia)"
                             name="price_id"
+                            required
                         >
                             <UInput
                                 v-model="form.price_id"
@@ -184,6 +187,7 @@
                         <UFormField
                             label="Harga (Bahasa Inggris)"
                             name="price_en"
+                            required
                         >
                             <UInput
                                 v-model="form.price_en"
@@ -248,6 +252,7 @@
                         <UFormField
                             label="Deskripsi (Bahasa Indonesia)"
                             name="description_id"
+                            required
                         >
                             <UTextarea
                                 v-model="form.description_id"
@@ -261,6 +266,7 @@
                         <UFormField
                             label="Deskripsi (Bahasa Inggris)"
                             name="description_en"
+                            required
                         >
                             <UTextarea
                                 v-model="form.description_en"
@@ -271,7 +277,7 @@
                             />
                         </UFormField>
                     </div>
-                </form>
+                </UForm>
 
                 <!-- MODE READ-ONLY TAMPILAN DETAIL -->
                 <div v-else class="space-y-6">
@@ -421,6 +427,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
+import { z } from "zod";
 
 definePageMeta({
     layout: "admin",
@@ -453,6 +460,18 @@ const form = reactive({
     price_id: "",
     price_en: "",
     moodle_course_id: "",
+});
+
+const schema = z.object({
+    title_id: z.string().min(1, "Judul Program (ID) wajib diisi"),
+    title_en: z.string().min(1, "Title Program (EN) wajib diisi"),
+    description_id: z.string().min(1, "Deskripsi (ID) wajib diisi"),
+    description_en: z.string().min(1, "Description (EN) wajib diisi"),
+    slug_id: z.string().min(1, "Slug (ID) wajib diisi"),
+    slug_en: z.string().min(1, "Slug (EN) wajib diisi"),
+    price_id: z.string().min(1, "Harga (ID) wajib diisi"),
+    price_en: z.string().min(1, "Price (EN) wajib diisi"),
+    moodle_course_id: z.string(),
 });
 
 function startEdit() {
@@ -500,6 +519,16 @@ const handleUpdate = async () => {
         return;
     }
 
+    const validation = schema.safeParse(form);
+    if (!validation.success) {
+        toast.add({
+            title: "Data belum lengkap",
+            description: validation.error.issues[0]?.message || "Periksa kembali form Anda.",
+            color: "error",
+        });
+        return;
+    }
+
     const formData = new FormData();
 
     formData.append("_method", "PUT");
@@ -511,8 +540,10 @@ const handleUpdate = async () => {
     formData.append("description_id", form.description_id);
     formData.append("description_en", form.description_en);
 
-    if (form.price_id) formData.append("price_id", form.price_id);
-    if (form.price_en) formData.append("price_en", form.price_en);
+    // Selalu kirim, walau dikosongkan admin (mis. bikin program jadi gratis) -
+    // sebelumnya harga lama tidak pernah bisa dihapus karena field kosong di-skip.
+    formData.append("price_id", form.price_id);
+    formData.append("price_en", form.price_en);
     if (form.moodle_course_id)
         formData.append("moodle_course_id", form.moodle_course_id);
 
@@ -565,7 +596,7 @@ function handleDeleteError(errorMessage: string) {
         title: "Gagal menghapus program",
         description:
             errorMessage || "Terjadi masalah saat memproses permintaan Anda.",
-        color: "danger",
+        color: "error",
         icon: "i-lucide-circle-alert",
     });
 }

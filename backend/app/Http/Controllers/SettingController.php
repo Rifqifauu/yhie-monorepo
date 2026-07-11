@@ -171,10 +171,10 @@ class SettingController extends Controller
     /**
      * DELETE /api/admin/settings/{key}
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $key): JsonResponse
     {
         try {
-            $setting = Setting::where('id', $id)->firstOrFail();
+            $setting = Setting::where('key', $key)->firstOrFail();
             $setting->delete();
 
             return response()->json([

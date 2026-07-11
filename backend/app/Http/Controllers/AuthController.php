@@ -92,8 +92,7 @@ class AuthController extends Controller
             return response()->json(
                 [
                     "message" =>
-                        "An error occurred during login. Please try again later." .
-                        $e->getMessage(),
+                        "An error occurred during login. Please try again later.",
                 ],
                 500,
             );
@@ -122,8 +121,7 @@ class AuthController extends Controller
 
             return response()->json(
                 [
-                    "message" =>
-                        "An error occurred during logout." . $e->getMessage(),
+                    "message" => "An error occurred during logout.",
                 ],
                 500,
             );

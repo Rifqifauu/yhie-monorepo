@@ -71,9 +71,11 @@
             <div
                 class="lg:col-span-2 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6"
             >
-                <form
+                <UForm
                     v-if="isEditing"
-                    @submit.prevent="handleUpdate"
+                    :schema="schema"
+                    :state="form"
+                    @submit="handleUpdate"
                     class="space-y-6"
                 >
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -138,7 +140,7 @@
                             size="lg"
                         />
                     </UFormField>
-                </form>
+                </UForm>
 
                 <div v-else class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -222,6 +224,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
+import { z } from "zod";
 
 interface Schedule {
     id: number | string;
@@ -266,7 +269,31 @@ function cancelEdit() {
     isEditing.value = false;
 }
 
+const schema = z
+    .object({
+        title_id: z.string().min(1, "Judul (ID) wajib diisi"),
+        title_en: z.string().min(1, "Judul (EN) wajib diisi"),
+        description_id: z.string(),
+        description_en: z.string(),
+        start_date: z.string().min(1, "Tanggal mulai wajib diisi"),
+        end_date: z.string().min(1, "Tanggal selesai wajib diisi"),
+    })
+    .refine((data) => data.end_date >= data.start_date, {
+        message: "Tanggal selesai harus sama atau setelah tanggal mulai",
+        path: ["end_date"],
+    });
+
 const handleUpdate = async () => {
+    const validation = schema.safeParse(form);
+    if (!validation.success) {
+        toast.add({
+            title: "Data belum lengkap",
+            description: validation.error.issues[0]?.message || "Periksa kembali form Anda.",
+            color: "error",
+        });
+        return;
+    }
+
     const formData = new FormData();
     // Loop object form ke FormData
     (Object.keys(form) as Array<keyof Schedule>).forEach((key) => {

@@ -53,7 +53,7 @@ export default defineNuxtConfig({
       onGuestOnly: "/admin",
     },
   },
-  
+
   routeRules: {
     "/sanctum/**": {
       proxy: "https://api.sertifikasihafizh.xyz/sanctum/**",

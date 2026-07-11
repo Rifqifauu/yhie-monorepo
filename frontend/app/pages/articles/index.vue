@@ -175,9 +175,11 @@
                     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                     <NuxtLink
-                        v-for="article in articles"
+                        v-for="(article, index) in articles"
                         :key="article.id"
                         :to="`/articles/${slugOf(article)}`"
+                        data-aos="fade-up"
+                        :data-aos-delay="(index % 6) * 80"
                         class="group bg-white dark:bg-emerald-900/10 border border-emerald-100/40 dark:border-emerald-800/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300 flex flex-col h-full"
                     >
                         <div

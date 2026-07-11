@@ -191,7 +191,7 @@
                                             </p>
                                         </div>
                                         <UButton
-                                            color="danger"
+                                            color="error"
                                             variant="ghost"
                                             icon="i-lucide-trash"
                                             size="sm"
@@ -395,7 +395,7 @@ const handleCreate = async () => {
         toast.add({
             title: "Gagal",
             description: "Mohon pilih minimal satu gambar media.",
-            color: "danger",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
         return;
@@ -427,7 +427,7 @@ const handleCreate = async () => {
             title: "Gagal",
             description:
                 result.error || "Terjadi kesalahan saat menyimpan data.",
-            color: "danger",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
     }

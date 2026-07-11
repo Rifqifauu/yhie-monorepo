@@ -8,6 +8,7 @@ use App\Models\Article;
 use Illuminate\Http\Request;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -37,7 +38,9 @@ class DashboardController extends Controller
             $pendingTransaction = (int) ($transactionStats->pending ?? 0);
             $totalRevenue = (float) ($transactionStats->revenue ?? 0);
 
-            $upcomingSchedule = Schedule::where('start_date', '<', now()->addDays(7))->get();
+            $upcomingSchedule = Schedule::whereBetween('start_date', [now(), now()->addDays(7)])
+                ->orderBy('start_date')
+                ->get();
 
             // Trend = perbandingan 30 hari terakhir vs 30 hari sebelumnya, dari data asli.
             $periodStart = now()->subDays(30);
@@ -57,10 +60,11 @@ class DashboardController extends Controller
                 (float) Transaction::where('payment_status', 'completed')->where('updated_at', '>=', $periodStart)->sum('amount'),
                 (float) Transaction::where('payment_status', 'completed')->whereBetween('updated_at', [$previousPeriodStart, $periodStart])->sum('amount'),
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error("Error fetching dashboard data: " . $e->getMessage());
             return response()->json(
                 [
-                    "message" => $e->getMessage(),
+                    "message" => "Failed to fetch dashboard data.",
                 ],
                 500,
             );

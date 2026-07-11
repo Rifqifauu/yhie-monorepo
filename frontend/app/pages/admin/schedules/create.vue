@@ -43,7 +43,12 @@
             <div
                 class="lg:col-span-2 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6"
             >
-                <form @submit.prevent="handleCreate" class="space-y-6">
+                <UForm
+                    :schema="schema"
+                    :state="form"
+                    @submit="handleCreate"
+                    class="space-y-6"
+                >
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <UFormField
                             label="Judul (Bahasa Indonesia)"
@@ -115,13 +120,15 @@
                             size="lg"
                         />
                     </UFormField>
-                </form>
+                </UForm>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { z } from "zod";
+
 definePageMeta({ layout: "admin" });
 
 const router = useRouter();
@@ -137,7 +144,31 @@ const form = reactive({
     end_date: "",
 });
 
+const schema = z
+    .object({
+        title_id: z.string().min(1, "Judul (ID) wajib diisi"),
+        title_en: z.string().min(1, "Judul (EN) wajib diisi"),
+        description_id: z.string(),
+        description_en: z.string(),
+        start_date: z.string().min(1, "Tanggal mulai wajib diisi"),
+        end_date: z.string().min(1, "Tanggal selesai wajib diisi"),
+    })
+    .refine((data) => data.end_date >= data.start_date, {
+        message: "Tanggal selesai harus sama atau setelah tanggal mulai",
+        path: ["end_date"],
+    });
+
 const handleCreate = async () => {
+    const validation = schema.safeParse(form);
+    if (!validation.success) {
+        toast.add({
+            title: "Data belum lengkap",
+            description: validation.error.issues[0]?.message || "Periksa kembali form Anda.",
+            color: "error",
+        });
+        return;
+    }
+
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
         formData.append(key, value);
@@ -156,7 +187,7 @@ const handleCreate = async () => {
         toast.add({
             title: "Gagal",
             description: result.error || "Terjadi kesalahan.",
-            color: "danger",
+            color: "error",
         });
     }
 };

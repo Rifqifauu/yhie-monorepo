@@ -12,21 +12,31 @@
 
         <div class="max-w-7xl mx-auto relative z-10">
             <div class="text-center mb-16 max-w-5xl mx-auto p-4">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-50 tracking-tight">
+                <h2 data-aos="fade-up" class="text-4xl md:text-5xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-50 tracking-tight">
                     {{ locale === 'id' ? 'Jadwal Kegiatan' : 'Event Schedules' }}
                 </h2>
-                <div class="w-20 h-1 bg-gradient-to-r from-emerald-800 to-emerald-500 mx-auto rounded-full"></div>
-                <span class="text-lg font-medium text-emerald-850 dark:text-white mt-4 block">
+                <div data-aos="fade-up" data-aos-delay="50" class="w-20 h-1 bg-gradient-to-r from-emerald-800 to-emerald-500 mx-auto rounded-full"></div>
+                <span data-aos="fade-up" data-aos-delay="100" class="text-lg font-medium text-emerald-850 dark:text-white mt-4 block">
                     {{ locale === 'id' ? 'Ikuti berbagai jadwal kegiatan dan program kami.' : 'Join our upcoming events and programs.' }}
                 </span>
             </div>
 
             <!-- Loading State -->
-            <div v-if="pending" class="flex flex-col items-center justify-center py-20 gap-4">
-                <UIcon name="i-heroicons-arrow-path" class="w-12 h-12 animate-spin text-emerald-600 dark:text-emerald-400" />
-                <span class="text-sm font-medium tracking-wide text-emerald-700 dark:text-emerald-300">
-                    {{ locale === 'id' ? 'Memuat jadwal...' : 'Loading schedules...' }}
-                </span>
+            <div v-if="pending" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+                <div class="lg:col-span-2 rounded-[2rem] p-8 md:p-12 border border-emerald-200 dark:border-white/10 min-h-[500px] flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <USkeleton class="h-4 w-40 rounded" />
+                        <USkeleton class="h-10 w-2/3 rounded" />
+                    </div>
+                    <div class="flex flex-wrap gap-4 md:gap-6">
+                        <USkeleton v-for="n in 4" :key="n" class="w-20 h-24 md:w-24 md:h-28 rounded-2xl" />
+                    </div>
+                    <USkeleton class="h-24 w-full max-w-2xl rounded-2xl" />
+                </div>
+                <div class="lg:col-span-1 rounded-[2rem] p-6 border border-emerald-100 dark:border-emerald-800/60 space-y-4">
+                    <USkeleton class="h-6 w-1/2 rounded" />
+                    <USkeleton v-for="n in 3" :key="n" class="h-20 w-full rounded-2xl" />
+                </div>
             </div>
 
             <!-- Error State -->
@@ -58,7 +68,7 @@
             <!-- Data State -->
             <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
                 <!-- Left Column: Highlight & Countdown -->
-                <div class="lg:col-span-2 relative bg-emerald-50 dark:bg-emerald-950 rounded-[2rem] p-8 md:p-12 overflow-hidden shadow-[0_20px_50px_rgba(16,185,129,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-emerald-200 dark:border-white/10 group flex flex-col justify-between min-h-[500px]">
+                <div data-aos="fade-right" class="lg:col-span-2 relative bg-emerald-50 dark:bg-emerald-950 rounded-[2rem] p-8 md:p-12 overflow-hidden shadow-[0_20px_50px_rgba(16,185,129,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-emerald-200 dark:border-white/10 group flex flex-col justify-between min-h-[500px]">
                     <!-- Dark background decorative elements -->
                     <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-[80px] pointer-events-none"></div>
                     <div class="absolute bottom-0 left-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -160,7 +170,7 @@
                 </div>
 
                 <!-- Right Column: Incoming Schedules -->
-                <div class="lg:col-span-1 flex flex-col h-full">
+                <div data-aos="fade-left" data-aos-delay="100" class="lg:col-span-1 flex flex-col h-full">
                     <div class="bg-white dark:bg-emerald-950/40 rounded-[2rem] p-6 border border-emerald-100 dark:border-emerald-800/60 shadow-[0_10px_40px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] flex flex-col h-full">
                         <div class="flex items-center justify-between mb-6 pb-4 border-b border-emerald-100 dark:border-emerald-800/50">
                             <h3 class="text-xl font-bold text-slate-900 dark:text-emerald-50">
@@ -219,7 +229,7 @@
                                 variant="soft"
                                 class="w-full justify-center rounded-xl py-2.5 font-medium"
                                 trailing-icon="i-lucide-arrow-right"
-                                to="/schedules"
+                                :to="localePath('/schedules')"
                             >
                                 {{ locale === 'id' ? 'Lihat Semua Jadwal' : 'View All Schedules' }}
                             </UButton>
@@ -237,6 +247,7 @@ import { useI18n } from "vue-i18n";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
 const { locale } = useI18n();
+const localePath = useLocalePath();
 const { schedules, pending, error, refresh, titleOf, descOf } = useSchedules();
 
 const formatDate = (dateStr: string) => {

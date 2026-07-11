@@ -51,7 +51,12 @@
             <div
                 class="lg:col-span-2 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6"
             >
-                <form @submit.prevent="handleCreate" class="space-y-6">
+                <UForm
+                    :schema="schema"
+                    :state="form"
+                    @submit="handleCreate"
+                    class="space-y-6"
+                >
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <UFormField
                             label="Judul Program (ID)"
@@ -103,14 +108,14 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <UFormField label="Harga (ID)" name="price_id">
+                        <UFormField label="Harga (ID)" name="price_id" required>
                             <UInput
                                 v-model="form.price_id"
                                 placeholder="50000"
                                 size="lg"
                             />
                         </UFormField>
-                        <UFormField label="Price (EN)" name="price_en">
+                        <UFormField label="Price (EN)" name="price_en" required>
                             <UInput
                                 v-model="form.price_en"
                                 placeholder="5"
@@ -145,27 +150,29 @@
                         />
                     </UFormField>
 
-                    <UFormField label="Deskripsi (ID)" name="description_id">
+                    <UFormField label="Deskripsi (ID)" name="description_id" required>
                         <UTextarea
                             v-model="form.description_id"
                             :rows="4"
                             size="lg"
                         />
                     </UFormField>
-                    <UFormField label="Description (EN)" name="description_en">
+                    <UFormField label="Description (EN)" name="description_en" required>
                         <UTextarea
                             v-model="form.description_en"
                             :rows="4"
                             size="lg"
                         />
                     </UFormField>
-                </form>
+                </UForm>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { z } from "zod";
+
 definePageMeta({ layout: "admin" });
 
 const router = useRouter();
@@ -187,6 +194,18 @@ const form = reactive({
     moodle_course_id: "",
 });
 
+const schema = z.object({
+    title_id: z.string().min(1, "Judul Program (ID) wajib diisi"),
+    title_en: z.string().min(1, "Title Program (EN) wajib diisi"),
+    description_id: z.string().min(1, "Deskripsi (ID) wajib diisi"),
+    description_en: z.string().min(1, "Description (EN) wajib diisi"),
+    slug_id: z.string().min(1, "Slug (ID) wajib diisi"),
+    slug_en: z.string().min(1, "Slug (EN) wajib diisi"),
+    price_id: z.string().min(1, "Harga (ID) wajib diisi"),
+    price_en: z.string().min(1, "Price (EN) wajib diisi"),
+    moodle_course_id: z.string(),
+});
+
 function onFileChange(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
@@ -197,14 +216,30 @@ function onFileChange(event: Event) {
 }
 
 const handleCreate = async () => {
+    const validation = schema.safeParse(form);
+    if (!validation.success) {
+        toast.add({
+            title: "Data belum lengkap",
+            description: validation.error.issues[0]?.message || "Periksa kembali form Anda.",
+            color: "error",
+        });
+        return;
+    }
+    if (!selectedFile.value) {
+        toast.add({
+            title: "Data belum lengkap",
+            description: "Gambar Program wajib diunggah.",
+            color: "error",
+        });
+        return;
+    }
+
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
         if (value) formData.append(key, value);
     });
 
-    if (selectedFile.value) {
-        formData.append("image_path", selectedFile.value);
-    }
+    formData.append("image_path", selectedFile.value);
 
     const result = await createProgram(formData);
 
@@ -219,7 +254,7 @@ const handleCreate = async () => {
         toast.add({
             title: "Gagal",
             description: result.error,
-            color: "danger",
+            color: "error",
         });
     }
 };

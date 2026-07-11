@@ -60,8 +60,10 @@
                 <!-- Data State -->
                 <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div
-                        v-for="sched in schedules"
+                        v-for="(sched, index) in schedules"
                         :key="sched.id"
+                        data-aos="fade-up"
+                        :data-aos-delay="(index % 6) * 80"
                         class="bg-white dark:bg-emerald-900/20 rounded-3xl p-6 border border-emerald-100 dark:border-emerald-800/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
                     >
                         <div class="flex items-center justify-between mb-3">

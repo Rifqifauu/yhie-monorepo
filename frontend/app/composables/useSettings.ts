@@ -62,14 +62,14 @@ export const useSettings = () => {
     });
   };
 
-  // Save all modified settings concurrently
+  // Save all modified settings dalam satu request (endpoint settings-bulk)
   const saveAllSettings = async (formState: Record<string, string>) => {
     isSubmitting.value = true;
     try {
-      // Mengirim request satu per satu (berurutan) agar tidak membebani server / memicu rate-limit
-      for (const [key, value] of Object.entries(formState)) {
-        await updateSetting(key, value ?? "");
-      }
+      await client("/api/settings-bulk", {
+        method: "POST",
+        body: { settings: formState },
+      });
       await refresh();
       return { success: true };
     } catch (err: any) {

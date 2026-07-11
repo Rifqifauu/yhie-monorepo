@@ -22,7 +22,7 @@
                             >Edit Article</UButton
                         >
                         <UButton
-                            color="danger"
+                            color="error"
                             variant="solid"
                             icon="i-lucide-trash"
                             @click="triggerDelete"
@@ -261,7 +261,7 @@
                                             </p>
                                         </div>
                                         <UButton
-                                            color="danger"
+                                            color="error"
                                             variant="ghost"
                                             icon="i-lucide-trash"
                                             size="sm"
@@ -640,7 +640,7 @@ const handleUpdate = async () => {
         toast.add({
             title: "Gagal memperbarui",
             description: result.error,
-            color: "danger",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
     }
@@ -668,7 +668,7 @@ function handleDeleteError(errorMessage: string) {
         title: "Gagal menghapus artikel",
         description:
             errorMessage || "Terjadi masalah saat memproses permintaan Anda.",
-        color: "danger",
+        color: "error",
         icon: "i-lucide-circle-alert",
     });
 }

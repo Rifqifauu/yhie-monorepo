@@ -48,7 +48,11 @@
                     <span
                         class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-emerald-100/80 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200 border border-emerald-200/50 dark:border-emerald-800/50"
                     >
-                        Program Sertifikasi
+                        {{
+                            locale === "en"
+                                ? "Certification Program"
+                                : "Program Sertifikasi"
+                        }}
                     </span>
                     <h1
                         class="mt-4 text-3xl md:text-5xl font-serif font-extrabold tracking-tight text-emerald-950 dark:text-emerald-50 leading-tight"
@@ -63,21 +67,33 @@
                                 name="i-lucide-award"
                                 class="w-4.5 h-4.5 text-amber-500"
                             />
-                            Sertifikasi IAO
+                            {{
+                                locale === "en"
+                                    ? "IAO Certification"
+                                    : "Sertifikasi IAO"
+                            }}
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             <UIcon
                                 name="i-lucide-trees"
                                 class="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400"
                             />
-                            Tadabbur Alam
+                            {{
+                                locale === "en"
+                                    ? "Nature Retreat"
+                                    : "Tadabbur Alam"
+                            }}
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             <UIcon
                                 name="i-lucide-shield-check"
                                 class="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400"
                             />
-                            Legalitas Resmi
+                            {{
+                                locale === "en"
+                                    ? "Official Legality"
+                                    : "Legalitas Resmi"
+                            }}
                         </span>
                     </div>
                 </div>
@@ -91,8 +107,8 @@
                         icon="i-heroicons-exclamation-triangle"
                         color="red"
                         variant="soft"
-                        title="Program Tidak Ditemukan"
-                        description="Halaman program yang Anda cari tidak ditemukan atau telah dipindahkan."
+                        :title="locale === 'en' ? 'Program Not Found' : 'Program Tidak Ditemukan'"
+                        :description="locale === 'en' ? 'The program page you are looking for was not found or has been moved.' : 'Halaman program yang Anda cari tidak ditemukan atau telah dipindahkan.'"
                     >
                         <template #actions>
                             <UButton
@@ -101,7 +117,11 @@
                                 variant="solid"
                                 :to="localePath('/program')"
                             >
-                                Kembali ke Program
+                                {{
+                                    locale === "en"
+                                        ? "Back to Programs"
+                                        : "Kembali ke Program"
+                                }}
                             </UButton>
                         </template>
                     </UAlert>
@@ -275,9 +295,7 @@
                             />
 
                             <div
-                                v-if="
-                                    priceOf(program) && priceOf(program) !== 0
-                                "
+                                v-if="isPaidProgram(program)"
                                 class="space-y-3 p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/60 text-sm"
                             >
                                 <h4
@@ -435,6 +453,15 @@ const titleOf = (p: any) => (locale.value === "en" ? p.title_en : p.title_id);
 const descOf = (p: any) =>
     locale.value === "en" ? p.description_en : p.description_id;
 const priceOf = (p: any) => (locale.value === "en" ? p.price_en : p.price_id);
+
+// Program dianggap berbayar hanya jika harganya angka > 0 - bandingkan
+// secara numerik karena API mengembalikan harga sebagai string (kolom decimal).
+const isPaidProgram = (p: any) => {
+    const price = priceOf(p);
+    if (price === null || price === undefined || price === "") return false;
+    const numericPrice = typeof price === "string" ? parseFloat(price) : price;
+    return !isNaN(numericPrice) && numericPrice > 0;
+};
 
 const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
 

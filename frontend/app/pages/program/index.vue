@@ -22,8 +22,10 @@
                     @retry="refresh"
                 >
                     <ProgramCard
-                        v-for="program in programs"
+                        v-for="(program, index) in programs"
                         :key="program.id"
+                        :data-aos="'fade-up'"
+                        :data-aos-delay="(index % 6) * 80"
                         :to="localePath(`/program/${slugOf(program)}`)"
                         :image-src="imageUrl(program.image_path)"
                         :title="titleOf(program)"

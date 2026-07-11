@@ -22,7 +22,7 @@
                             >Edit Partner</UButton
                         >
                         <UButton
-                            color="danger"
+                            color="error"
                             variant="solid"
                             icon="i-lucide-trash"
                             @click="triggerDelete"
@@ -95,9 +95,11 @@
             <div
                 class="lg:col-span-2 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6"
             >
-                <form
+                <UForm
                     v-if="isEditing"
-                    @submit.prevent="handleUpdate"
+                    :schema="schema"
+                    :state="form"
+                    @submit="handleUpdate"
                     class="space-y-6"
                 >
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -192,6 +194,7 @@
                         <UFormField
                             label="Deskripsi (Bahasa Indonesia)"
                             name="description_id"
+                            required
                         >
                             <UTextarea
                                 v-model="form.description_id"
@@ -205,6 +208,7 @@
                         <UFormField
                             label="Deskripsi (Bahasa Inggris)"
                             name="description_en"
+                            required
                         >
                             <UTextarea
                                 v-model="form.description_en"
@@ -215,7 +219,7 @@
                             />
                         </UFormField>
                     </div>
-                </form>
+                </UForm>
 
                 <div v-else class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -324,6 +328,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
+import { z } from "zod";
 
 definePageMeta({
     layout: "admin",
@@ -376,6 +381,15 @@ function cancelEdit() {
     imagePreview.value = null;
 }
 
+const schema = z.object({
+    name_id: z.string().min(1, "Nama Partner (ID) wajib diisi"),
+    name_en: z.string().min(1, "Nama Partner (EN) wajib diisi"),
+    description_id: z.string().min(1, "Deskripsi (ID) wajib diisi"),
+    description_en: z.string().min(1, "Deskripsi (EN) wajib diisi"),
+    slug_id: z.string().min(1, "Slug (ID) wajib diisi"),
+    slug_en: z.string().min(1, "Slug (EN) wajib diisi"),
+});
+
 function onFileChange(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
@@ -386,6 +400,18 @@ function onFileChange(event: Event) {
 }
 
 const handleUpdate = async () => {
+    const validation = schema.safeParse(form);
+    if (!validation.success) {
+        toast.add({
+            title: "Data belum lengkap",
+            description:
+                validation.error.issues[0]?.message ||
+                "Periksa kembali form Anda.",
+            color: "error",
+        });
+        return;
+    }
+
     const formData = new FormData();
     formData.append("name_id", form.name_id);
     formData.append("name_en", form.name_en);
@@ -416,7 +442,7 @@ const handleUpdate = async () => {
         toast.add({
             title: "Gagal memperbarui",
             description: result.error,
-            color: "danger",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
     }
@@ -444,7 +470,7 @@ function handleDeleteError(errorMessage: string) {
         title: "Gagal menghapus partner",
         description:
             errorMessage || "Terjadi masalah saat memproses permintaan Anda.",
-        color: "danger",
+        color: "error",
         icon: "i-lucide-circle-alert",
     });
 }

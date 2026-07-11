@@ -90,6 +90,17 @@ class ArticleController extends Controller
 
         $data = $request->validate($rules);
 
+        $authorId = $data["author_id"] ?? auth()->id();
+        if (!$authorId) {
+            return response()->json(
+                [
+                    "message" =>
+                        "Tidak bisa menentukan penulis artikel. Silakan login terlebih dahulu.",
+                ],
+                422,
+            );
+        }
+
         try {
             if (empty($data["slug_id"])) {
                 $data["slug_id"] = Str::slug($data["title_id"]);
@@ -98,7 +109,7 @@ class ArticleController extends Controller
                 $data["slug_en"] = Str::slug($data["title_en"]);
             }
 
-            $data["author_id"] = $data["author_id"] ?? (auth()->id() ?? 1);
+            $data["author_id"] = $authorId;
             $data["image"] = $this->storeImages($request);
 
             $article = Article::create($data);

@@ -21,7 +21,8 @@
         </UAlert>
 
         <!-- Main Form -->
-        <UForm v-else :schema="schema" :state="form" class="space-y-6 flex-1 flex flex-col" @submit="handleSubmit">
+        <UForm v-else :schema="schema" :state="form" class="space-y-6 flex-1 flex flex-col" @submit="handleSubmit"
+            @error="onSubmitError">
             <!-- Tab Navigation -->
             <div class="flex gap-1 border-b border-gray-200 dark:border-gray-800 pb-px overflow-x-auto">
                 <button v-for="tab in tabs" :key="tab.key" type="button" @click="activeTab = tab.key"
@@ -181,6 +182,10 @@ const allKeys = tabs.flatMap((t) => t.fields.map((f) => f.key));
 const form = reactive<Record<string, string>>(Object.fromEntries(allKeys.map((k) => [k, ""])));
 const activeTab = ref("general");
 
+// Field -> tab, dipakai untuk lompat ke tab yang errornya tersembunyi.
+const fieldToTab: Record<string, string> = {};
+tabs.forEach((t) => t.fields.forEach((f) => (fieldToTab[f.key] = t.key)));
+
 // Populate form when data arrives
 watch(settings, (val) => {
     if (val?.length) allKeys.forEach((k) => (form[k] = getSettingValue(k)));
@@ -193,5 +198,22 @@ const handleSubmit = async () => {
         ? { title: "Tersimpan!", description: "Semua pengaturan berhasil diperbarui.", color: "success", icon: "i-lucide-circle-check" }
         : { title: "Gagal Menyimpan", description: res.error, color: "error", icon: "i-lucide-alert-triangle" }
     );
+};
+
+// Validasi gagal bisa terjadi di tab yang sedang tersembunyi (v-show) - pindahkan
+// ke tab pertama yang bermasalah supaya pesan errornya tidak nyangkut senyap.
+const onSubmitError = (event: { errors?: { name?: string; message: string }[] }) => {
+    const firstError = event.errors?.[0];
+    if (!firstError) return;
+
+    const tabKey = firstError.name ? fieldToTab[firstError.name] : undefined;
+    if (tabKey) activeTab.value = tabKey;
+
+    toast.add({
+        title: "Form belum lengkap",
+        description: firstError.message || "Periksa kembali isian pada tab yang ditandai.",
+        color: "error",
+        icon: "i-lucide-alert-triangle",
+    });
 };
 </script>

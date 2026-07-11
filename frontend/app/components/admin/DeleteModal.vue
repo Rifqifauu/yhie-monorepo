@@ -51,15 +51,7 @@ const openModel = defineModel<boolean>("open", { default: false });
 const emit = defineEmits(["success", "error"]);
 
 async function deleteItem() {
-    console.log("Mencoba menghapus dengan data:", {
-        id: props.id,
-        endpoint: props.endpoint,
-    });
-
     if (!props.id || !props.endpoint) {
-        console.error(
-            "Gagal menghapus: properti 'id' atau 'endpoint' tidak didefinisikan!",
-        );
         return;
     }
 
@@ -74,8 +66,6 @@ async function deleteItem() {
         emit("success");
         openModel.value = false;
     } catch (err: any) {
-        console.error("Terjadi error saat request API:", err);
-
         const backendMessage =
             err.data?.message || err.response?._data?.message || err.message;
         emit("error", backendMessage);
