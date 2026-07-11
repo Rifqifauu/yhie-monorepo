@@ -44,7 +44,14 @@ export default defineNuxtConfig({
         : "https://sertifikasihafizh.xyz",
     baseUrl: "https://api.sertifikasihafizh.xyz",
     mode: "cookie",
-    redirectIfUnauthenticated: true,
+    // Dimatikan: dulu ini efektif tidak pernah nyala karena /api/user belum
+    // dilindungi auth:sanctum (401 tidak pernah terjadi). Sekarang /api/user
+    // sudah benar minta login, jadi kalau ini tetap true, SEMUA halaman
+    // publik (bukan cuma /admin) ikut auto-redirect ke /login setiap 401 -
+    // termasuk homepage untuk pengunjung anonim. Proteksi /admin/* sudah
+    // ditangani middleware kustom (middleware/auth.global.ts), jadi redirect
+    // otomatis bawaan modul ini tidak diperlukan lagi.
+    redirectIfUnauthenticated: false,
     redirect: {
       keepRequestedRoute: true,
       onLogin: "/admin",

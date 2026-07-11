@@ -2,21 +2,11 @@
   "nav": {
     "menu": [
       { "name": "Home", "path": "/" },
-      {
-        "name": "About",
-        "items": [
-          { "name": "About", "path": "/about" },
-          { "name": "Partners", "path": "/partner" }
-        ]
-      },
+      { "name": "About", "path": "/about" },
       { "name": "Program", "path": "/program" },
-      {
-        "name": "Gallery",
-        "items": [
-          { "name": "Gallery", "path": "/media" },
-          { "name": "Articles", "path": "/articles" }
-        ]
-      }
+      { "name": "Gallery", "path": "/media" },
+      { "name": "Partners", "path": "/partner" },
+      { "name": "Articles", "path": "/articles" }
     ]
   },
   "hero": {

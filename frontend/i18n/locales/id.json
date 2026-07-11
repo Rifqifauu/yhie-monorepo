@@ -2,21 +2,11 @@
   "nav": {
     "menu": [
       { "name": "Beranda", "path": "/" },
-      {
-        "name": "Tentang",
-        "items": [
-          { "name": "Tentang", "path": "/about" },
-          { "name": "Partner", "path": "/partner" }
-        ]
-      },
+      { "name": "Tentang", "path": "/about" },
       { "name": "Program", "path": "/program" },
-      {
-        "name": "Galeri",
-        "items": [
-          { "name": "Galeri", "path": "/media" },
-          { "name": "Artikel", "path": "/articles" }
-        ]
-      }
+      { "name": "Galeri", "path": "/media" },
+      { "name": "Partner", "path": "/partner" },
+      { "name": "Artikel", "path": "/articles" }
     ]
   },
   "hero": {
