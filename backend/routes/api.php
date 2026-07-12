@@ -21,8 +21,10 @@ use App\Http\Controllers\FlipPaymentController;
 | Digunakan untuk menampilkan data ke pengunjung website (Frontend)
 | dan menerima *submit* form pendaftaran awal.
 */
+use App\Http\Controllers\DokuWebhookController;
 
-Route::post("/create-bill", [FlipPaymentController::class, "createBill"]);
+Route::post('/webhooks/doku', [DokuWebhookController::class, 'handle']);
+
 
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);

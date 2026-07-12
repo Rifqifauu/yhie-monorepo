@@ -39,5 +39,10 @@ return [
         'url' => env('MOODLE_URL'),
         'token' => env('MOODLE_TOKEN'),
     ],
+    'doku' => [
+        'client_id' => env('DOKU_CLIENT_ID'),
+        'secret_key' => env('DOKU_SECRET_KEY'),
+        'base_url' => env('DOKU_PAYMENT_URL'),
+    ],
 
 ];

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProgramRegistration;
-use App\Models\Transaction;
 use App\Services\MailService;
 use App\Services\MoodleService;
+use App\Services\TransactionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +17,7 @@ class ProgramRegistrationController extends Controller
     public function __construct(
         private MailService $mailService,
         private MoodleService $moodleService,
+        private TransactionService $transactionService
     ) {
     }
 
@@ -31,15 +32,14 @@ class ProgramRegistrationController extends Controller
             "age" => "nullable|integer|min:1|max:150",
             "address" => "nullable|string|max:1000",
             "notes" => "nullable|string|max:1000",
-            "amount" => "required|numeric|min:0", // Ambil nominal harga program dari frontend/database
+            "amount" => "required|numeric|min:0",
             "id_card" => "required|image|mimes:jpeg,png,jpg,webp|max:2048",
             "photo" => "required|image|mimes:jpeg,png,jpg,webp|max:2048",
         ]);
 
-        $data["id_card"] =
-            "/storage/" . $request->file("id_card")->store("registrations", "public");
-        $data["photo"] =
-            "/storage/" . $request->file("photo")->store("registrations", "public");
+        // Simpan file ke storage public
+        $data["id_card"] = "/storage/" . $request->file("id_card")->store("registrations", "public");
+        $data["photo"] = "/storage/" . $request->file("photo")->store("registrations", "public");
 
         // Bungkus dengan DB::transaction demi keamanan data jikalau salah satu query fail
         DB::beginTransaction();
@@ -48,51 +48,47 @@ class ProgramRegistrationController extends Controller
             // 1. Simpan Data Registrasi
             $registration = ProgramRegistration::create($data);
 
-            // 2. Otomatis Buat Data Transaksi Awal (Pending)
-            $transaction = $registration->transactions()->create([
-                "reference_id" =>
-                    "INV-" .
-                    date("Ymd") .
-                    "-" .
-                    strtoupper(bin2hex(random_bytes(4))),
-                "amount" => $data["amount"],
-                "payment_status" => "pending",
-                "payment_method" => "manual_transfer", // Nanti diganti dinamis kalau sudah pakai PG
+            // 2. Buat Transaksi & Generate Link DOKU via TransactionService
+            $transaction = $this->transactionService->createTransactionWithPG([
+                'program_registration_id' => $registration->id,
+                'amount' => $data['amount']
             ]);
 
             DB::commit();
 
             // Email invoice - dikirim setelah commit, kegagalan kirim tidak menggagalkan pendaftaran
+            // (Pastikan template email Anda nantinya menyertakan $transaction->payment_url)
             $this->mailService->sendInvoice($transaction);
 
             return response()->json(
                 [
-                    "message" =>
-                        "Registration and invoice created successfully.",
-                    "data" => $registration->load(["program", "transactions"]),
+                    "message" => "Registration and invoice created successfully. Please redirect user to payment URL.",
+                    "data" => [
+                        "registration" => $registration->load("program"),
+                        "transaction" => $transaction,
+                    ]
                 ],
-                201,
+                201
             );
         } catch (\Throwable $e) {
             DB::rollBack();
 
             // Bersihkan file yang sudah terlanjur tersimpan sebelum transaksi gagal.
             foreach (["id_card", "photo"] as $file) {
-                Storage::disk("public")->delete(
-                    str_replace("/storage/", "", $data[$file]),
-                );
+                if (isset($data[$file])) {
+                    Storage::disk("public")->delete(
+                        str_replace("/storage/", "", $data[$file])
+                    );
+                }
             }
 
-            Log::error(
-                "Error creating program registration: " . $e->getMessage(),
-            );
+            Log::error("Error creating program registration: " . $e->getMessage());
 
             return response()->json(
                 [
-                    "message" =>
-                        "Failed to submit registration. Please try again later.",
+                    "message" => "Failed to submit registration. Please try again later.",
                 ],
-                500,
+                500
             );
         }
     }
@@ -122,7 +118,7 @@ class ProgramRegistrationController extends Controller
                     "message" => "Registrations fetched successfully.",
                     "data" => $registrations,
                 ],
-                200,
+                200
             );
         } catch (\Throwable $e) {
             Log::error("Error fetching registrations: " . $e->getMessage());
@@ -130,7 +126,7 @@ class ProgramRegistrationController extends Controller
                 [
                     "message" => "Failed to fetch registrations.",
                 ],
-                500,
+                500
             );
         }
     }
@@ -145,13 +141,13 @@ class ProgramRegistrationController extends Controller
                     "transactions",
                 ]),
             ],
-            200,
+            200
         );
     }
 
     public function update(
         Request $request,
-        ProgramRegistration $programRegistration,
+        ProgramRegistration $programRegistration
     ): JsonResponse {
         $data = $request->validate([
             "full_name" => "sometimes|string|max:255",
@@ -185,16 +181,15 @@ class ProgramRegistrationController extends Controller
                         ->fresh()
                         ->load(["program", "transactions"]),
                 ],
-                200,
+                200
             );
         } catch (\Throwable $e) {
             Log::error("Error updating registration: " . $e->getMessage());
             return response()->json(
                 [
-                    "message" =>
-                        "Failed to update registration. Please try again later.",
+                    "message" => "Failed to update registration. Please try again later.",
                 ],
-                500,
+                500
             );
         }
     }
@@ -204,7 +199,7 @@ class ProgramRegistrationController extends Controller
      * di sini (mis. Moodle API belum siap) tidak menggagalkan proses approve.
      */
     private function provisionMoodleAccount(
-        ProgramRegistration $registration,
+        ProgramRegistration $registration
     ): void {
         try {
             $result = $this->moodleService->createUser($registration);
@@ -216,7 +211,7 @@ class ProgramRegistrationController extends Controller
             $this->mailService->sendMoodleAccount(
                 $registration,
                 $result["username"],
-                $result["password"],
+                $result["password"]
             );
         } catch (\Throwable $e) {
             Log::error("Error provisioning Moodle account: " . $e->getMessage());
@@ -224,7 +219,7 @@ class ProgramRegistrationController extends Controller
     }
 
     public function destroy(
-        ProgramRegistration $programRegistration,
+        ProgramRegistration $programRegistration
     ): JsonResponse {
         try {
             // Karena di migration pakai cascadeOnDelete, transaksi terkait otomatis ikut terhapus
@@ -234,7 +229,7 @@ class ProgramRegistrationController extends Controller
                 [
                     "message" => "Registration deleted successfully.",
                 ],
-                200,
+                200
             );
         } catch (\Throwable $e) {
             Log::error("Error deleting registration: " . $e->getMessage());
@@ -242,7 +237,7 @@ class ProgramRegistrationController extends Controller
                 [
                     "message" => "Failed to delete registration.",
                 ],
-                500,
+                500
             );
         }
     }
