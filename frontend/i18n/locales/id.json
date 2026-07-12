@@ -24,6 +24,8 @@
     "linkPrimary": "/register",
     "linkSecondary": "/program",
     "imageAlt": "Suasana khusyuk setoran hafalan Al-Qur'an di alam terbuka bersama Yayasan Hafiz Indonesia Emas",
+    "location": "Desa Tejasari, Kabupaten Purbalingga",
+    "loadingSchedule": "Memuat jadwal...",
     "seoTitle": "Sertifikasi Hafiz & Wisata Tadabbur Alam | Yayasan Hafiz Indonesia Emas",
     "seoDesc": "Program sertifikasi Hafiz Al-Qur'an resmi dengan konsep wisata alam (tadabbur). Kurangi stres ujian, tingkatkan fokus, dan raih sertifikat internasional IAO.",
     "keywords": "sertifikasi hafiz quran, wisata tahfidz, sertifikat iao, yayasan hafiz indonesia emas, ujian hafalan tanpa stres, tadabbur alam hafiz, sertifikasi tahfidz"
@@ -164,7 +166,7 @@
     "uploadSuccess": "Bukti transfer berhasil diunggah. Silakan tunggu verifikasi dari admin kami.",
     "alreadyUploaded": "Anda sudah mengunggah bukti transfer. Anda bisa mengunggah ulang selama status masih menunggu verifikasi.",
     "viewReceipt": "Lihat Bukti Transfer Terunggah",
-    "searchCta": "Lupa nomor invoice? Cari di sini",
+    "searchCta": "Cari Invoice",
     "searchTitle": "Cari Invoice/Tagihan",
     "searchDesc": "Masukkan email dan nomor WhatsApp yang sama dengan yang digunakan saat mendaftar untuk menemukan invoice Anda.",
     "searchEmailLabel": "Email",

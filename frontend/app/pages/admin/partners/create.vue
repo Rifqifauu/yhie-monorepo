@@ -51,7 +51,12 @@
             <div
                 class="lg:col-span-2 bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6"
             >
-                <form @submit.prevent="handleCreate" class="space-y-6">
+                <UForm
+                    :schema="schema"
+                    :state="form"
+                    @submit="handleCreate"
+                    class="space-y-6"
+                >
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <UFormField
                             label="Nama Partner (Indonesia)"
@@ -115,33 +120,35 @@
                         <UFormField
                             label="Deskripsi (Indonesia)"
                             name="description_id"
+                            required
                         >
                             <UTextarea
                                 v-model="form.description_id"
                                 :rows="4"
                                 size="lg"
-                                required
                             />
                         </UFormField>
                         <UFormField
                             label="Deskripsi (Inggris)"
                             name="description_en"
+                            required
                         >
                             <UTextarea
                                 v-model="form.description_en"
                                 :rows="4"
                                 size="lg"
-                                required
                             />
                         </UFormField>
                     </div>
-                </form>
+                </UForm>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { z } from "zod";
+
 definePageMeta({ layout: "admin" });
 
 const router = useRouter();
@@ -160,6 +167,15 @@ const form = reactive({
     slug_en: "",
 });
 
+const schema = z.object({
+    name_id: z.string().min(1, "Nama Partner (ID) wajib diisi"),
+    name_en: z.string().min(1, "Nama Partner (EN) wajib diisi"),
+    description_id: z.string().min(1, "Deskripsi (ID) wajib diisi"),
+    description_en: z.string().min(1, "Deskripsi (EN) wajib diisi"),
+    slug_id: z.string().min(1, "Slug (ID) wajib diisi"),
+    slug_en: z.string().min(1, "Slug (EN) wajib diisi"),
+});
+
 function onFileChange(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
@@ -170,12 +186,28 @@ function onFileChange(event: Event) {
 }
 
 const handleCreate = async () => {
+    const validation = schema.safeParse(form);
+    if (!validation.success) {
+        toast.add({
+            title: "Data belum lengkap",
+            description: validation.error.issues[0]?.message || "Periksa kembali form Anda.",
+            color: "error",
+        });
+        return;
+    }
+    if (!selectedFile.value) {
+        toast.add({
+            title: "Data belum lengkap",
+            description: "Logo Partner wajib diunggah.",
+            color: "error",
+        });
+        return;
+    }
+
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => formData.append(key, value));
 
-    if (selectedFile.value) {
-        formData.append("logo", selectedFile.value);
-    }
+    formData.append("logo", selectedFile.value);
 
     const result = await createPartner(formData);
 
@@ -190,7 +222,7 @@ const handleCreate = async () => {
         toast.add({
             title: "Gagal",
             description: result.error,
-            color: "danger",
+            color: "error",
         });
     }
 };

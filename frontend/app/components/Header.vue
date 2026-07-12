@@ -60,7 +60,15 @@
 
                 <div class="hidden md:flex gap-3 items-center">
                     <NuxtLink
-                        v-if="isAuthenticated"
+                        :to="localePath('/invoice/search')"
+                        class="flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 hover:border-amber-500 dark:hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-300 text-sm font-semibold"
+                    >
+                        <UIcon name="i-lucide-receipt-text" class="w-4 h-4" />
+                        <span>{{ t("invoice.searchCta") }}</span>
+                    </NuxtLink>
+
+                    <NuxtLink
+                        v-if="isAdmin"
                         :to="localePath('/admin')"
                         class="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-800 dark:bg-amber-400 text-white dark:text-emerald-950 transition-all duration-300 hover:scale-105 hover:shadow-md focus:ring-2 focus:ring-amber-500"
                     >
@@ -156,7 +164,7 @@
                     </NuxtLink>
                 </div>
 
-                <div v-if="isAuthenticated" class="mb-4">
+                <div v-if="isAdmin" class="mb-4">
                     <NuxtLink
                         :to="localePath('/admin')"
                         @click="isMobileMenuOpen = false"
@@ -170,13 +178,26 @@
                     </NuxtLink>
                 </div>
 
+                <div class="mb-4">
+                    <NuxtLink
+                        :to="localePath('/invoice/search')"
+                        @click="isMobileMenuOpen = false"
+                        class="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 font-semibold"
+                    >
+                        <UIcon name="i-lucide-receipt-text" class="w-4.5 h-4.5" />
+                        <span>{{ t("invoice.searchCta") }}</span>
+                    </NuxtLink>
+                </div>
+
                 <hr class="border-emerald-500/10 mb-4" />
 
                 <div class="space-y-4">
                     <div class="flex items-center justify-between px-2">
                         <span
                             class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter"
-                            >Pilih Bahasa</span
+                            >{{
+                                locale === "en" ? "Choose Language" : "Pilih Bahasa"
+                            }}</span
                         >
                         <USelect
                             v-model="currentLocale"
@@ -187,7 +208,9 @@
                     <div class="flex items-center justify-between px-2">
                         <span
                             class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter"
-                            >Mode Tampilan</span
+                            >{{
+                                locale === "en" ? "Display Mode" : "Mode Tampilan"
+                            }}</span
                         >
                         <button
                             @click="toggleTheme"
@@ -203,12 +226,20 @@
 </template>
 
 <script setup lang="ts">
-const { locale, tm, rt } = useI18n();
+const { t, locale, tm, rt } = useI18n();
 const switchLocalePath = useSwitchLocalePath();
 const router = useRouter();
 const localePath = useLocalePath();
 const route = useRoute();
-const { isAuthenticated } = useSanctumAuth();
+interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+}
+
+const { user, isAuthenticated } = useSanctumAuth<AuthUser>();
+const isAdmin = computed(() => isAuthenticated.value && user.value?.role === "admin");
 
 const isMobileMenuOpen = ref(false);
 const isScrolled = ref(false);
@@ -221,8 +252,15 @@ const goToHome = () => {
     router.push(localePath("/"));
 };
 
+let ticking = false;
+
 const handleScroll = () => {
-    isScrolled.value = window.scrollY > 20;
+    if (ticking) return;
+    window.requestAnimationFrame(() => {
+        isScrolled.value = window.scrollY > 20;
+        ticking = false;
+    });
+    ticking = true;
 };
 
 const toggleTheme = () => {

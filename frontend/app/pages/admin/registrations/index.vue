@@ -172,30 +172,42 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-gray-500 mb-1.5">Foto KTP/Identitas</p>
-                            <a
+                            <button
                                 v-if="selectedRegistration.id_card"
-                                :href="fileUrl(selectedRegistration.id_card)"
-                                target="_blank"
+                                type="button"
+                                class="block w-full"
+                                @click="
+                                    openImagePreview(
+                                        selectedRegistration.id_card,
+                                        'Foto KTP/Identitas',
+                                    )
+                                "
                             >
                                 <img
                                     :src="fileUrl(selectedRegistration.id_card)"
-                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800"
+                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-primary-400 transition-all"
                                 />
-                            </a>
+                            </button>
                             <p v-else class="text-gray-400">-</p>
                         </div>
                         <div>
                             <p class="text-gray-500 mb-1.5">Pas Foto</p>
-                            <a
+                            <button
                                 v-if="selectedRegistration.photo"
-                                :href="fileUrl(selectedRegistration.photo)"
-                                target="_blank"
+                                type="button"
+                                class="block w-full"
+                                @click="
+                                    openImagePreview(
+                                        selectedRegistration.photo,
+                                        'Pas Foto',
+                                    )
+                                "
                             >
                                 <img
                                     :src="fileUrl(selectedRegistration.photo)"
-                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800"
+                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-primary-400 transition-all"
                                 />
-                            </a>
+                            </button>
                             <p v-else class="text-gray-400">-</p>
                         </div>
                     </div>
@@ -226,29 +238,57 @@
                                 selectedRegistration.transactions[0]
                                     .transaction_receipt
                             "
-                            class="pt-1"
+                            class="pt-2"
                         >
-                            <a
-                                :href="
-                                    fileUrl(
+                            <p class="text-gray-500 mb-1.5">Bukti Transfer</p>
+                            <button
+                                type="button"
+                                class="block w-full"
+                                @click="
+                                    openImagePreview(
                                         selectedRegistration.transactions[0]
                                             .transaction_receipt,
+                                        'Bukti Transfer',
                                     )
                                 "
-                                target="_blank"
-                                class="text-primary-600 dark:text-primary-400 hover:underline"
-                                >Lihat Bukti Transfer</a
                             >
+                                <img
+                                    :src="
+                                        fileUrl(
+                                            selectedRegistration
+                                                .transactions[0]
+                                                .transaction_receipt,
+                                        )
+                                    "
+                                    class="w-full h-32 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-primary-400 transition-all"
+                                />
+                            </button>
                         </div>
                     </div>
                 </div>
             </template>
         </UModal>
+
+        <AdminDeleteModal
+            v-model:open="isDeleteOpen"
+            :id="selectedForDelete?.id"
+            :title="selectedForDelete?.full_name"
+            endpoint="api/program-registrations"
+            @success="handleDeleteSuccess"
+            @error="handleDeleteError"
+        />
+
+        <AdminImagePreviewModal
+            v-model:open="isImagePreviewOpen"
+            :src="imagePreviewSrc"
+            :title="imagePreviewTitle"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { h, resolveComponent } from "vue";
+import { useClipboard } from "@vueuse/core";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 
@@ -281,6 +321,44 @@ function viewDetail(row: Row<RegistrationRow>) {
     selectedRegistration.value = row.original;
     isDetailOpen.value = true;
 }
+
+const isImagePreviewOpen = ref(false);
+const imagePreviewSrc = ref("");
+const imagePreviewTitle = ref("");
+
+function openImagePreview(path: string, title: string) {
+    imagePreviewSrc.value = fileUrl(path);
+    imagePreviewTitle.value = title;
+    isImagePreviewOpen.value = true;
+}
+
+const isDeleteOpen = ref(false);
+const selectedForDelete = ref<RegistrationRow | null>(null);
+
+function triggerDelete(row: Row<RegistrationRow>) {
+    selectedForDelete.value = row.original;
+    isDeleteOpen.value = true;
+}
+
+function handleDeleteSuccess() {
+    toast.add({
+        title: "Terhapus",
+        description: "Pendaftaran dihapus",
+        color: "success",
+    });
+    refresh();
+}
+
+function handleDeleteError(message: string) {
+    toast.add({
+        title: "Gagal",
+        description: message || "Error",
+        color: "red",
+        icon: "i-lucide-triangle-alert",
+    });
+}
+
+const { copy } = useClipboard();
 
 const statusColor = (status?: string) =>
     ({ pending: "warning", approved: "success", rejected: "error" })[
@@ -434,6 +512,7 @@ function getRowItems(row: Row<RegistrationRow>) {
             {
                 label: "Setujui",
                 icon: "i-lucide-check",
+                disabled: row.original.status !== "pending",
                 onSelect: async () => {
                     try {
                         await client(
@@ -450,7 +529,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                     } catch (e: any) {
                         toast.add({
                             title: "Gagal",
-                            description: e?.message || "Error",
+                            description: e?.data?.message || e?.message || "Error",
                             color: "red",
                             icon: "i-lucide-triangle-alert",
                         });
@@ -460,6 +539,7 @@ function getRowItems(row: Row<RegistrationRow>) {
             {
                 label: "Tolak",
                 icon: "i-lucide-x",
+                disabled: row.original.status !== "pending",
                 onSelect: async () => {
                     try {
                         await client(
@@ -476,7 +556,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                     } catch (e: any) {
                         toast.add({
                             title: "Gagal",
-                            description: e?.message || "Error",
+                            description: e?.data?.message || e?.message || "Error",
                             color: "red",
                             icon: "i-lucide-triangle-alert",
                         });
@@ -491,7 +571,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                 onSelect: () => {
                     const id = row.original.id ? String(row.original.id) : "";
                     if (id) {
-                        useClipboard().copy(id);
+                        copy(id);
                         toast.add({
                             title: "ID disalin",
                             description: `ID: ${id}`,
@@ -506,28 +586,7 @@ function getRowItems(row: Row<RegistrationRow>) {
                 label: "Hapus",
                 icon: "i-lucide-trash-2",
                 color: "error",
-                onSelect: async () => {
-                    if (!confirm("Hapus pendaftaran ini?")) return;
-                    try {
-                        await client(
-                            `/api/program-registrations/${row.original.id}`,
-                            { method: "DELETE" },
-                        );
-                        toast.add({
-                            title: "Terhapus",
-                            description: "Pendaftaran dihapus",
-                            color: "success",
-                        });
-                        refresh();
-                    } catch (e: any) {
-                        toast.add({
-                            title: "Gagal",
-                            description: e?.message || "Error",
-                            color: "red",
-                            icon: "i-lucide-triangle-alert",
-                        });
-                    }
-                },
+                onSelect: () => triggerDelete(row),
             },
         ],
     ];

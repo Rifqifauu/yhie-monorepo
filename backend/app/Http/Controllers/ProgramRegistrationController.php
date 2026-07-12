@@ -160,6 +160,23 @@ class ProgramRegistrationController extends Controller
             "status" => "sometimes|in:pending,approved,rejected",
         ]);
 
+        // Pendaftaran hanya boleh disetujui kalau pembayarannya sudah completed.
+        if (
+            ($data["status"] ?? null) === "approved" &&
+            !$programRegistration
+                ->transactions()
+                ->where("payment_status", "completed")
+                ->exists()
+        ) {
+            return response()->json(
+                [
+                    "message" =>
+                        "Pendaftaran tidak bisa disetujui karena pembayaran belum selesai (completed).",
+                ],
+                422,
+            );
+        }
+
         $wasApproved = $programRegistration->status === "approved";
 
         try {
@@ -195,8 +212,9 @@ class ProgramRegistrationController extends Controller
     }
 
     /**
-     * Buat akun Moodle + kirim emailnya. Dibungkus try/catch supaya kegagalan
-     * di sini (mis. Moodle API belum siap) tidak menggagalkan proses approve.
+     * Buat akun Moodle, daftarkan ke course program terkait, lalu kirim emailnya.
+     * Dibungkus try/catch supaya kegagalan di sini (mis. Moodle API belum siap)
+     * tidak menggagalkan proses approve.
      */
     private function provisionMoodleAccount(
         ProgramRegistration $registration
@@ -208,6 +226,10 @@ class ProgramRegistrationController extends Controller
                 "moodle_user_id" => $result["moodle_user_id"],
             ]);
 
+            // Enrollment gagal (mis. course belum dipetakan / izin token kurang)
+            // tidak boleh menggagalkan pengiriman kredensial akun yang sudah dibuat.
+            $this->enrollToProgramCourse($registration, $result["moodle_user_id"]);
+
             $this->mailService->sendMoodleAccount(
                 $registration,
                 $result["username"],
@@ -215,6 +237,26 @@ class ProgramRegistrationController extends Controller
             );
         } catch (\Throwable $e) {
             Log::error("Error provisioning Moodle account: " . $e->getMessage());
+        }
+    }
+
+    private function enrollToProgramCourse(
+        ProgramRegistration $registration,
+        int $moodleUserId,
+    ): void {
+        $courseId = $registration->program->moodle_course_id ?? null;
+
+        if (!$courseId) {
+            Log::warning(
+                "Program #{$registration->program_id} belum punya moodle_course_id, enrollment dilewati.",
+            );
+            return;
+        }
+
+        try {
+            $this->moodleService->enrollUser($moodleUserId, $courseId);
+        } catch (\Throwable $e) {
+            Log::error("Error enrolling Moodle user to course: " . $e->getMessage());
         }
     }
 

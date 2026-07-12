@@ -24,6 +24,7 @@ export interface PaginatedResponse<T> {
 
 export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
+  existingCategory?: string[];
 }
 
 export const useArticles = () => {
@@ -42,6 +43,11 @@ export const useArticles = () => {
 
   watch([category, search], () => {
     page.value = 1;
+  });
+
+  // Kolom search dikosongkan (backspace) -> otomatis tampilkan semua data lagi
+  watch(searchInput, (val) => {
+    if (!val.trim()) search.value = "";
   });
 
   const {
@@ -68,6 +74,9 @@ export const useArticles = () => {
   });
 
   const articles = computed<Article[]>(() => paginator.value.data ?? []);
+  const existingCategories = computed<string[]>(
+    () => apiResponse.value?.existingCategory ?? [],
+  );
   const totalPages = computed<number>(() => paginator.value.last_page ?? 1);
   const totalItems = computed<number>(() => paginator.value.total ?? 0);
   const fromItem = computed<number>(() => paginator.value.from ?? 0);
@@ -168,6 +177,7 @@ export const useArticles = () => {
   const clearSearch = () => {
     searchInput.value = "";
     search.value = "";
+    category.value = "";
   };
 
   const changePage = (target: number) => {
@@ -241,6 +251,7 @@ export const useArticles = () => {
 
     // Computed Data
     articles,
+    existingCategories,
     totalPages,
     totalItems,
     fromItem,

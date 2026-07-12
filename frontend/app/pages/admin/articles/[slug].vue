@@ -22,7 +22,7 @@
                             >Edit Article</UButton
                         >
                         <UButton
-                            color="danger"
+                            color="error"
                             variant="solid"
                             icon="i-lucide-trash"
                             @click="triggerDelete"
@@ -206,11 +206,12 @@
                         <UFormField
                             label="Kategori"
                             name="category"
-                            help="Gunakan koma untuk memisahkan jika lebih dari satu."
+                            required
                         >
-                            <UInput
+                            <USelect
                                 v-model="form.category"
-                                placeholder="Contoh: berita, edukasi, pengumuman"
+                                :items="categoryOptions"
+                                placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
                                 size="lg"
                                 class="w-full"
@@ -260,7 +261,7 @@
                                             </p>
                                         </div>
                                         <UButton
-                                            color="danger"
+                                            color="error"
                                             variant="ghost"
                                             icon="i-lucide-trash"
                                             size="sm"
@@ -517,6 +518,16 @@ const form = reactive({
     is_published: false,
 });
 
+// Kategori tetap (ENUM di database) - harus sinkron dengan App\Enums\ContentCategory di backend.
+const categoryOptions = [
+    "Umum",
+    "Edukasi",
+    "Akademik",
+    "Berita",
+    "Pengumuman",
+    "Kegiatan",
+];
+
 function startEdit() {
     if (!article.value) return;
 
@@ -629,7 +640,7 @@ const handleUpdate = async () => {
         toast.add({
             title: "Gagal memperbarui",
             description: result.error,
-            color: "danger",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
     }
@@ -657,7 +668,7 @@ function handleDeleteError(errorMessage: string) {
         title: "Gagal menghapus artikel",
         description:
             errorMessage || "Terjadi masalah saat memproses permintaan Anda.",
-        color: "danger",
+        color: "error",
         icon: "i-lucide-circle-alert",
     });
 }

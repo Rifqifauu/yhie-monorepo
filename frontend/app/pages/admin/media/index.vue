@@ -8,7 +8,7 @@
             createRoute="/admin/media/create"
         >
             <template #actions>
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-3">
                     <UInput
                         v-model="searchInput"
                         icon="i-lucide-search"
@@ -16,6 +16,14 @@
                         size="lg"
                         class="min-w-0 sm:w-72"
                         @keyup.enter="applySearch"
+                    />
+
+                    <USelect
+                        v-model="categorySelectValue"
+                        :items="categoryOptions"
+                        value-key="value"
+                        size="lg"
+                        class="w-48"
                     />
 
                     <UButton
@@ -141,6 +149,7 @@ const {
     page,
     totalItems,
     category,
+    existingCategories,
     changePage,
     coverOf, // Gunakan helper ini untuk mengambil thumbnail
     searchInput,
@@ -148,6 +157,23 @@ const {
     clearSearch,
     refresh,
 } = useGallery();
+
+// Nilai "" tidak boleh dipakai langsung sebagai value item Select (reserved
+// oleh komponennya untuk state kosong/placeholder, bikin "Semua Kategori"
+// tidak bisa dipilih balik). Pakai sentinel lalu terjemahkan ke "" di sini.
+const CATEGORY_ALL = "__all__";
+
+const categoryOptions = computed(() => [
+    { label: "Semua Kategori", value: CATEGORY_ALL },
+    ...existingCategories.value.map((c) => ({ label: c, value: c })),
+]);
+
+const categorySelectValue = computed({
+    get: () => category.value || CATEGORY_ALL,
+    set: (val: string) => {
+        category.value = val === CATEGORY_ALL ? "" : val;
+    },
+});
 
 // 2. Kalkulasi fromItem dan toItem secara lokal
 const fromItem = computed(() => {

@@ -47,6 +47,20 @@
             class="flex flex-col items-center justify-between gap-4 pt-4 sm:flex-row"
         >
             <div class="flex items-center gap-4 w-full sm:w-auto">
+                <UButton
+                    v-if="childTitle"
+                    :to="
+                        parentRoute ||
+                        `/admin/${title.toLowerCase().replace(/\s+/g, '-')}`
+                    "
+                    icon="i-lucide-arrow-left"
+                    color="neutral"
+                    variant="soft"
+                    size="sm"
+                    square
+                    aria-label="Kembali"
+                />
+
                 <div
                     v-if="icon"
                     class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"

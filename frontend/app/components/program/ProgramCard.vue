@@ -37,7 +37,7 @@
         <div class="p-5">
             <div class="flex items-center justify-between text-sm mb-2">
                 <span class="text-emerald-600 dark:text-emerald-300">
-                    Harga
+                    {{ locale === "en" ? "Price" : "Harga" }}
                 </span>
                 <span
                     class="font-semibold text-emerald-800 dark:text-amber-300"
@@ -58,7 +58,9 @@
             <div
                 class="mt-4 flex items-center justify-between text-sm font-semibold text-emerald-700"
             >
-                <span class="dark:text-emerald-200">Lihat detail</span>
+                <span class="dark:text-emerald-200">{{
+                    locale === "en" ? "View details" : "Lihat detail"
+                }}</span>
                 <UIcon name="i-lucide-arrow-right" class="w-4 h-4" />
             </div>
         </div>
@@ -66,6 +68,8 @@
 </template>
 
 <script setup lang="ts">
+const { locale } = useI18n();
+
 defineProps<{
     to: string;
     imageSrc: string;

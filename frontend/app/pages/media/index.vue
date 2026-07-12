@@ -78,6 +78,8 @@
                     <div
                         v-for="(item, index) in mediaItems"
                         :key="item.id"
+                        data-aos="fade-up"
+                        :data-aos-delay="(index % 6) * 80"
                         class="break-inside-avoid group cursor-pointer"
                         @click="openLightbox(item)"
                     >
@@ -200,57 +202,63 @@
                         <UIcon name="i-lucide-chevron-right" class="w-7 h-7" />
                     </button>
 
-                    <div
-                        class="max-w-4xl w-full mx-auto px-4 flex flex-col items-center justify-center"
-                        @click.stop
-                    >
-                        <img
-                            v-if="currentImageSrc"
-                            :src="currentImageSrc"
-                            :alt="getDynamicTitle(activeItem)"
-                            class="max-h-[62vh] md:max-h-[68vh] mx-auto rounded-xl shadow-2xl object-contain border border-white/5 transition-all duration-300"
-                        />
-
+                    <Transition name="lightbox-content" appear>
                         <div
-                            v-if="activeItem"
-                            class="mt-5 text-center px-6 py-5 w-full bg-zinc-900/80 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl"
+                            class="max-w-4xl w-full mx-auto px-4 flex flex-col items-center justify-center"
+                            @click.stop
                         >
-                            <div class="mb-2">
-                                <span
-                                    class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20"
-                                >
-                                    <UIcon
-                                        name="i-lucide-tag"
-                                        class="w-3 h-3"
-                                    />
-                                    {{ getCategoryLabel(activeItem.category) }}
-                                </span>
-                            </div>
-
-                            <h3
-                                class="text-white font-serif font-bold text-lg md:text-xl leading-snug"
-                            >
-                                {{ getDynamicTitle(activeItem) }}
-                            </h3>
-
-                            <p
-                                class="text-emerald-100/60 text-xs md:text-sm mt-1.5 leading-relaxed max-h-20 overflow-y-auto custom-scrollbar pr-1 font-medium"
-                            >
-                                {{ getDynamicDesc(activeItem) }}
-                            </p>
+                            <img
+                                v-if="currentImageSrc"
+                                :src="currentImageSrc"
+                                :alt="getDynamicTitle(activeItem)"
+                                class="max-h-[62vh] md:max-h-[68vh] mx-auto rounded-xl shadow-2xl object-contain border border-white/5 transition-all duration-300"
+                            />
 
                             <div
-                                class="text-white/40 text-[10px] font-bold mt-4 tracking-widest uppercase flex items-center justify-center gap-1.5"
+                                v-if="activeItem"
+                                class="mt-5 text-center px-6 py-5 w-full bg-zinc-900/80 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl"
                             >
-                                <UIcon
-                                    name="i-lucide-layers"
-                                    class="w-3.5 h-3.5 text-emerald-500"
-                                />
-                                {{ imageIndex + 1 }} / {{ totalImages }}
-                                {{ locale === "en" ? "Photos" : "Foto" }}
+                                <div class="mb-2">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20"
+                                    >
+                                        <UIcon
+                                            name="i-lucide-tag"
+                                            class="w-3 h-3"
+                                        />
+                                        {{
+                                            getCategoryLabel(
+                                                activeItem.category,
+                                            )
+                                        }}
+                                    </span>
+                                </div>
+
+                                <h3
+                                    class="text-white font-serif font-bold text-lg md:text-xl leading-snug"
+                                >
+                                    {{ getDynamicTitle(activeItem) }}
+                                </h3>
+
+                                <p
+                                    class="text-emerald-100/60 text-xs md:text-sm mt-1.5 leading-relaxed max-h-20 overflow-y-auto custom-scrollbar pr-1 font-medium"
+                                >
+                                    {{ getDynamicDesc(activeItem) }}
+                                </p>
+
+                                <div
+                                    class="text-white/40 text-[10px] font-bold mt-4 tracking-widest uppercase flex items-center justify-center gap-1.5"
+                                >
+                                    <UIcon
+                                        name="i-lucide-layers"
+                                        class="w-3.5 h-3.5 text-emerald-500"
+                                    />
+                                    {{ imageIndex + 1 }} / {{ totalImages }}
+                                    {{ locale === "en" ? "Photos" : "Foto" }}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Transition>
                 </div>
             </Transition>
         </Teleport>
@@ -434,6 +442,22 @@ useSeoMeta({
 .lightbox-enter-from,
 .lightbox-leave-to {
     opacity: 0;
+}
+
+.lightbox-content-enter-active {
+    transition:
+        opacity 0.25s ease-out,
+        transform 0.25s ease-out;
+}
+.lightbox-content-leave-active {
+    transition:
+        opacity 0.15s ease-in,
+        transform 0.15s ease-in;
+}
+.lightbox-content-enter-from,
+.lightbox-content-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
 }
 
 .custom-scrollbar::-webkit-scrollbar {

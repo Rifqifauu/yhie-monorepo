@@ -13,14 +13,19 @@
         <div class="max-w-6xl mx-auto relative z-10">
             <div class="text-center mb-16 max-w-5xl mx-auto p-4 rounded-2xl">
                 <h2
+                    data-aos="fade-up"
                     class="text-4xl md:text-5xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-50 tracking-tight"
                 >
                     {{ t("programs.title") }}
                 </h2>
                 <div
+                    data-aos="fade-up"
+                    data-aos-delay="50"
                     class="w-20 h-1 bg-gradient-to-r from-emerald-800 to-emerald-500 mx-auto rounded-full"
                 ></div>
                 <span
+                    data-aos="fade-up"
+                    data-aos-delay="100"
                     class="text-lg font-medium text-emerald-850 dark:text-white mt-4 block"
                 >
                     {{ t("programs.description") }}
@@ -29,17 +34,21 @@
 
             <div
                 v-if="status === 'pending'"
-                class="flex flex-col items-center justify-center py-20 gap-4"
+                class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 max-w-5xl mx-auto"
             >
-                <UIcon
-                    name="i-heroicons-arrow-path"
-                    class="w-12 h-12 animate-spin text-emerald-600 dark:text-emerald-400"
-                />
-                <span
-                    class="text-sm font-medium tracking-wide text-emerald-700 dark:text-emerald-300"
+                <div
+                    v-for="n in 2"
+                    :key="n"
+                    class="w-full h-[520px] rounded-[2.5rem] flex flex-col p-4 bg-white/40 dark:bg-gray-900/40 border border-white/50 dark:border-white/10"
                 >
-                    Memuat data eksklusif...
-                </span>
+                    <USkeleton class="w-full h-[55%] rounded-[2rem] mb-5" />
+                    <div class="flex-1 flex flex-col px-4 pb-2 space-y-3">
+                        <USkeleton class="h-7 w-3/4 rounded" />
+                        <USkeleton class="h-4 w-full rounded" />
+                        <USkeleton class="h-4 w-2/3 rounded" />
+                        <USkeleton class="h-11 w-full rounded-full mt-auto" />
+                    </div>
+                </div>
             </div>
 
             <div v-else-if="error" class="max-w-xl mx-auto my-6">
@@ -74,8 +83,10 @@
                     class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 max-w-5xl mx-auto"
                 >
                     <div
-                        v-for="program in data"
+                        v-for="(program, index) in data"
                         :key="program.id"
+                        :data-aos="'fade-up'"
+                        :data-aos-delay="index * 100"
                         class="relative w-full h-[520px] rounded-[2.5rem] flex flex-col p-4 group transition-all duration-500 hover:-translate-y-2 bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]"
                     >
                         <div

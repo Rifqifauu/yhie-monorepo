@@ -42,11 +42,11 @@
 
         <div class="max-w-7xl mx-auto pb-6 relative z-10">
             <div class="text-center mb-16 max-w-3xl mx-auto px-4">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-50 tracking-tight">
+                <h2 data-aos="fade-up" class="text-4xl md:text-5xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-50 tracking-tight">
                     {{ t("partners.title") }}
                 </h2>
-                <div class="w-20 h-1 bg-gradient-to-r from-emerald-800 to-emerald-500 mx-auto rounded-full"></div>
-                <p class="text-lg font-medium text-emerald-850 dark:text-emerald-100/80 mt-4 block">
+                <div data-aos="fade-up" data-aos-delay="50" class="w-20 h-1 bg-gradient-to-r from-emerald-800 to-emerald-500 mx-auto rounded-full"></div>
+                <p data-aos="fade-up" data-aos-delay="100" class="text-lg font-medium text-emerald-850 dark:text-emerald-100/80 mt-4 block">
                     {{ locale === 'id' ? 'Telah berkolaborasi dan dipercaya oleh berbagai institusi serta perusahaan.' : 'Collaborated and trusted by various institutions and companies.' }}
                 </p>
             </div>
@@ -64,18 +64,31 @@
                 v-else-if="error"
                 class="text-center py-12 text-red-500 bg-red-50 dark:bg-red-950/20 rounded-xl p-6 max-w-md mx-auto"
             >
-                <p class="font-semibold">Gagal memuat data partner</p>
-                <p class="text-sm opacity-80">{{ error?.message }}</p>
+                <p class="font-semibold">
+                    {{
+                        locale === "en"
+                            ? "Failed to load partner data"
+                            : "Gagal memuat data partner"
+                    }}
+                </p>
+                <p class="text-sm opacity-80">
+                    {{
+                        locale === "en"
+                            ? "Please try again in a moment."
+                            : "Silakan coba lagi beberapa saat."
+                    }}
+                </p>
                 <button
                     @click="refresh"
                     class="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition"
                 >
-                    Coba Lagi
+                    {{ locale === "en" ? "Try Again" : "Coba Lagi" }}
                 </button>
             </div>
 
             <div
                 v-else-if="partners.length > 0"
+                data-aos="fade-up"
                 class="relative w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] [-webkit-mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
             >
                 <!-- First Row (Moving Right to Left) -->

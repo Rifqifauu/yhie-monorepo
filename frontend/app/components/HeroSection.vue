@@ -124,7 +124,7 @@
                                     name="i-lucide-map-pin"
                                     class="w-4 h-4 text-amber-500"
                                 />
-                                Desa Tejasari, Kabupaten Purbalingga
+                                {{ t("hero.location") }}
                                 <UIcon
                                     name="i-lucide-chevron-down"
                                     class="w-6 h-6 text-emerald-600 dark:text-emerald-400 transition-transform duration-300 ml-1 group-hover/btn:text-amber-500"
@@ -146,7 +146,7 @@
                                 >
                                     <span
                                         class="text-xs animate-pulse text-emerald-600 dark:text-emerald-400"
-                                        >Memuat jadwal...</span
+                                        >{{ t("hero.loadingSchedule") }}</span
                                     >
                                 </div>
 
@@ -179,7 +179,7 @@
                         class="group relative w-full flex justify-center"
                     >
                         <div
-                            class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-300"
+                            class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition duration-500 group-hover:duration-300"
                         ></div>
 
                         <UCarousel

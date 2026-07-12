@@ -21,7 +21,8 @@
         </UAlert>
 
         <!-- Main Form -->
-        <UForm v-else :state="form" class="space-y-6 flex-1 flex flex-col" @submit="handleSubmit">
+        <UForm v-else :schema="schema" :state="form" class="space-y-6 flex-1 flex flex-col" @submit="handleSubmit"
+            @error="onSubmitError">
             <!-- Tab Navigation -->
             <div class="flex gap-1 border-b border-gray-200 dark:border-gray-800 pb-px overflow-x-auto">
                 <button v-for="tab in tabs" :key="tab.key" type="button" @click="activeTab = tab.key"
@@ -70,9 +71,46 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from "vue";
+import { z } from "zod";
 import { useSettings } from "~/composables/useSettings";
 
 definePageMeta({ layout: "admin" });
+
+// Validasi field wajib (*), format No. WhatsApp, dan batas panjang Deskripsi SEO.
+const schema = z.object({
+    site_name: z.string().min(1, "Nama Website wajib diisi"),
+    tagline: z.string(),
+    site_description: z.string(),
+    meta_description: z
+        .string()
+        .max(160, "Deskripsi SEO maksimal 160 karakter"),
+    logo_url: z.string(),
+    favicon_url: z.string(),
+
+    contact_email: z.string().min(1, "Alamat Email wajib diisi"),
+    contact_phone: z.string(),
+    wa_number: z
+        .string()
+        .min(1, "No. WhatsApp wajib diisi")
+        .regex(/^\d+$/, "No. WhatsApp hanya boleh berisi angka"),
+    instagram_account: z.string(),
+    facebook_account: z.string(),
+
+    office_address: z.string().min(1, "Alamat Kantor wajib diisi"),
+    operating_hours: z.string(),
+    gmap_embed_map: z.string(),
+
+    about_history_id: z.string(),
+    about_history_en: z.string(),
+    about_vision_id: z.string(),
+    about_vision_en: z.string(),
+    about_mission_id: z.string(),
+    about_mission_en: z.string(),
+
+    bank_name: z.string().min(1, "Nama Bank wajib dipilih"),
+    bank_account_number: z.string().min(1, "No. Rekening wajib diisi"),
+    bank_account_name: z.string().min(1, "Nama Pemilik wajib diisi"),
+});
 
 const toast = useToast();
 const { settings, pending, error, refresh, isSubmitting, getSettingValue, saveAllSettings } = useSettings();
@@ -144,6 +182,10 @@ const allKeys = tabs.flatMap((t) => t.fields.map((f) => f.key));
 const form = reactive<Record<string, string>>(Object.fromEntries(allKeys.map((k) => [k, ""])));
 const activeTab = ref("general");
 
+// Field -> tab, dipakai untuk lompat ke tab yang errornya tersembunyi.
+const fieldToTab: Record<string, string> = {};
+tabs.forEach((t) => t.fields.forEach((f) => (fieldToTab[f.key] = t.key)));
+
 // Populate form when data arrives
 watch(settings, (val) => {
     if (val?.length) allKeys.forEach((k) => (form[k] = getSettingValue(k)));
@@ -156,5 +198,22 @@ const handleSubmit = async () => {
         ? { title: "Tersimpan!", description: "Semua pengaturan berhasil diperbarui.", color: "success", icon: "i-lucide-circle-check" }
         : { title: "Gagal Menyimpan", description: res.error, color: "error", icon: "i-lucide-alert-triangle" }
     );
+};
+
+// Validasi gagal bisa terjadi di tab yang sedang tersembunyi (v-show) - pindahkan
+// ke tab pertama yang bermasalah supaya pesan errornya tidak nyangkut senyap.
+const onSubmitError = (event: { errors?: { name?: string; message: string }[] }) => {
+    const firstError = event.errors?.[0];
+    if (!firstError) return;
+
+    const tabKey = firstError.name ? fieldToTab[firstError.name] : undefined;
+    if (tabKey) activeTab.value = tabKey;
+
+    toast.add({
+        title: "Form belum lengkap",
+        description: firstError.message || "Periksa kembali isian pada tab yang ditandai.",
+        color: "error",
+        icon: "i-lucide-alert-triangle",
+    });
 };
 </script>

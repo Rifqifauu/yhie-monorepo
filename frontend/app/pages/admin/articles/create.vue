@@ -157,9 +157,10 @@
                             required
                             class="w-full"
                         >
-                            <UInput
+                            <USelect
                                 v-model="form.category"
-                                placeholder="Tulis kategori..."
+                                :items="categoryOptions"
+                                placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
                                 size="lg"
                                 class="w-full"
@@ -197,7 +198,7 @@
                                         </p>
                                     </div>
                                     <UButton
-                                        color="danger"
+                                        color="error"
                                         variant="ghost"
                                         icon="i-lucide-trash"
                                         size="sm"
@@ -283,6 +284,16 @@ const statusItem = ref<SelectItem[]>([
     { label: "Published", value: 1 },
     { label: "Draft", value: 0 },
 ]);
+
+// Kategori tetap (ENUM di database) - harus sinkron dengan App\Enums\ContentCategory di backend.
+const categoryOptions = [
+    "Umum",
+    "Edukasi",
+    "Akademik",
+    "Berita",
+    "Pengumuman",
+    "Kegiatan",
+];
 
 interface ImageFile {
     id: string;
@@ -374,7 +385,7 @@ const handleCreate = async () => {
         toast.add({
             title: "Gagal",
             description: "Mohon pilih minimal satu gambar artikel.",
-            color: "danger",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
         return;
@@ -407,7 +418,7 @@ const handleCreate = async () => {
             title: "Gagal",
             description:
                 result.error || "Terjadi kesalahan saat menyimpan data.",
-            color: "danger",
+            color: "error",
             icon: "i-lucide-circle-alert",
         });
     }

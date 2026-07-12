@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.8.0",
+    "@vueuse/core": "^14.3.0",
     "aos": "^2.3.4",
     "nuxt": "^4.4.6",
     "nuxt-aos": "^1.2.6",

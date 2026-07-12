@@ -13,7 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
         ->withMiddleware(function (Middleware $middleware) {
     $middleware->statefulApi(); // Tambahkan baris ini
+    $middleware->alias([
+        'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+    ]);
+    // Backend ini murni JSON API tanpa halaman login berbasis Blade, jadi
+    // request tak-terautentikasi jangan dicoba redirect ke route "login" yang
+    // tidak pernah didaftarkan (itu akan crash jadi 500) - biarkan selalu 401 JSON.
+    $middleware->redirectGuestsTo(fn () => null);
 })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(function ($request, $throwable) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
     })->create();

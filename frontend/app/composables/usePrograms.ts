@@ -45,6 +45,14 @@ export const usePrograms = () => {
   const searchTerm = computed(() => search.value.trim());
   const isSubmitting = ref(false);
 
+  // Kolom search dikosongkan (backspace) -> otomatis tampilkan semua data lagi
+  watch(searchInput, (val) => {
+    if (!val.trim()) {
+      search.value = "";
+      page.value = 1;
+    }
+  });
+
   const {
     data: apiResponse,
     status,

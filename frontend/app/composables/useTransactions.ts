@@ -28,6 +28,11 @@ export const useTransactions = () => {
   const search = ref("");
   const searchTerm = computed(() => search.value.trim());
 
+  // Kolom search dikosongkan (backspace) -> otomatis tampilkan semua data lagi
+  watch(searchInput, (val) => {
+    if (!val.trim()) search.value = "";
+  });
+
   watch(search, () => {
     page.value = 1;
   });

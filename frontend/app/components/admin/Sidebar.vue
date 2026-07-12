@@ -214,6 +214,11 @@ const openLogoutModal = () => {
 const userMenuItems = computed<DropdownMenuItem[][]>(() => [
     [
         {
+            label: "Akun Saya",
+            icon: "i-lucide-user-cog",
+            to: "/admin/account",
+        },
+        {
             label: colorMode.value === "dark" ? "Mode Terang" : "Mode Gelap",
             icon: colorMode.value === "dark" ? "i-lucide-sun" : "i-lucide-moon",
             onSelect: toggleTheme,
@@ -231,12 +236,6 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
 
 const navigation = [
     { label: "Dashboard", to: "/admin", icon: "i-lucide-layout-dashboard" },
-    {
-        label: "Users",
-        to: "/admin/users",
-        icon: "i-lucide-users",
-        badge: "New",
-    },
     {
         label: "Registrations",
         to: "/admin/registrations",

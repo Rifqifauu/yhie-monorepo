@@ -69,8 +69,17 @@
               <div v-if="searchingRegistrations" class="p-4 text-center text-sm text-gray-500">
                 Mencari...
               </div>
-              <div v-else-if="registrationOptions.length === 0" class="p-4 text-center text-sm text-gray-500">
-                Ketik nama, email, atau telepon pendaftar.
+              <div
+                v-else-if="registrationOptions.length === 0 && !registrationSearch.trim()"
+                class="p-4 text-center text-sm text-gray-500"
+              >
+                Masukkan data yang Terdaftar
+              </div>
+              <div
+                v-else-if="registrationOptions.length === 0"
+                class="p-4 text-center text-sm text-gray-500"
+              >
+                Data tidak ditemukan
               </div>
               <button
                 v-for="option in registrationOptions"
@@ -106,11 +115,21 @@
         </div>
       </template>
     </UModal>
+
+    <AdminDeleteModal
+      v-model:open="isDeleteOpen"
+      :id="selectedForDelete?.id"
+      :title="selectedForDelete?.certificate_number"
+      endpoint="api/certificates"
+      @success="handleDeleteSuccess"
+      @error="handleDeleteError"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { h, resolveComponent } from "vue";
+import { useClipboard } from "@vueuse/core";
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 import type { CertificateItem } from "~/composables/useCertificates";
@@ -136,6 +155,24 @@ const {
 
 const toast = useToast();
 const client = useSanctumClient();
+const { copy } = useClipboard();
+
+const isDeleteOpen = ref(false);
+const selectedForDelete = ref<CertificateItem | null>(null);
+
+function triggerDelete(row: Row<CertificateItem>) {
+  selectedForDelete.value = row.original;
+  isDeleteOpen.value = true;
+}
+
+function handleDeleteSuccess() {
+  toast.add({ title: "Terhapus", description: "Sertifikat dihapus", color: "success" });
+  refresh();
+}
+
+function handleDeleteError(message: string) {
+  toast.add({ title: "Gagal", description: message || "Error", color: "red", icon: "i-lucide-triangle-alert" });
+}
 
 // --- Modal terbitkan sertifikat ---
 const isIssueOpen = ref(false);
@@ -264,7 +301,7 @@ function getRowItems(row: Row<CertificateItem>) {
         label: "Salin Nomor",
         icon: "i-lucide-copy",
         onSelect: () => {
-          useClipboard().copy(row.original.certificate_number);
+          copy(row.original.certificate_number);
           toast.add({ title: "Disalin", description: row.original.certificate_number, color: "success" });
         },
       },
@@ -274,16 +311,7 @@ function getRowItems(row: Row<CertificateItem>) {
         label: "Hapus",
         icon: "i-lucide-trash-2",
         color: "error",
-        onSelect: async () => {
-          if (!confirm("Hapus sertifikat ini?")) return;
-          try {
-            await client(`/api/certificates/${row.original.id}`, { method: "DELETE" });
-            toast.add({ title: "Terhapus", description: "Sertifikat dihapus", color: "success" });
-            refresh();
-          } catch (e: any) {
-            toast.add({ title: "Gagal", description: e?.message || "Error", color: "red", icon: "i-lucide-triangle-alert" });
-          }
-        },
+        onSelect: () => triggerDelete(row),
       },
     ],
   ];

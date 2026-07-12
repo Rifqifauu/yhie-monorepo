@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ContentCategory;
 use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str; // Tambahan untuk manipulasi string
@@ -28,7 +29,10 @@ class MediaController extends Controller
             $media = Media::orderBy("created_at", "desc")
                 ->orderBy("id", "desc")
                 ->when($category, function ($query, $category) {
-                    return $query->where("category", $category);
+                    // Case-insensitive supaya filter tetap cocok walau beda kapitalisasi
+                    return $query->whereRaw("LOWER(category) = ?", [
+                        Str::lower($category),
+                    ]);
                 })
                 ->when($search, function ($query, $search) {
                     return $query->where(function ($q) use ($search) {
@@ -69,15 +73,12 @@ class MediaController extends Controller
             "description_en" => "required|string",
             "slug_id" => "required|string|unique:media,slug_id",
             "slug_en" => "required|string|unique:media,slug_en",
-            "category" => "required|string|max:255",
+            "category" => ["required", Rule::in(ContentCategory::values())],
 
             // Validasi untuk file upload
             "image" => "required|array",
             "image.*" => "required|image|mimes:jpeg,png,jpg,webp|max:2048",
         ]);
-
-        // Format kategori agar seragam (Title Case, huruf kecil semua dulu, dan bersih dari spasi berlebih)
-        $data["category"] = Str::title(Str::lower(trim($data["category"])));
 
         try {
             $imagePaths = [];
@@ -159,19 +160,16 @@ class MediaController extends Controller
                 "string",
                 Rule::unique("media")->ignore($id),
             ],
-            "category" => "sometimes|required|string|max:255",
+            "category" => [
+                "sometimes",
+                "required",
+                Rule::in(ContentCategory::values()),
+            ],
 
             // Validasi file opsional saat update
             "image" => "sometimes|required|array",
             "image.*" => "image|mimes:jpeg,png,jpg,webp|max:2048",
         ]);
-
-        // Format kategori jika diupdate agar seragam (Title Case, bersih dari spasi berlebih)
-        if (isset($validated["category"])) {
-            $validated["category"] = Str::title(
-                Str::lower(trim($validated["category"])),
-            );
-        }
 
         try {
             $media = Media::findOrFail($id);

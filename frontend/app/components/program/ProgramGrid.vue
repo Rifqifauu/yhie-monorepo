@@ -14,13 +14,13 @@
             icon="i-heroicons-exclamation-triangle"
             color="red"
             variant="soft"
-            title="Gagal memuat program"
-            description="Silakan coba lagi beberapa saat."
+            :title="locale === 'en' ? 'Failed to load programs' : 'Gagal memuat program'"
+            :description="locale === 'en' ? 'Please try again in a moment.' : 'Silakan coba lagi beberapa saat.'"
             class="max-w-xl mx-auto"
         >
             <template #actions>
                 <UButton size="sm" color="red" @click="$emit('retry')">
-                    Coba lagi
+                    {{ locale === "en" ? "Try again" : "Coba lagi" }}
                 </UButton>
             </template>
         </UAlert>
@@ -29,7 +29,7 @@
         <div v-else-if="!programs.length" class="text-center py-16">
             <EmptyData
                 title="Program"
-                description="Belum ada program untuk kata kunci ini."
+                :description="locale === 'en' ? 'No programs found for this keyword.' : 'Belum ada program untuk kata kunci ini.'"
             />
         </div>
 
@@ -44,6 +44,8 @@
 </template>
 
 <script setup lang="ts">
+const { locale } = useI18n();
+
 defineProps<{
     pending: boolean;
     error: any;

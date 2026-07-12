@@ -33,10 +33,15 @@
                             icon="i-heroicons-arrow-down-tray"
                             color="gray"
                             variant="ghost"
+                            @click="downloadReport"
                         >
                             Unduh Laporan
                         </UButton>
-                        <UButton icon="i-heroicons-plus" color="emerald">
+                        <UButton
+                            icon="i-heroicons-plus"
+                            color="emerald"
+                            to="/admin/schedules/create"
+                        >
                             Agenda Baru
                         </UButton>
                     </div>
@@ -47,10 +52,14 @@
         <UContainer class="py-8">
             <div class="space-y-8">
                 <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    <UCard
+                    <NuxtLink
                         v-for="stat in stats"
                         :key="stat.title"
-                        class="group transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5 dark:hover:shadow-emerald-400/5"
+                        :to="stat.to"
+                        class="block"
+                    >
+                    <UCard
+                        class="group transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5 dark:hover:shadow-emerald-400/5 cursor-pointer"
                         :ui="{ body: { padding: 'p-6' } }"
                     >
                         <div class="flex items-start justify-between">
@@ -106,6 +115,7 @@
                             </p>
                         </div>
                     </UCard>
+                    </NuxtLink>
                 </div>
 
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -116,7 +126,11 @@
                             >
                                 Rekap Pendaftaran
                             </h3>
-                            <UButton variant="link" color="emerald" class="px-0"
+                            <UButton
+                                variant="link"
+                                color="emerald"
+                                class="px-0"
+                                to="/admin/registrations"
                                 >Kelola</UButton
                             >
                         </div>
@@ -278,6 +292,7 @@
                                         color="gray"
                                         icon="i-heroicons-arrow-right"
                                         trailing
+                                        to="/admin/schedules"
                                     >
                                         Lihat Kalender Penuh
                                     </UButton>
@@ -304,11 +319,14 @@ interface Schedule {
 
 interface DashboardData {
     articles: number;
+    articlesTrend: number;
     pendingTransaction: number;
+    pendingTransactionTrend: number;
     totalRevenue: number;
+    revenueTrend: number;
     pendingRegistrations: number;
-    acceptedRegistrations: number;
-    rejectedRegistrations: number;
+    approvedRegistration: number;
+    rejectedRegistration: number;
     upcomingSchedule: Schedule[];
 }
 
@@ -334,6 +352,28 @@ const formatCurrency = (val: number) => {
     }).format(val);
 };
 
+const downloadReport = () => {
+    if (!import.meta.client || !dashboard.value) return;
+
+    const rows = [
+        ["Metrik", "Nilai"],
+        ["Artikel Terbit", dashboard.value.articles],
+        ["Transaksi Pending", dashboard.value.pendingTransaction],
+        ["Total Pendapatan", dashboard.value.totalRevenue],
+        ["Pendaftaran Menunggu", dashboard.value.pendingRegistrations],
+        ["Pendaftaran Diterima", dashboard.value.approvedRegistration],
+        ["Pendaftaran Ditolak", dashboard.value.rejectedRegistration],
+    ];
+    const csv = rows.map((row) => row.join(",")).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `laporan-dashboard-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+};
+
 const formatDate = (date: string) => {
     // Note: Pastikan data API selalu dalam UTC format agar meminimalkan hydration warning di Nuxt 4
     if (!date) return "-";
@@ -349,22 +389,25 @@ const stats = computed(() => [
         title: "Artikel Terbit",
         value: dashboard.value?.articles ?? 0,
         icon: "i-heroicons-document-text",
-        trend: 12,
-        detail: "Dibandingkan dengan 30 hari terakhir",
+        trend: dashboard.value?.articlesTrend ?? 0,
+        detail: "Artikel terbit baru, 30 hari terakhir vs 30 hari sebelumnya",
+        to: "/admin/articles",
     },
     {
         title: "Transaksi Pending",
         value: dashboard.value?.pendingTransaction ?? 0,
         icon: "i-heroicons-clock",
-        trend: -5,
-        detail: "Sistem merespon lebih cepat dari biasanya",
+        trend: dashboard.value?.pendingTransactionTrend ?? 0,
+        detail: "Transaksi pending baru, 30 hari terakhir vs 30 hari sebelumnya",
+        to: "/admin/transactions",
     },
     {
         title: "Total Pendapatan",
         value: formatCurrency(dashboard.value?.totalRevenue ?? 0),
         icon: "i-heroicons-banknotes",
-        trend: 8,
-        detail: "Total akumulasi bulan ini",
+        trend: dashboard.value?.revenueTrend ?? 0,
+        detail: "Pendapatan selesai, 30 hari terakhir vs 30 hari sebelumnya",
+        to: "/admin/transactions",
     },
 ]);
 
@@ -383,7 +426,7 @@ const registrationStats = computed(() => [
     {
         label: "Pendaftaran Diterima",
         description: "Selesai diproses",
-        value: dashboard.value?.acceptedRegistrations ?? 0,
+        value: dashboard.value?.approvedRegistration ?? 0,
         icon: "i-heroicons-check-circle",
         bgClass: "bg-emerald-50/50 dark:bg-emerald-950/20",
         ringClass: "ring-1 ring-emerald-200 dark:ring-emerald-900/50",
@@ -394,7 +437,7 @@ const registrationStats = computed(() => [
     {
         label: "Pendaftaran Ditolak",
         description: "Tidak memenuhi syarat",
-        value: dashboard.value?.rejectedRegistrations ?? 0,
+        value: dashboard.value?.rejectedRegistration ?? 0,
         icon: "i-heroicons-x-circle",
         bgClass: "bg-red-50/50 dark:bg-red-950/20",
         ringClass: "ring-1 ring-red-200 dark:ring-red-900/50",
