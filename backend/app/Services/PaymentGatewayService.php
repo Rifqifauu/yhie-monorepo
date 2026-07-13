@@ -16,12 +16,6 @@ class PaymentGatewayService
      */
     public function __construct()
     {
-<<<<<<< HEAD
-=======
-        // Config doku ada di config/services.php (nested di bawah key 'doku'),
-        // bukan file config/doku.php terpisah - path lama config('doku.*')
-        // selalu balikin null.
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
         $this->clientId = config('services.doku.client_id');
         $this->secretKey = config('services.doku.secret_key');
         $this->baseUrl = config('services.doku.base_url');
