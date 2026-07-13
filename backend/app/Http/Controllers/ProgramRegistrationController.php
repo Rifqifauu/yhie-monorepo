@@ -45,14 +45,6 @@ class ProgramRegistrationController extends Controller
         try {
             // 1. Simpan Data Registrasi
             $registration = ProgramRegistration::create($data);
-
-            // 2. Otomatis buat data transaksi awal (pending, transfer manual).
-            // Sengaja TIDAK memanggil Doku (createTransactionWithPG) di sini -
-            // itu memanggil API pihak ketiga secara sinkron di dalam transaksi
-            // DB yang sama, jadi kalau Doku gagal/lambat, seluruh pendaftaran
-            // (termasuk yang niatnya transfer manual) ikut gagal. Pembuatan
-            // link Doku dipisah jadi endpoint sendiri untuk dipanggil frontend
-            // saat pengguna benar-benar memilih bayar via payment gateway.
             $transaction = $registration->transactions()->create([
                 "reference_id" =>
                     "INV-" .

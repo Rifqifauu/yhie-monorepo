@@ -55,40 +55,6 @@ class TransactionController extends Controller
     }
 
     /**
-     * POST /api/transactions
-     * Create a transaction linked to a program registration via Payment Gateway (DOKU).
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            "program_registration_id" => "required|exists:program_registrations,id",
-            "amount" => "required|numeric|min:0",
-        ]);
-
-        try {
-            // Logika diserahkan ke service
-            $transaction = $this->transactionService->createTransactionWithPG($data);
-
-            return response()->json([
-                "message" => "Transaction created successfully. Please redirect user to payment_url.",
-                "data" => new TransactionResource($transaction),
-            ], 201);
-
-        } catch (\Exception $e) {
-            $statusCode = $e->getCode() ?: 500;
-            $statusCode = ($statusCode >= 400 && $statusCode <= 599) ? $statusCode : 500;
-
-            if ($statusCode === 500) {
-                Log::error("Error creating PG transaction: " . $e->getMessage());
-            }
-
-            return response()->json([
-                "message" => $statusCode === 500 ? "Failed to create transaction with PG." : $e->getMessage(),
-            ], $statusCode);
-        }
-    }
-
-    /**
      * GET /api/transactions/{transaction}
      */
     public function show(Transaction $transaction): JsonResponse

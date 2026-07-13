@@ -3,46 +3,19 @@
 namespace App\Services;
 
 use App\Models\Transaction;
-use App\Models\ProgramRegistration;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Exception;
 
 class TransactionService
 {
     protected PaymentGatewayService $pgService;
 
-    // Inject PaymentGatewayService ke dalam TransactionService
+    /**
+     * Inject PaymentGatewayService ke dalam TransactionService
+     */
     public function __construct(PaymentGatewayService $pgService)
     {
         $this->pgService = $pgService;
-    }
-
-    /**
-     * Membuat transaksi baru dan men-generate link DOKU
-     */
-    public function createTransactionWithPG(array $data): Transaction
-    {
-        // 1. Ambil data pendaftar untuk dikirim ke DOKU
-        $registration = ProgramRegistration::find($data['program_registration_id']);
-        if (!$registration) {
-            throw new Exception("Program registration not found.", 404);
-        }
-
-        // 2. Buat referensi invoice unik (contoh: INV-202607-XXXX)
-        $referenceId = 'INV-' . date('Ym') . '-' . strtoupper(Str::random(6));
-
-        // 3. Simpan transaksi awal ke database (sebelum tembak DOKU)
-        $transaction = Transaction::create([
-            'program_registration_id' => $registration->id,
-            'reference_id' => $referenceId,
-            'amount' => $data['amount'],
-            'payment_status' => 'pending',
-            'payment_method' => 'manual_transfer',
-        ]);
-
-        return $this->generatePaymentUrl($transaction, failTransactionOnError: true);
     }
 
     /**
@@ -63,6 +36,10 @@ class TransactionService
         $registration = $transaction->programRegistration
             ?? $transaction->load('programRegistration')->programRegistration;
 
+        if (!$registration) {
+            throw new Exception("Program registration data is missing for this transaction.", 404);
+        }
+
         $dokuPayload = [
             'amount' => $transaction->amount,
             'invoice_number' => $transaction->reference_id,
@@ -77,6 +54,7 @@ class TransactionService
             $transaction->update([
                 'payment_method' => 'doku_hosted',
                 'payment_url' => $dokuResponse['response']['payment']['url'],
+                'pg_transaction_id' => $dokuResponse['response']['order']['invoice_number'] ?? null,
                 'pg_response' => json_encode($dokuResponse),
             ]);
         } else {
@@ -102,13 +80,13 @@ class TransactionService
         $invoiceNumber = $payload['order']['invoice_number'] ?? null;
 
         if (!$invoiceNumber) {
-            throw new Exception("Invoice number not found in payload");
+            throw new Exception("Invoice number not found in payload", 400);
         }
 
         $transaction = Transaction::where('reference_id', $invoiceNumber)->first();
 
         if (!$transaction) {
-            throw new Exception("Transaction not found for invoice: " . $invoiceNumber);
+            throw new Exception("Transaction not found for invoice: " . $invoiceNumber, 404);
         }
 
         // Jika transaksi sudah selesai sebelumnya, abaikan (idempotent)
@@ -141,7 +119,7 @@ class TransactionService
     /**
      * Simpan bukti transfer manual untuk sebuah invoice yang masih pending.
      */
-    public function uploadReceipt(string $referenceId, UploadedFile $file): Transaction
+    public function uploadReceipt(string $referenceId, $file): Transaction
     {
         $transaction = Transaction::where('reference_id', $referenceId)->first();
 
@@ -162,6 +140,7 @@ class TransactionService
 
         $transaction->update([
             'transaction_receipt' => '/storage/' . $file->store('receipts', 'public'),
+            'payment_method' => 'manual_transfer',
         ]);
 
         return $transaction->fresh()->load('programRegistration.program');
