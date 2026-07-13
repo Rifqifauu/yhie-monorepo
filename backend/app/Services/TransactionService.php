@@ -3,11 +3,7 @@
 namespace App\Services;
 
 use App\Models\ProgramRegistration;
-<<<<<<< HEAD
 use App\Models\Transaction;
-=======
-use Illuminate\Http\UploadedFile;
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Exception;
@@ -53,11 +49,7 @@ class TransactionService
             'invoice_number' => $transaction->reference_id,
             'customer_name' => $registration->full_name,
             'customer_email' => $registration->email,
-<<<<<<< HEAD
             // Opsional: tambahkan callback_url di sini jika tidak di-set default di PaymentGatewayService
-=======
-            'customer_phone' => $registration->phone,
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
         ];
 
         // Tembak API DOKU via PaymentGatewayService
@@ -81,7 +73,6 @@ class TransactionService
     }
 
     /**
-<<<<<<< HEAD
      * 2. Menangani notifikasi webhook otomatis dari DOKU
      */
     public function handleDokuNotification(array $payload): Transaction
@@ -91,38 +82,19 @@ class TransactionService
 
         if (!$invoiceNumber) {
             throw new Exception("Invoice number not found in payload", 400);
-=======
-     * Proses notifikasi webhook dari DOKU, update status transaksi (idempotent).
-     * Dipanggil oleh DokuWebhookController setelah signature terverifikasi.
-     */
-    public function handleDokuNotification(array $payload): Transaction
-    {
-        $invoiceNumber = $payload['order']['invoice_number'] ?? null;
-
-        if (!$invoiceNumber) {
-            throw new Exception("Invoice number not found in payload");
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
         }
 
         $transaction = Transaction::where('reference_id', $invoiceNumber)->first();
 
         if (!$transaction) {
-<<<<<<< HEAD
             throw new Exception("Transaction not found for invoice: " . $invoiceNumber, 404);
         }
 
         // Jika transaksi sudah berstatus completed sebelumnya, abaikan (Idempotent)
-=======
-            throw new Exception("Transaction not found for invoice: " . $invoiceNumber);
-        }
-
-        // Jika transaksi sudah selesai sebelumnya, abaikan (idempotent)
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
         if ($transaction->payment_status === 'completed') {
             return $transaction;
         }
 
-<<<<<<< HEAD
         // Cek status dari DOKU
         $transactionStatus = $payload['transaction']['status'] ?? '';
 
@@ -143,24 +115,6 @@ class TransactionService
             $transaction->update([
                 'payment_status' => 'expired',
                 'pg_response' => json_encode($payload)
-=======
-        $transactionStatus = $payload['transaction']['status'] ?? '';
-
-        if (in_array(strtolower($transactionStatus), ['success', 'settlement'])) {
-            $transaction->update([
-                'payment_status' => 'completed',
-                'paid_at' => now(),
-                'pg_response' => json_encode($payload),
-            ]);
-
-            // Update status registrasi menjadi 'approved' agar bisa memicu
-            // pembuatan akun Moodle secara otomatis.
-            $transaction->programRegistration()->update(['status' => 'approved']);
-        } elseif (in_array(strtolower($transactionStatus), ['failed', 'expired'])) {
-            $transaction->update([
-                'payment_status' => 'expired',
-                'pg_response' => json_encode($payload),
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
             ]);
         }
 
@@ -168,25 +122,16 @@ class TransactionService
     }
 
     /**
-<<<<<<< HEAD
      * 3. Menangani logika upload bukti bayar manual (Fallback jika PG bermasalah / user pilih manual)
      */
     public function uploadReceipt(string $referenceId, $file): Transaction
     {
         $transaction = Transaction::where("reference_id", $referenceId)->first();
-=======
-     * Simpan bukti transfer manual untuk sebuah invoice yang masih pending.
-     */
-    public function uploadReceipt(string $referenceId, UploadedFile $file): Transaction
-    {
-        $transaction = Transaction::where('reference_id', $referenceId)->first();
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
 
         if (!$transaction) {
             throw new Exception("Invoice not found.", 404);
         }
 
-<<<<<<< HEAD
         if ($transaction->payment_status !== "pending") {
             throw new Exception("Invoice is no longer awaiting payment.", 422);
         }
@@ -207,23 +152,5 @@ class TransactionService
         ]);
 
         return $transaction->fresh()->load("programRegistration.program");
-=======
-        if ($transaction->payment_status !== 'pending') {
-            throw new Exception("Invoice is no longer awaiting payment.", 422);
-        }
-
-        // Hapus bukti transfer lama (kalau ini re-upload) sebelum simpan yang baru.
-        if ($transaction->transaction_receipt) {
-            Storage::disk('public')->delete(
-                str_replace('/storage/', '', $transaction->transaction_receipt),
-            );
-        }
-
-        $transaction->update([
-            'transaction_receipt' => '/storage/' . $file->store('receipts', 'public'),
-        ]);
-
-        return $transaction->fresh()->load('programRegistration.program');
->>>>>>> 40bd9949cc4c4fec508e77d1d42567e34980d6a8
     }
 }
