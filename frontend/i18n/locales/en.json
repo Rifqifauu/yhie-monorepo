@@ -2,12 +2,14 @@
   "nav": {
     "menu": [
       { "name": "Home", "path": "/" },
-      { "name": "About", "path": "/about" },
+      { "name": "About Us", "path": "/about" },
       { "name": "Program", "path": "/program" },
       { "name": "Gallery", "path": "/media" },
-      { "name": "Partners", "path": "/partner" },
+      { "name": "Our Partners", "path": "/partner" },
       { "name": "Articles", "path": "/articles" }
-    ]
+    ],
+    "groupAbout": "Profile",
+    "groupMedia": "Publications"
   },
   "hero": {
     "title": "Hafiz Certification Amidst the Serenity of Nature",

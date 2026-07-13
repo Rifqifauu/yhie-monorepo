@@ -2,12 +2,14 @@
   "nav": {
     "menu": [
       { "name": "Beranda", "path": "/" },
-      { "name": "Tentang", "path": "/about" },
+      { "name": "Tentang Kami", "path": "/about" },
       { "name": "Program", "path": "/program" },
       { "name": "Galeri", "path": "/media" },
-      { "name": "Partner", "path": "/partner" },
+      { "name": "Partner Kami", "path": "/partner" },
       { "name": "Artikel", "path": "/articles" }
-    ]
+    ],
+    "groupAbout": "Profil",
+    "groupMedia": "Publikasi"
   },
   "hero": {
     "title": "Sertifikasi Hafiz Sambil Tadabbur Alam",

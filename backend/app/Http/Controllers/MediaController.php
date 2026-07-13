@@ -18,19 +18,20 @@ class MediaController extends Controller
         $search = $request->query("search");
         $category = $request->query("category");
 
-        // Menggunakan pluck() agar hasil berupa array of strings yang rapi: ["Berita", "Artikel"]
-        // Ditambah whereNotNull agar tidak mengambil kategori yang kosong (jika ada)
-        $existingCategory = Media::select("category")
-            ->whereNotNull("category")
+        // Daftar kategori nyata yang ada di data (id + en berpasangan), dipakai
+        // frontend untuk membangun tombol/dropdown filter dengan label sesuai
+        // locale yang aktif.
+        $existingCategory = Media::select("category_id", "category_en")
+            ->whereNotNull("category_id")
             ->distinct()
-            ->pluck("category");
+            ->get();
 
         try {
             $media = Media::orderBy("created_at", "desc")
                 ->orderBy("id", "desc")
                 ->when($category, function ($query, $category) {
                     // Case-insensitive supaya filter tetap cocok walau beda kapitalisasi
-                    return $query->whereRaw("LOWER(category) = ?", [
+                    return $query->whereRaw("LOWER(category_id) = ?", [
                         Str::lower($category),
                     ]);
                 })
@@ -73,7 +74,7 @@ class MediaController extends Controller
             "description_en" => "required|string",
             "slug_id" => "required|string|unique:media,slug_id",
             "slug_en" => "required|string|unique:media,slug_en",
-            "category" => ["required", Rule::in(ContentCategory::values())],
+            "category_id" => ["required", Rule::in(ContentCategory::values())],
 
             // Validasi untuk file upload
             "image" => "required|array",
@@ -91,6 +92,11 @@ class MediaController extends Controller
             }
 
             $data["image"] = $imagePaths;
+            // category_en selalu diturunkan dari category_id, tidak dipilih
+            // terpisah oleh admin - supaya tidak mungkin tidak sinkron.
+            $data["category_en"] = ContentCategory::from(
+                $data["category_id"],
+            )->en();
 
             $media = Media::create($data);
 
@@ -160,7 +166,7 @@ class MediaController extends Controller
                 "string",
                 Rule::unique("media")->ignore($id),
             ],
-            "category" => [
+            "category_id" => [
                 "sometimes",
                 "required",
                 Rule::in(ContentCategory::values()),
@@ -190,6 +196,12 @@ class MediaController extends Controller
                     $newImagePaths[] = "/storage/" . $path;
                 }
                 $validated["image"] = $newImagePaths;
+            }
+
+            if (array_key_exists("category_id", $validated)) {
+                $validated["category_en"] = ContentCategory::from(
+                    $validated["category_id"],
+                )->en();
             }
 
             $media->update($validated);

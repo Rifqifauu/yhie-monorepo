@@ -153,12 +153,12 @@
                         </UFormField>
                         <UFormField
                             label="Kategori"
-                            name="category"
+                            name="category_id"
                             required
                             class="w-full"
                         >
                             <USelect
-                                v-model="form.category"
+                                v-model="form.category_id"
                                 :items="categoryOptions"
                                 placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
@@ -316,7 +316,7 @@ const form = reactive({
     content_en: "",
     slug_id: "",
     slug_en: "",
-    category: "",
+    category_id: "",
     is_published: 0,
 });
 

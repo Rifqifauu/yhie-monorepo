@@ -202,11 +202,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <UFormField
                             label="Kategori"
-                            name="category"
+                            name="category_id"
                             required
                         >
                             <USelect
-                                v-model="form.category"
+                                v-model="form.category_id"
                                 :items="categoryOptions"
                                 placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
@@ -366,7 +366,7 @@
                             <span
                                 class="text-xs font-mono font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950/40 border border-primary-100 dark:border-primary-900 px-2.5 py-1 rounded-md inline-block"
                             >
-                                {{ media?.category || "Uncategorized" }}
+                                {{ media?.category_id || "Uncategorized" }}
                             </span>
                         </div>
                     </div>
@@ -434,7 +434,7 @@ const schema = z.object({
     title_en: z.string().min(1, "Judul (EN) wajib diisi"),
     slug_id: z.string().min(1, "Slug (ID) wajib diisi"),
     slug_en: z.string().min(1, "Slug (EN) wajib diisi"),
-    category: z.string().min(1, "Kategori wajib diisi"),
+    category_id: z.string().min(1, "Kategori wajib diisi"),
     description_id: z.string().max(100, "Deskripsi maksimal 100 karakter").optional(),
     description_en: z.string().max(100, "Deskripsi maksimal 100 karakter").optional(),
 });
@@ -472,7 +472,7 @@ const form = reactive({
     title_en: "",
     slug_id: "",
     slug_en: "",
-    category: "",
+    category_id: "",
     description_id: "",
     description_en: "",
 });
@@ -494,7 +494,7 @@ function startEdit() {
     form.title_en = media.value.title_en || "";
     form.slug_id = media.value.slug_id || "";
     form.slug_en = media.value.slug_en || "";
-    form.category = media.value.category || "";
+    form.category_id = media.value.category_id || "";
     form.description_id = media.value.description_id || "";
     form.description_en = media.value.description_en || "";
 
@@ -572,7 +572,7 @@ const handleUpdate = async () => {
     formData.append("title_en", form.title_en);
     formData.append("slug_id", form.slug_id);
     formData.append("slug_en", form.slug_en);
-    formData.append("category", form.category);
+    formData.append("category_id", form.category_id);
     formData.append("description_id", form.description_id);
     formData.append("description_en", form.description_en);
 

@@ -203,9 +203,9 @@
 
                             <span
                                 class="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg text-white shadow-sm"
-                                :class="getCategoryBg(article.category)"
+                                :class="getCategoryBg(article.category_id)"
                             >
-                                {{ getCategoryLabel(article.category) }}
+                                {{ getCategoryLabel(categoryOf(article)) }}
                             </span>
                         </div>
 
@@ -306,6 +306,8 @@ const {
     contentOf,
     slugOf,
     coverOf,
+    categoryOf,
+    categoryLabelOf,
     applySearch,
     clearSearch,
     changePage,
@@ -314,13 +316,15 @@ const {
 
 // Filter categories - dibangun dari kategori yang benar-benar ada di data,
 // bukan daftar tetap, supaya selalu cocok dengan apa yang diinput admin.
+// value tetap pakai category_id (locale-independent) supaya filter tetap
+// cocok dengan query backend, label mengikuti locale aktif.
 const categories = computed(() => {
     const list = [
         { value: "", label: locale.value === "en" ? "All" : "Semua" },
     ];
     existingCategories.value.forEach((cat) => {
-        if (!cat) return;
-        list.push({ value: cat, label: cat });
+        if (!cat?.category_id) return;
+        list.push({ value: cat.category_id, label: categoryLabelOf(cat) });
     });
     return list;
 });

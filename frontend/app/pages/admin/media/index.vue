@@ -165,7 +165,10 @@ const CATEGORY_ALL = "__all__";
 
 const categoryOptions = computed(() => [
     { label: "Semua Kategori", value: CATEGORY_ALL },
-    ...existingCategories.value.map((c) => ({ label: c, value: c })),
+    ...existingCategories.value.map((c) => ({
+        label: c.category_id,
+        value: c.category_id,
+    })),
 ]);
 
 const categorySelectValue = computed({
@@ -281,7 +284,7 @@ const columns: TableColumn<GalleryMedia>[] = [
         },
     },
     {
-        accessorKey: "category",
+        accessorKey: "category_id",
         header: "Kategori",
         meta: {
             class: { th: "w-32" },
@@ -294,7 +297,7 @@ const columns: TableColumn<GalleryMedia>[] = [
                     variant: "subtle",
                     class: "capitalize font-medium",
                 },
-                () => row.original.category || "Uncategorized",
+                () => row.original.category_id || "Uncategorized",
             );
         },
     },

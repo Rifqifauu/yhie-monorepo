@@ -16,7 +16,8 @@ class Article extends Model
         "slug_en",
         "is_published",
         "author_id",
-        "category",
+        "category_id",
+        "category_en",
     ];
 
     protected $casts = [

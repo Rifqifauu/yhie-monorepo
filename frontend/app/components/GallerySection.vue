@@ -192,7 +192,7 @@
                             <span
                                 class="inline-block text-[10px] font-bold uppercase text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md mb-1.5 border border-amber-400/20"
                             >
-                                {{ item.category }}
+                                {{ categoryOf(item) }}
                             </span>
                             <p
                                 class="text-white font-semibold text-sm line-clamp-2 leading-snug"
@@ -290,7 +290,7 @@
                                 class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-md border border-amber-500/20"
                             >
                                 <UIcon name="i-lucide-tag" class="w-3 h-3" />
-                                {{ activeItem.category }}
+                                {{ categoryOf(activeItem) }}
                             </span>
                         </div>
 
@@ -337,8 +337,16 @@ import { useGallery } from "~/composables/useGallery";
 const { locale } = useI18n();
 const localePath = useLocalePath();
 
-const { mediaItems, pending, error, refresh, titleOf, descOf, imagesOf } =
-    useGallery();
+const {
+    mediaItems,
+    pending,
+    error,
+    refresh,
+    titleOf,
+    descOf,
+    categoryOf,
+    imagesOf,
+} = useGallery();
 
 // Ambil maksimal 8 item album untuk dipajang di beranda (Homepage Preview)
 const previewItems = computed(() => mediaItems.value.slice(0, 8));

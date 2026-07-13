@@ -85,7 +85,7 @@
                     >
                         <div
                             class="relative overflow-hidden rounded-2xl bg-white dark:bg-emerald-900/20 border border-emerald-100/60 dark:border-emerald-800/40 shadow-sm hover:shadow-xl transition-all duration-500"
-                            :class="getCategoryBorder(item.category)"
+                            :class="getCategoryBorder(item.category_id)"
                         >
                             <div
                                 class="overflow-hidden relative"
@@ -126,7 +126,9 @@
                                             class="inline-block text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400 mb-1.5 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20"
                                         >
                                             {{
-                                                getCategoryLabel(item.category)
+                                                getCategoryLabel(
+                                                    categoryOf(item),
+                                                )
                                             }}
                                         </span>
                                         <h3
@@ -228,7 +230,7 @@
                                         />
                                         {{
                                             getCategoryLabel(
-                                                activeItem.category,
+                                                categoryOf(activeItem),
                                             )
                                         }}
                                     </span>
@@ -282,6 +284,8 @@ const {
     pageItems,
     titleOf,
     descOf,
+    categoryOf,
+    categoryLabelOf,
     imagesOf,
     coverOf,
     changePage,
@@ -296,6 +300,8 @@ const handleCategoryChange = async (newCategory: string) => {
     await refresh();
 };
 
+// value tetap pakai category_id (locale-independent) supaya filter tetap
+// cocok dengan query backend, label mengikuti locale aktif.
 const filters = computed(() => {
     const list = [
         {
@@ -305,34 +311,34 @@ const filters = computed(() => {
     ];
 
     existingCategories.value.forEach((cat) => {
-        if (!cat) return;
+        if (!cat?.category_id) return;
         list.push({
-            value: cat.toLowerCase(),
-            label: cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase(),
+            value: cat.category_id,
+            label: categoryLabelOf(cat),
         });
     });
 
     return list;
 });
 
-const getCategoryLabel = (cat?: string) => {
-    if (!cat) return "";
-    return cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
-};
+const getCategoryLabel = (cat?: string) => cat || "";
+
+// Warna border diputar dari daftar warna tetap berdasar category_id (stabil
+// lintas-locale) - dulu ada switch-case dengan value lama ("graduation" dkk)
+// yang sudah tidak dipakai backend, jadi selalu jatuh ke default.
+const categoryBorderColors = [
+    "border-t-2 border-emerald-600 dark:border-emerald-500",
+    "border-t-2 border-amber-500 dark:border-amber-400",
+    "border-t-2 border-teal-500 dark:border-teal-400",
+    "border-t-2 border-emerald-700 dark:border-emerald-600",
+];
 
 const getCategoryBorder = (cat?: string) => {
-    switch (cat?.toLowerCase()) {
-        case "graduation":
-            return "border-t-2 border-amber-500 dark:border-amber-400";
-        case "academic":
-            return "border-t-2 border-emerald-600 dark:border-emerald-500";
-        case "tourism":
-            return "border-t-2 border-teal-500 dark:border-teal-400";
-        case "social":
-            return "border-t-2 border-emerald-500 dark:border-emerald-400";
-        default:
-            return "border-t-2 border-emerald-600 dark:border-emerald-500";
-    }
+    if (!cat) return categoryBorderColors[0];
+    let hash = 0;
+    for (let i = 0; i < cat.length; i++)
+        hash = (hash + cat.charCodeAt(i)) % categoryBorderColors.length;
+    return categoryBorderColors[hash];
 };
 
 const getCardHeight = (index: number) => {

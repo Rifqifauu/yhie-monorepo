@@ -205,11 +205,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <UFormField
                             label="Kategori"
-                            name="category"
+                            name="category_id"
                             required
                         >
                             <USelect
-                                v-model="form.category"
+                                v-model="form.category_id"
                                 :items="categoryOptions"
                                 placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
@@ -401,7 +401,7 @@
                             <span
                                 class="text-xs font-mono font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950/40 border border-primary-100 dark:border-primary-900 px-2.5 py-1 rounded-md inline-block"
                             >
-                                {{ article?.category || "Uncategorized" }}
+                                {{ article?.category_id || "Uncategorized" }}
                             </span>
                         </div>
                         <div>
@@ -514,7 +514,7 @@ const form = reactive({
     content_en: "",
     slug_id: "",
     slug_en: "",
-    category: "",
+    category_id: "",
     is_published: false,
 });
 
@@ -537,7 +537,7 @@ function startEdit() {
     form.content_en = article.value.content_en || "";
     form.slug_id = article.value.slug_id || "";
     form.slug_en = article.value.slug_en || "";
-    form.category = article.value.category || "";
+    form.category_id = article.value.category_id || "";
     form.is_published = !!article.value.is_published;
 
     clearSelectedFiles();
@@ -612,7 +612,7 @@ const handleUpdate = async () => {
     formData.append("slug_en", form.slug_en);
     formData.append("content_id", form.content_id);
     formData.append("content_en", form.content_en);
-    formData.append("category", form.category);
+    formData.append("category_id", form.category_id);
     formData.append("is_published", form.is_published ? "1" : "0");
 
     // Untuk update via FormData, Laravel butuh method spoofing
