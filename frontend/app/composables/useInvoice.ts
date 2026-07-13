@@ -5,6 +5,8 @@ export interface InvoiceTransaction {
   reference_id: string;
   amount: number;
   payment_status: "pending" | "completed" | "failed" | "expired";
+  payment_method: string;
+  payment_url: string | null;
   transaction_receipt: string | null;
   program_registration?: any;
 }

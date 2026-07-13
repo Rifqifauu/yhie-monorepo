@@ -13,6 +13,8 @@ class TransactionResource extends JsonResource
             "reference_id" => $this->reference_id,
             "amount" => $this->amount,
             "payment_status" => $this->payment_status,
+            "payment_method" => $this->payment_method,
+            "payment_url" => $this->payment_url,
             "transaction_receipt" => $this->transaction_receipt,
 
             // whenLoaded mencegah error N+1 query jika relasi tidak dipanggil

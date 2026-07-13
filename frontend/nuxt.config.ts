@@ -87,6 +87,13 @@ export default defineNuxtConfig({
     runtimeConfig: {
       public: {
         apiBase: "https://api.sertifikasihafizh.xyz/api",
+        // Script embed DOKU Checkout (popup modal, lihat invoice/[reference_id].vue).
+        // SENGAJA masih arah ke sandbox di kedua environment sampai integrasi
+        // Doku benar-benar teruji dengan kredensial produksi asli - ganti ke
+        // https://jokul.doku.com/jokul-checkout-js/v1/jokul-checkout-1.0.0.js
+        // begitu siap live.
+        dokuCheckoutScriptUrl:
+          "https://sandbox.doku.com/jokul-checkout-js/v1/jokul-checkout-1.0.0.js",
       },
     },
   },
@@ -100,6 +107,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
       public: {
         apiBase: "https://api.sertifikasihafizh.xyz/api",
+        dokuCheckoutScriptUrl:
+          "https://sandbox.doku.com/jokul-checkout-js/v1/jokul-checkout-1.0.0.js",
       },
     },
   },

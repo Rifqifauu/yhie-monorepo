@@ -41,7 +41,11 @@ class PaymentGatewayService
             "order" => [
                 "amount" => $orderData['amount'],
                 "invoice_number" => $orderData['invoice_number'],
+                "currency" => "IDR",
                 "callback_url" => $orderData['callback_url'] ?? url('/payment/callback'),
+                // Wajib menurut dokumentasi DOKU Checkout - tanpa ini halaman
+                // checkout gagal render metode pembayaran (500 di sisi DOKU).
+                "auto_redirect" => true,
             ],
             "payment" => [
                 "payment_due_date" => 60 // Masa aktif pembayaran dalam menit
@@ -49,6 +53,7 @@ class PaymentGatewayService
             "customer" => [
                 "name" => $orderData['customer_name'] ?? 'Guest',
                 "email" => $orderData['customer_email'] ?? 'guest@example.com',
+                "phone" => $orderData['customer_phone'] ?? null,
             ]
         ];
 

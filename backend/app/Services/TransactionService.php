@@ -48,6 +48,7 @@ class TransactionService
             'invoice_number' => $transaction->reference_id,
             'customer_name' => $registration->full_name,
             'customer_email' => $registration->email,
+            'customer_phone' => $registration->phone,
         ];
 
         // 5. Tembak API DOKU via PaymentGatewayService
