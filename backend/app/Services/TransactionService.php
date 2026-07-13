@@ -46,6 +46,11 @@ class TransactionService
             'customer_name' => $registration->full_name,
             'customer_email' => $registration->email,
             'customer_phone' => $registration->phone,
+            // Setelah bayar, DOKU redirect user balik ke halaman invoice ini
+            // (bukan default url('/payment/callback') yang nunjuk ke domain
+            // backend dan bukan halaman yang enak dilihat user).
+            'callback_url' => rtrim(config('app.frontend_url'), '/') .
+                "/invoice/{$transaction->reference_id}",
         ];
 
         $dokuResponse = $this->pgService->createDokuPayment($dokuPayload);
