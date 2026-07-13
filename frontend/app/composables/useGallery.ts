@@ -8,7 +8,8 @@ export interface GalleryMedia {
   slug_id?: string;
   description_en: string;
   description_id: string;
-  category: string;
+  category_id: string;
+  category_en: string;
   image?: string | string[] | { path?: string; [key: string]: any } | any;
   images?: any[]; // <-- Tambahkan ini untuk menampung array dari relasi backend
   [key: string]: any;
@@ -23,9 +24,14 @@ export interface PaginatedResponse<T> {
   to: number | null;
 }
 
+export interface CategoryPair {
+  category_id: string;
+  category_en: string;
+}
+
 export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
-  existingCategory?: string[];
+  existingCategory?: CategoryPair[];
 }
 
 export const useGallery = () => {
@@ -80,9 +86,11 @@ export const useGallery = () => {
   });
 
   const mediaItems = computed<GalleryMedia[]>(() => paginator.value.data);
-  const existingCategories = computed<string[]>(() => {
+  const existingCategories = computed<CategoryPair[]>(() => {
     return apiResponse.value?.existingCategory ?? [];
   });
+  const categoryLabelOf = (pair: CategoryPair): string =>
+    locale.value === "en" ? pair.category_en : pair.category_id;
   const totalPages = computed<number>(() => paginator.value.last_page);
   const totalItems = computed<number>(() => paginator.value.total);
   const fromItem = computed<number>(() => paginator.value.from ?? 0);
@@ -97,6 +105,13 @@ export const useGallery = () => {
   const descOf = (item: GalleryMedia): string => {
     if (!item) return "";
     return locale.value === "en" ? item.description_en : item.description_id;
+  };
+
+  const categoryOf = (item: GalleryMedia): string => {
+    if (!item) return "";
+    return locale.value === "en"
+      ? (item.category_en ?? item.category_id)
+      : (item.category_id ?? item.category_en);
   };
 
   const backendUrl = config.public.sanctum?.baseUrl || "http://127.0.0.1:8000";
@@ -264,6 +279,8 @@ export const useGallery = () => {
     pageItems,
     titleOf,
     descOf,
+    categoryOf,
+    categoryLabelOf,
     imagesOf,
     coverOf,
     buildImageUrl,

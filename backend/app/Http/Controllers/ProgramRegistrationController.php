@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ProgramRegistration;
 use App\Services\MailService;
 use App\Services\MoodleService;
-use App\Services\TransactionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +16,6 @@ class ProgramRegistrationController extends Controller
     public function __construct(
         private MailService $mailService,
         private MoodleService $moodleService,
-        private TransactionService $transactionService
     ) {
     }
 
@@ -48,27 +46,39 @@ class ProgramRegistrationController extends Controller
             // 1. Simpan Data Registrasi
             $registration = ProgramRegistration::create($data);
 
-            // 2. Buat Transaksi & Generate Link DOKU via TransactionService
-            $transaction = $this->transactionService->createTransactionWithPG([
-                'program_registration_id' => $registration->id,
-                'amount' => $data['amount']
+            // 2. Otomatis buat data transaksi awal (pending, transfer manual).
+            // Sengaja TIDAK memanggil Doku (createTransactionWithPG) di sini -
+            // itu memanggil API pihak ketiga secara sinkron di dalam transaksi
+            // DB yang sama, jadi kalau Doku gagal/lambat, seluruh pendaftaran
+            // (termasuk yang niatnya transfer manual) ikut gagal. Pembuatan
+            // link Doku dipisah jadi endpoint sendiri untuk dipanggil frontend
+            // saat pengguna benar-benar memilih bayar via payment gateway.
+            $transaction = $registration->transactions()->create([
+                "reference_id" =>
+                    "INV-" .
+                    date("Ymd") .
+                    "-" .
+                    strtoupper(bin2hex(random_bytes(4))),
+                "amount" => $data["amount"],
+                "payment_status" => "pending",
+                "payment_method" => "manual_transfer",
             ]);
 
             DB::commit();
 
             // Email invoice - dikirim setelah commit, kegagalan kirim tidak menggagalkan pendaftaran
-            // (Pastikan template email Anda nantinya menyertakan $transaction->payment_url)
             $this->mailService->sendInvoice($transaction);
 
             return response()->json(
                 [
-                    "message" => "Registration and invoice created successfully. Please redirect user to payment URL.",
-                    "data" => [
-                        "registration" => $registration->load("program"),
-                        "transaction" => $transaction,
-                    ]
+                    "message" =>
+                        "Registration and invoice created successfully.",
+                    "data" => $registration->load([
+                        "program",
+                        "transactions",
+                    ]),
                 ],
-                201
+                201,
             );
         } catch (\Throwable $e) {
             DB::rollBack();

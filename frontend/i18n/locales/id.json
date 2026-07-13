@@ -2,12 +2,14 @@
   "nav": {
     "menu": [
       { "name": "Beranda", "path": "/" },
-      { "name": "Tentang", "path": "/about" },
+      { "name": "Tentang Kami", "path": "/about" },
       { "name": "Program", "path": "/program" },
       { "name": "Galeri", "path": "/media" },
-      { "name": "Partner", "path": "/partner" },
+      { "name": "Partner Kami", "path": "/partner" },
       { "name": "Artikel", "path": "/articles" }
-    ]
+    ],
+    "groupAbout": "Profil",
+    "groupMedia": "Publikasi"
   },
   "hero": {
     "title": "Sertifikasi Hafiz Sambil Tadabbur Alam",
@@ -159,6 +161,9 @@
     "transferInfo": "Transfer Ke Rekening Berikut",
     "pgTitle": "Pembayaran Otomatis (Virtual Account, E-Wallet, QRIS)",
     "pgComingSoon": "Segera hadir. Untuk saat ini, silakan gunakan transfer manual di atas.",
+    "pgDesc": "Bayar otomatis lewat Virtual Account, E-Wallet, atau QRIS - status pembayaran akan terupdate otomatis.",
+    "pgButton": "Bayar Sekarang",
+    "pgLoadError": "Gagal memuat halaman pembayaran. Silakan coba lagi atau gunakan transfer manual di atas.",
     "uploadTitle": "Upload Bukti Transfer",
     "uploadDesc": "Sudah melakukan transfer? Upload bukti transfer di bawah ini agar tim kami dapat memverifikasi pembayaran Anda.",
     "uploadButton": "Kirim Bukti Transfer",

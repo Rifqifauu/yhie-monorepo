@@ -148,11 +148,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <UFormField
                             label="Kategori"
-                            name="category"
+                            name="category_id"
                             required
                         >
                             <USelect
-                                v-model="form.category"
+                                v-model="form.category_id"
                                 :items="categoryOptions"
                                 placeholder="Pilih kategori..."
                                 icon="i-lucide-folder"
@@ -280,7 +280,7 @@ const schema = z.object({
     title_en: z.string().min(1, "Judul (EN) wajib diisi"),
     slug_id: z.string().min(1, "Slug (ID) wajib diisi"),
     slug_en: z.string().min(1, "Slug (EN) wajib diisi"),
-    category: z.string().min(1, "Kategori wajib diisi"),
+    category_id: z.string().min(1, "Kategori wajib diisi"),
     description_id: z
         .string()
         .max(100, "Deskripsi maksimal 100 karakter")
@@ -314,7 +314,7 @@ const form = reactive({
     title_en: "",
     slug_id: "",
     slug_en: "",
-    category: "",
+    category_id: "",
     description_id: "",
     description_en: "",
 });

@@ -134,9 +134,45 @@
                     </div>
                 </div>
 
-                <!-- Payment Gateway - belum tersedia, placeholder saja -->
+                <!-- Payment Gateway (DOKU) - tampil kalau transaksi punya payment_url -->
                 <div
-                    v-if="transaction.payment_status === 'pending'"
+                    v-if="
+                        transaction.payment_status === 'pending' &&
+                        transaction.payment_url
+                    "
+                    class="bg-white/80 dark:bg-emerald-900/40 border border-emerald-200/70 dark:border-emerald-800/60 rounded-3xl p-6 shadow-xl space-y-3"
+                >
+                    <div class="flex items-center gap-3">
+                        <UIcon
+                            name="i-lucide-credit-card"
+                            class="w-5 h-5 shrink-0 text-emerald-600 dark:text-emerald-400"
+                        />
+                        <div class="text-sm">
+                            <p class="font-semibold text-slate-900 dark:text-white">
+                                {{ t("invoice.pgTitle") }}
+                            </p>
+                            <p class="text-xs text-slate-500 dark:text-emerald-200/60">
+                                {{ t("invoice.pgDesc") }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <p v-if="dokuLoadError" class="text-xs text-red-500">
+                        {{ t("invoice.pgLoadError") }}
+                    </p>
+
+                    <button
+                        @click="handlePayWithDoku"
+                        :disabled="dokuLoading"
+                        class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-700 to-emerald-800 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold shadow-lg transition-all duration-300"
+                    >
+                        {{ dokuLoading ? t("invoice.uploading") : t("invoice.pgButton") }}
+                    </button>
+                </div>
+
+                <!-- Payment Gateway - belum tersedia utk transaksi ini (transfer manual, dsb) -->
+                <div
+                    v-else-if="transaction.payment_status === 'pending'"
                     class="flex items-center gap-3 p-4 rounded-2xl border border-dashed border-slate-300 dark:border-emerald-800/60 text-slate-400 dark:text-emerald-200/40"
                 >
                     <UIcon name="i-lucide-credit-card" class="w-5 h-5 shrink-0" />
@@ -212,6 +248,17 @@ const { getSettingValue } = useSettings();
 const referenceId = route.params.reference_id as string;
 const { transaction, pending, isUploading, uploadError, uploadReceipt } =
     useInvoice(referenceId);
+
+const {
+    isLoading: dokuLoading,
+    loadError: dokuLoadError,
+    openCheckout,
+} = useDokuCheckout();
+
+const handlePayWithDoku = () => {
+    if (!transaction.value?.payment_url) return;
+    openCheckout(transaction.value.payment_url);
+};
 
 const selectedFile = ref<File | null>(null);
 

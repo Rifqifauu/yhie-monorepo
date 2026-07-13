@@ -1,5 +1,3 @@
-import { is } from "@nuxt/ui/runtime/locale/index.js";
-
 // 1. Definisikan Interface untuk Type Safety
 export interface Article {
   title_en: string;
@@ -22,9 +20,14 @@ export interface PaginatedResponse<T> {
   to: number | null;
 }
 
+export interface CategoryPair {
+  category_id: string;
+  category_en: string;
+}
+
 export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
-  existingCategory?: string[];
+  existingCategory?: CategoryPair[];
 }
 
 export const useArticles = () => {
@@ -74,9 +77,11 @@ export const useArticles = () => {
   });
 
   const articles = computed<Article[]>(() => paginator.value.data ?? []);
-  const existingCategories = computed<string[]>(
+  const existingCategories = computed<CategoryPair[]>(
     () => apiResponse.value?.existingCategory ?? [],
   );
+  const categoryLabelOf = (pair: CategoryPair): string =>
+    locale.value === "en" ? pair.category_en : pair.category_id;
   const totalPages = computed<number>(() => paginator.value.last_page ?? 1);
   const totalItems = computed<number>(() => paginator.value.total ?? 0);
   const fromItem = computed<number>(() => paginator.value.from ?? 0);
@@ -100,6 +105,11 @@ export const useArticles = () => {
 
   const contentOf = (article: Article): string =>
     locale.value === "en" ? article.content_en : article.content_id;
+
+  const categoryOf = (article: Article): string =>
+    locale.value === "en"
+      ? article.category_en ?? article.category_id
+      : article.category_id ?? article.category_en;
 
   const slugOf = (article: Article): string =>
     locale.value === "en" ? article.slug_en : article.slug_id;
@@ -265,6 +275,8 @@ export const useArticles = () => {
     contentOf,
     slugOf,
     coverOf,
+    categoryOf,
+    categoryLabelOf,
 
     // Methods
     applySearch,

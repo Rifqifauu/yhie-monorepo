@@ -2,12 +2,14 @@
   "nav": {
     "menu": [
       { "name": "Home", "path": "/" },
-      { "name": "About", "path": "/about" },
+      { "name": "About Us", "path": "/about" },
       { "name": "Program", "path": "/program" },
       { "name": "Gallery", "path": "/media" },
-      { "name": "Partners", "path": "/partner" },
+      { "name": "Our Partners", "path": "/partner" },
       { "name": "Articles", "path": "/articles" }
-    ]
+    ],
+    "groupAbout": "Profile",
+    "groupMedia": "Publications"
   },
   "hero": {
     "title": "Hafiz Certification Amidst the Serenity of Nature",
@@ -158,6 +160,9 @@
     "transferInfo": "Transfer To This Account",
     "pgTitle": "Automatic Payment (Virtual Account, E-Wallet, QRIS)",
     "pgComingSoon": "Coming soon. For now, please use the manual transfer above.",
+    "pgDesc": "Pay automatically via Virtual Account, E-Wallet, or QRIS - your payment status will update automatically.",
+    "pgButton": "Pay Now",
+    "pgLoadError": "Failed to load the payment page. Please try again or use the manual transfer above.",
     "uploadTitle": "Upload Payment Receipt",
     "uploadDesc": "Already made the transfer? Upload your payment receipt below so our team can verify your payment.",
     "uploadButton": "Submit Receipt",

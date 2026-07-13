@@ -57,10 +57,10 @@
                     <!-- Category Badge -->
                     <span
                         class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.2em] text-white shadow-sm"
-                        :class="getCategoryBg(article.category)"
+                        :class="getCategoryBg(article.category_id)"
                     >
                         <UIcon name="i-lucide-tag" class="w-3.5 h-3.5" />
-                        {{ getCategoryLabel(article.category) }}
+                        {{ getCategoryLabel(categoryOf(article)) }}
                     </span>
 
                     <!-- Title -->
@@ -274,9 +274,9 @@
                                     </span>
                                     <span
                                         class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-white"
-                                        :class="getCategoryBg(article.category)"
+                                        :class="getCategoryBg(article.category_id)"
                                     >
-                                        {{ getCategoryLabel(article.category) }}
+                                        {{ getCategoryLabel(categoryOf(article)) }}
                                     </span>
                                 </div>
                             </div>
@@ -417,7 +417,7 @@
                                         class="w-4 h-4 text-amber-500 shrink-0"
                                     />
                                     <span>{{
-                                        getCategoryLabel(article.category)
+                                        getCategoryLabel(categoryOf(article))
                                     }}</span>
                                 </div>
                             </div>
@@ -565,33 +565,33 @@ const latestArticles = computed(() =>
 const latestPending = computed(() => latestStatus.value === "pending");
 
 // --- Categories ---
-const categories = [
-    { value: "news", labelId: "Berita", labelEn: "News" },
-    { value: "announcement", labelId: "Pengumuman", labelEn: "Announcement" },
-    { value: "event", labelId: "Kegiatan", labelEn: "Event" },
-    { value: "education", labelId: "Edukasi", labelEn: "Education" },
+// article.category_id / article.category_en datang langsung dari backend
+// (App\Enums\ContentCategory), jadi label di sini tinggal pilih sesuai locale
+// - tidak perlu peta manual yang gampang basi (dulu ada peta lama berisi
+// slug seperti "news"/"education" yang sudah tidak dipakai backend).
+const categoryOf = (item: any) =>
+    item &&
+    (locale.value === "en"
+        ? (item.category_en ?? item.category_id)
+        : (item.category_id ?? item.category_en));
+
+const getCategoryLabel = (cat?: string) => cat || "";
+
+// Warna badge diputar dari daftar warna tetap berdasar category_id (stabil
+// lintas-locale), sama seperti pola di articles/index.vue.
+const categoryBgColors = [
+    "bg-emerald-600 dark:bg-emerald-500",
+    "bg-amber-500 dark:bg-amber-600",
+    "bg-teal-600 dark:bg-teal-500",
+    "bg-emerald-700 dark:bg-emerald-600",
 ];
 
-const getCategoryLabel = (cat?: string) => {
-    if (!cat) return "";
-    const found = categories.find((c) => c.value === cat);
-    if (!found) return cat;
-    return locale.value === "en" ? found.labelEn : found.labelId;
-};
-
 const getCategoryBg = (cat?: string) => {
-    switch (cat) {
-        case "news":
-            return "bg-emerald-600 dark:bg-emerald-500";
-        case "announcement":
-            return "bg-amber-500 dark:bg-amber-600";
-        case "event":
-            return "bg-teal-600 dark:bg-teal-500";
-        case "education":
-            return "bg-emerald-700 dark:bg-emerald-600";
-        default:
-            return "bg-emerald-600 dark:bg-emerald-500";
-    }
+    if (!cat) return categoryBgColors[0];
+    let hash = 0;
+    for (let i = 0; i < cat.length; i++)
+        hash = (hash + cat.charCodeAt(i)) % categoryBgColors.length;
+    return categoryBgColors[hash];
 };
 
 // --- Helpers ---

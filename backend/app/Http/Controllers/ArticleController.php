@@ -18,12 +18,13 @@ class ArticleController extends Controller
         $search = $request->query("search");
         $category = $request->query("category");
 
-        // Sama seperti MediaController: daftar kategori nyata yang ada di data,
-        // dipakai frontend untuk membangun tombol/dropdown filter secara dinamis.
-        $existingCategory = Article::select("category")
-            ->whereNotNull("category")
+        // Sama seperti MediaController: daftar kategori nyata yang ada di data
+        // (id + en berpasangan), dipakai frontend untuk membangun tombol/dropdown
+        // filter secara dinamis dengan label sesuai locale yang aktif.
+        $existingCategory = Article::select("category_id", "category_en")
+            ->whereNotNull("category_id")
             ->distinct()
-            ->pluck("category");
+            ->get();
 
         try {
             $articles = Article::with("author")
@@ -31,7 +32,7 @@ class ArticleController extends Controller
                 ->orderBy("id", "desc")
                 ->when($category, function ($query, $category) {
                     // Case-insensitive supaya filter tetap cocok walau beda kapitalisasi
-                    return $query->whereRaw("LOWER(category) = ?", [
+                    return $query->whereRaw("LOWER(category_id) = ?", [
                         Str::lower($category),
                     ]);
                 })
@@ -76,7 +77,7 @@ class ArticleController extends Controller
             "slug_en" => "nullable|string|max:255",
             "is_published" => "required|boolean",
             "author_id" => "nullable|integer|exists:users,id",
-            "category" => ["required", Rule::in(ContentCategory::values())],
+            "category_id" => ["required", Rule::in(ContentCategory::values())],
         ];
 
         if ($request->hasFile("image")) {
@@ -111,6 +112,11 @@ class ArticleController extends Controller
 
             $data["author_id"] = $authorId;
             $data["image"] = $this->storeImages($request);
+            // category_en selalu diturunkan dari category_id, tidak dipilih
+            // terpisah oleh admin - supaya tidak mungkin tidak sinkron.
+            $data["category_en"] = ContentCategory::from(
+                $data["category_id"],
+            )->en();
 
             $article = Article::create($data);
 
@@ -177,7 +183,7 @@ class ArticleController extends Controller
             "slug_en" => "nullable|string|max:255",
             "is_published" => "sometimes|required|boolean",
             "author_id" => "sometimes|nullable|integer|exists:users,id",
-            "category" => [
+            "category_id" => [
                 "sometimes",
                 "required",
                 Rule::in(ContentCategory::values()),
@@ -226,6 +232,12 @@ class ArticleController extends Controller
                 empty($validated["author_id"])
             ) {
                 $validated["author_id"] = $article->author_id;
+            }
+
+            if (array_key_exists("category_id", $validated)) {
+                $validated["category_en"] = ContentCategory::from(
+                    $validated["category_id"],
+                )->en();
             }
 
             $article->update($validated);
