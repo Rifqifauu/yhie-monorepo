@@ -23,54 +23,47 @@ class TransactionService
     /**
      * 1. Membuat transaksi baru dan men-generate link DOKU
      */
-    public function createTransactionWithPG(array $data): Transaction
-    {
-        // Ambil data pendaftar untuk dikirim ke DOKU
-        $registration = ProgramRegistration::find($data['program_registration_id']);
-        if (!$registration) {
-            throw new Exception("Program registration not found.", 404);
-        }
+     public function createTransactionWithPG(Transaction $transaction): Transaction
+         {
+             // Pastikan relasi programRegistration ada (untuk nama/email customer di DOKU)
+             $transaction->loadMissing('programRegistration');
+             $registration = $transaction->programRegistration;
 
-        // Buat referensi invoice unik (contoh: INV-202607-XXXX)
-        $referenceId = 'INV-' . date('Ym') . '-' . strtoupper(Str::random(6));
+             if (!$registration) {
+                 throw new Exception("Program registration data is missing for this transaction.", 404);
+             }
 
-        // Simpan transaksi awal ke database dengan status pending
-        $transaction = Transaction::create([
-            'program_registration_id' => $registration->id,
-            'reference_id' => $referenceId,
-            'amount' => $data['amount'],
-            'payment_status' => 'pending',
-            'payment_method' => 'doku_hosted', // Penanda bayar via PG
-        ]);
+             // Update penanda bahwa transaksi ini sekarang menggunakan metode DOKU (opsional)
+             $transaction->update(['payment_method' => 'doku_hosted']);
 
-        // Siapkan payload untuk API DOKU
-        $dokuPayload = [
-            'amount' => $transaction->amount,
-            'invoice_number' => $transaction->reference_id,
-            'customer_name' => $registration->full_name,
-            'customer_email' => $registration->email,
-            // Opsional: tambahkan callback_url di sini jika tidak di-set default di PaymentGatewayService
-        ];
+             // Siapkan payload untuk API DOKU menggunakan data transaksi yang sudah ada
+             $dokuPayload = [
+                 'amount' => $transaction->amount,
+                 'invoice_number' => $transaction->reference_id, // Gunakan reference_id yang sudah ada
+                 'customer_name' => $registration->full_name,
+                 'customer_email' => $registration->email,
+                 // Opsional: tambahkan callback_url di sini jika tidak di-set default di PaymentGatewayService
+             ];
 
-        // Tembak API DOKU via PaymentGatewayService
-        $dokuResponse = $this->pgService->createDokuPayment($dokuPayload);
+             // Tembak API DOKU via PaymentGatewayService
+             $dokuResponse = $this->pgService->createDokuPayment($dokuPayload);
 
-        // Cek apakah DOKU berhasil mengembalikan URL pembayaran
-        if (isset($dokuResponse['response']['payment']['url'])) {
-            // Update transaksi dengan URL dan raw response dari DOKU
-            $transaction->update([
-                'payment_url' => $dokuResponse['response']['payment']['url'],
-                'pg_transaction_id' => $dokuResponse['response']['order']['invoice_number'] ?? null,
-                'pg_response' => json_encode($dokuResponse),
-            ]);
-        } else {
-            // Jika gagal tembak API DOKU, update status transaksi menjadi failed
-            $transaction->update(['payment_status' => 'failed']);
-            throw new Exception("Gagal membuat link pembayaran DOKU. Pastikan credential valid.", 500);
-        }
+             // Cek apakah DOKU berhasil mengembalikan URL pembayaran
+             if (isset($dokuResponse['response']['payment']['url'])) {
+                 // Update transaksi dengan URL dan raw response dari DOKU
+                 $transaction->update([
+                     'payment_url' => $dokuResponse['response']['payment']['url'],
+                     'pg_transaction_id' => $dokuResponse['response']['order']['invoice_number'] ?? null,
+                     'pg_response' => json_encode($dokuResponse),
+                 ]);
+             } else {
+                 // Jika gagal tembak API DOKU, lemparkan error tanpa mengubah status menjadi failed
+                 // (Agar user masih bisa mencoba lagi atau bayar manual)
+                 throw new Exception("Gagal membuat link pembayaran DOKU. Pastikan credential valid.", 500);
+             }
 
-        return $transaction->fresh()->load('programRegistration.program');
-    }
+             return $transaction->fresh()->load('programRegistration.program');
+         }
 
     /**
      * 2. Menangani notifikasi webhook otomatis dari DOKU
