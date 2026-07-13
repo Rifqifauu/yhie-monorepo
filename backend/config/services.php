@@ -41,5 +41,10 @@ return [
         // ID role "Student" default Moodle = 5, ubah lewat .env kalau instance-nya beda.
         'student_role_id' => env('MOODLE_STUDENT_ROLE_ID', 5),
     ],
+    'doku' => [
+        'client_id' => env('DOKU_CLIENT_ID'),
+        'secret_key' => env('DOKU_SECRET_KEY'),
+        'base_url' => env('DOKU_PAYMENT_URL'),
+    ],
 
 ];
