@@ -14,6 +14,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FlipPaymentController;
+use App\Http\Controllers\LoginGateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,15 @@ Route::prefix("settings")->group(function () {
     Route::get("/{key}", [SettingController::class, "show"]);
 });
 
+// Gerbang passcode utk halaman /login, publik. "status" cuma balikin
+// aktif/tidak (bukan nilainya), "verify" dibatasi rate limit krn jadi
+// target brute-force kalau tidak dilindungi.
+Route::prefix("login-gate")->group(function () {
+    Route::get("status", [LoginGateController::class, "status"]);
+    Route::post("verify", [LoginGateController::class, "verify"])
+        ->middleware("throttle:10,1");
+});
+
 // Pendaftaran program biasanya bersifat publik
 Route::post("program-registrations", [
     ProgramRegistrationController::class,
@@ -72,6 +82,12 @@ Route::post("transactions/track/{reference_id}/receipt", [
     TransactionController::class,
     "uploadReceipt",
 ]);
+// Generate/refresh link pembayaran DOKU untuk invoice yang masih pending,
+// publik (tanpa login), dibatasi rate limit karena tiap panggilan tembak API DOKU.
+Route::post("transactions/track/{reference_id}/generate-payment", [
+    TransactionController::class,
+    "generatePayment",
+])->middleware("throttle:10,1");
 
 // Cari invoice tanpa reference_id (pakai kombinasi email+telepon), publik,
 // dibatasi rate limit karena tidak butuh token rahasia seperti reference_id.

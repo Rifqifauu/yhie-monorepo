@@ -12,6 +12,10 @@ use Illuminate\Database\QueryException;
 
 class SettingController extends Controller
 {
+    // Key yang tidak boleh pernah bocor lewat endpoint publik (index/show),
+    // meski tetap dikelola lewat mekanisme Setting yang sama oleh admin.
+    protected array $publicHidden = ['login_passcode'];
+
     // ── PUBLIC ────────────────────────────────────────────────────────────────
 
     /**
@@ -22,7 +26,7 @@ class SettingController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $settings = Setting::all();
+            $settings = Setting::whereNotIn('key', $this->publicHidden)->get();
 
             return response()->json([
                 'message' => 'Settings fetched successfully.',
@@ -42,6 +46,13 @@ class SettingController extends Controller
      */
     public function show(string $key): JsonResponse
     {
+        if (in_array($key, $this->publicHidden)) {
+            return response()->json([
+                'message' => 'Setting not found.',
+                'data' => null
+            ], 404);
+        }
+
         try {
             $setting = Setting::where('key', $key)->firstOrFail();
 

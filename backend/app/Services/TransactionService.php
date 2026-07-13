@@ -39,10 +39,30 @@ class TransactionService
             'reference_id' => $referenceId,
             'amount' => $data['amount'],
             'payment_status' => 'pending',
-            'payment_method' => 'doku_hosted', // Penanda ini bayar via PG
+            'payment_method' => 'manual_transfer',
         ]);
 
-        // 4. Siapkan payload untuk DOKU
+        return $this->generatePaymentUrl($transaction, failTransactionOnError: true);
+    }
+
+    /**
+     * Generate/refresh link pembayaran DOKU untuk transaksi yang SUDAH ada
+     * (mis. awalnya transfer manual, lalu registran pilih bayar via DOKU dari
+     * halaman invoice). Dipanggil publik lewat endpoint bertopeng reference_id,
+     * BUKAN id mentah, supaya tidak bisa ditebak/di-enumerate orang lain
+     * (lihat TransactionController::generatePayment).
+     */
+    public function generatePaymentUrl(
+        Transaction $transaction,
+        bool $failTransactionOnError = false,
+    ): Transaction {
+        if ($transaction->payment_status !== 'pending') {
+            throw new Exception("Invoice is no longer awaiting payment.", 422);
+        }
+
+        $registration = $transaction->programRegistration
+            ?? $transaction->load('programRegistration')->programRegistration;
+
         $dokuPayload = [
             'amount' => $transaction->amount,
             'invoice_number' => $transaction->reference_id,
@@ -51,19 +71,22 @@ class TransactionService
             'customer_phone' => $registration->phone,
         ];
 
-        // 5. Tembak API DOKU via PaymentGatewayService
         $dokuResponse = $this->pgService->createDokuPayment($dokuPayload);
 
-        // 6. Cek apakah DOKU berhasil mengembalikan URL pembayaran
         if (isset($dokuResponse['response']['payment']['url'])) {
-            // Update transaksi dengan URL dan raw response dari DOKU
             $transaction->update([
+                'payment_method' => 'doku_hosted',
                 'payment_url' => $dokuResponse['response']['payment']['url'],
                 'pg_response' => json_encode($dokuResponse),
             ]);
         } else {
-            // Jika gagal tembak API DOKU, update status transaksi
-            $transaction->update(['payment_status' => 'failed']);
+            // Kalau ini transaksi baru khusus PG (tidak ada opsi lain), gagal
+            // total. Kalau ini transaksi transfer manual yang cuma "coba"
+            // bayar pakai DOKU, biarkan tetap pending - transfer manual masih
+            // bisa dipakai sebagai jalur pembayaran.
+            if ($failTransactionOnError) {
+                $transaction->update(['payment_status' => 'failed']);
+            }
             throw new Exception("Gagal membuat link pembayaran DOKU: " . json_encode($dokuResponse), 500);
         }
 

@@ -15,6 +15,8 @@ export const useInvoice = (referenceId: string) => {
   const client = useSanctumClient();
   const isUploading = ref(false);
   const uploadError = ref("");
+  const isGeneratingPayment = ref(false);
+  const generatePaymentError = ref("");
 
   const {
     data: apiResponse,
@@ -54,6 +56,26 @@ export const useInvoice = (referenceId: string) => {
     }
   };
 
+  const generatePayment = async () => {
+    generatePaymentError.value = "";
+    isGeneratingPayment.value = true;
+
+    try {
+      const res = await client<{ data: InvoiceTransaction }>(
+        `/api/transactions/track/${referenceId}/generate-payment`,
+        { method: "POST" },
+      );
+      apiResponse.value = res;
+      return res.data.payment_url;
+    } catch (err: any) {
+      generatePaymentError.value =
+        err?.data?.message || "Gagal membuat link pembayaran.";
+      return null;
+    } finally {
+      isGeneratingPayment.value = false;
+    }
+  };
+
   return {
     transaction,
     pending,
@@ -61,6 +83,9 @@ export const useInvoice = (referenceId: string) => {
     isUploading,
     uploadError,
     uploadReceipt,
+    isGeneratingPayment,
+    generatePaymentError,
+    generatePayment,
     refresh,
   };
 };

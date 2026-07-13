@@ -66,6 +66,30 @@
                 </UButton>
             </div>
         </UForm>
+
+        <!-- Keamanan: form terpisah & disimpan sendiri (bukan bagian dari form
+             pengaturan umum di atas), supaya menyimpan tab lain tidak pernah
+             ikut menghapus/menimpa passcode ini secara tidak sengaja. -->
+        <div v-if="!pending && !error" class="bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6 space-y-4 max-w-3xl">
+            <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <UIcon name="i-lucide-shield-check" class="w-4 h-4" />
+                    Keamanan Halaman Login
+                </h3>
+                <UBadge :color="gateEnabled ? 'success' : 'neutral'" variant="subtle">
+                    {{ gateEnabled ? 'Aktif' : 'Tidak aktif' }}
+                </UBadge>
+            </div>
+            <UFormField label="Passcode URL Login"
+                help="Kalau diisi, pengunjung harus memasukkan passcode ini dulu sebelum bisa membuka halaman /login. Kosongkan lalu simpan untuk menonaktifkan gerbang ini.">
+                <UInput v-model="passcodeInput" type="text" placeholder="Kosongkan untuk menonaktifkan" icon="i-lucide-key-round" size="lg" class="w-full" />
+            </UFormField>
+            <div class="flex justify-end">
+                <UButton color="primary" variant="soft" size="lg" icon="i-lucide-save" :loading="passcodeSaving" @click="handleSavePasscode">
+                    Simpan Passcode
+                </UButton>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -113,7 +137,45 @@ const schema = z.object({
 });
 
 const toast = useToast();
-const { settings, pending, error, refresh, isSubmitting, getSettingValue, saveAllSettings } = useSettings();
+const { settings, pending, error, refresh, isSubmitting, getSettingValue, saveAllSettings, updateSetting } = useSettings();
+
+// ── Keamanan: gerbang passcode /login (terpisah dari form umum di atas) ────
+const client = useSanctumClient();
+const passcodeInput = ref("");
+const passcodeSaving = ref(false);
+const gateEnabled = ref(false);
+
+const { data: gateStatus, refresh: refreshGateStatus } = await useAsyncData(
+    "login-gate-status",
+    () => client<{ enabled: boolean }>("/api/login-gate/status"),
+);
+watch(gateStatus, (val) => { gateEnabled.value = !!val?.enabled; }, { immediate: true });
+
+const handleSavePasscode = async () => {
+    passcodeSaving.value = true;
+    try {
+        await updateSetting("login_passcode", passcodeInput.value);
+        await refreshGateStatus();
+        passcodeInput.value = "";
+        toast.add({
+            title: "Tersimpan!",
+            description: gateEnabled.value
+                ? "Gerbang passcode halaman login diaktifkan."
+                : "Gerbang passcode halaman login dinonaktifkan.",
+            color: "success",
+            icon: "i-lucide-circle-check",
+        });
+    } catch (err: any) {
+        toast.add({
+            title: "Gagal Menyimpan",
+            description: err.data?.message || err.message || "Gagal menyimpan passcode.",
+            color: "error",
+            icon: "i-lucide-alert-triangle",
+        });
+    } finally {
+        passcodeSaving.value = false;
+    }
+};
 
 // ── Field Definitions ──────────────────────────────────────────────────────
 interface Field {

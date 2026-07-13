@@ -175,6 +175,42 @@ class TransactionController extends Controller
     }
 
     /**
+     * POST /api/transactions/track/{referenceId}/generate-payment
+     * Public - registran memilih bayar via DOKU dari halaman invoice
+     * (transaksi bisa saja awalnya transfer manual). Pakai reference_id
+     * (bukan id mentah) supaya tidak bisa ditebak/di-enumerate orang lain.
+     */
+    public function generatePayment(string $referenceId): JsonResponse
+    {
+        $transaction = Transaction::where("reference_id", $referenceId)->first();
+
+        if (!$transaction) {
+            return response()->json(["message" => "Invoice not found."], 404);
+        }
+
+        try {
+            $transaction = $this->transactionService->generatePaymentUrl($transaction);
+
+            return response()->json([
+                "message" => "Payment link generated successfully.",
+                "data" => new TransactionResource($transaction),
+            ], 200);
+
+        } catch (\Exception $e) {
+            $statusCode = $e->getCode() ?: 500;
+            $statusCode = ($statusCode >= 400 && $statusCode <= 599) ? $statusCode : 500;
+
+            if ($statusCode === 500) {
+                Log::error("Error generating PG payment link: " . $e->getMessage());
+            }
+
+            return response()->json([
+                "message" => $statusCode === 500 ? "Failed to generate payment link." : $e->getMessage(),
+            ], $statusCode);
+        }
+    }
+
+    /**
      * PUT /api/transactions/{transaction}
      */
     public function update(Request $request, Transaction $transaction): JsonResponse
