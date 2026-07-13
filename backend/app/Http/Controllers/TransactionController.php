@@ -54,39 +54,35 @@ class TransactionController extends Controller
         }
     }
 
-    /**
-     * POST /api/transactions
-     * Create a transaction linked to a program registration via Payment Gateway (DOKU).
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            "program_registration_id" => "required|exists:program_registrations,id",
-            "amount" => "required|numeric|min:0",
-        ]);
+    public function generatePayment(Request $request, Transaction $transaction): JsonResponse
+        {
+            try {
+                if ($transaction->payment_status !== 'pending') {
+                    return response()->json([
+                        "message" => "Cannot generate payment. Transaction is already {$transaction->payment_status}.",
+                    ], 400);
+                }
 
-        try {
-            // Logika diserahkan ke service
-            $transaction = $this->transactionService->createTransactionWithPG($data);
+                $updatedTransaction = $this->transactionService->createTransactionWithPG($transaction);
 
-            return response()->json([
-                "message" => "Transaction created successfully. Please redirect user to payment_url.",
-                "data" => new TransactionResource($transaction),
-            ], 201);
+                return response()->json([
+                    "message" => "Payment Gateway generated successfully. Please redirect user to payment_url.",
+                    "data" => new TransactionResource($updatedTransaction),
+                ], 200);
 
-        } catch (\Exception $e) {
-            $statusCode = $e->getCode() ?: 500;
-            $statusCode = ($statusCode >= 400 && $statusCode <= 599) ? $statusCode : 500;
+            } catch (\Exception $e) {
+                $statusCode = $e->getCode() ?: 500;
+                $statusCode = ($statusCode >= 400 && $statusCode <= 599) ? $statusCode : 500;
 
-            if ($statusCode === 500) {
-                Log::error("Error creating PG transaction: " . $e->getMessage());
+                if ($statusCode === 500) {
+                    Log::error("Error generating PG for existing transaction: " . $e->getMessage());
+                }
+
+                return response()->json([
+                    "message" => $statusCode === 500 ? "Failed to generate payment gateway." : $e->getMessage(),
+                ], $statusCode);
             }
-
-            return response()->json([
-                "message" => $statusCode === 500 ? "Failed to create transaction with PG." : $e->getMessage(),
-            ], $statusCode);
         }
-    }
 
     /**
      * GET /api/transactions/{transaction}

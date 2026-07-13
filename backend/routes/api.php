@@ -13,7 +13,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FlipPaymentController;
+use App\Http\Controllers\DokuWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,10 +22,9 @@ use App\Http\Controllers\FlipPaymentController;
 | Digunakan untuk menampilkan data ke pengunjung website (Frontend)
 | dan menerima *submit* form pendaftaran awal.
 */
-use App\Http\Controllers\DokuWebhookController;
 
 Route::post('/webhooks/doku', [DokuWebhookController::class, 'handle']);
-
+Route::put('/transactions/{transaction}/generate-payment', [TransactionController::class, 'generatePayment']);
 
 Route::prefix("articles")->group(function () {
     Route::get("/", [ArticleController::class, "index"]);
