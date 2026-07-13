@@ -16,9 +16,9 @@ class PaymentGatewayService
      */
     public function __construct()
     {
-        $this->clientId = config('doku.client_id');
-        $this->secretKey = config('doku.secret_key');
-        $this->baseUrl = config('doku.base_url');
+        $this->clientId = config('services.doku.client_id');
+        $this->secretKey = config('services.doku.secret_key');
+        $this->baseUrl = config('services.doku.base_url');
     }
 
     /**
