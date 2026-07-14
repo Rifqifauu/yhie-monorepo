@@ -180,7 +180,7 @@ const { user, logout } = useSanctumAuth();
 const openModal = ref(false);
 const loading = ref(false);
 const toast = useToast();
-const colorMode = useColorMode();
+const { colorMode, toggleTheme } = useThemeMode();
 const route = useRoute();
 
 const props = defineProps({
@@ -200,10 +200,6 @@ const toggleSidebar = () => {
     if (!props.isMobile) {
         isDesktopSidebarOpen.value = !isDesktopSidebarOpen.value;
     }
-};
-
-const toggleTheme = () => {
-    colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
 };
 
 const openLogoutModal = () => {

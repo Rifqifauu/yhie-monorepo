@@ -50,6 +50,17 @@
                                 <!-- Textarea -->
                                 <UTextarea v-else-if="f.type === 'textarea'" v-model="form[f.key]"
                                     :placeholder="f.placeholder" :rows="f.rows || 3" size="lg" class="w-full" />
+                                <!-- Image upload -->
+                                <div v-else-if="f.type === 'file'" class="flex items-center gap-3">
+                                    <img v-if="form[f.key]" :src="previewSrc(form[f.key])" :alt="f.label"
+                                        class="h-12 w-12 object-contain rounded border border-gray-200 dark:border-gray-700 bg-white p-1" />
+                                    <UButton color="neutral" variant="soft" size="sm" icon="i-lucide-upload"
+                                        :loading="uploadingKey === f.key" @click="triggerFileInput(f.key)">
+                                        {{ form[f.key] ? "Ganti Gambar" : "Unggah Gambar" }}
+                                    </UButton>
+                                    <input :ref="(el) => setFileInputRef(f.key, el as HTMLInputElement)" type="file"
+                                        accept="image/*" class="hidden" @change="handleImageUpload(f.key, $event)" />
+                                </div>
                                 <!-- Default Input -->
                                 <UInput v-else v-model="form[f.key]" :placeholder="f.placeholder"
                                     :icon="f.icon" :type="f.type || 'text'" size="lg" class="w-full" />
@@ -87,6 +98,40 @@
             <div class="flex justify-end">
                 <UButton color="primary" variant="soft" size="lg" icon="i-lucide-save" :loading="passcodeSaving" @click="handleSavePasscode">
                     Simpan Passcode
+                </UButton>
+            </div>
+        </div>
+
+        <!-- Gambar Hero Section: bisa nambah/hapus gambar satu-satu, langsung
+             tersimpan ke server begitu diunggah/dihapus (bukan bagian dari
+             form bulk-save umum di atas). -->
+        <div v-if="!pending && !error" class="bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-800 rounded-lg shadow-sm p-6 space-y-4 max-w-3xl">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
+                <UIcon name="i-lucide-images" class="w-4 h-4" />
+                Gambar Hero Section (Beranda)
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Gambar-gambar ini tampil bergantian (slider) di bagian hero halaman beranda.
+            </p>
+
+            <div v-if="heroImagePaths.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                <div v-for="path in heroImagePaths" :key="path" class="relative group">
+                    <img :src="previewSrc(path)" alt="Gambar hero"
+                        class="w-full aspect-video object-cover rounded-lg border border-gray-200 dark:border-gray-700" />
+                    <UButton color="error" variant="solid" icon="i-lucide-trash" size="xs"
+                        class="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        :loading="removingHeroPath === path" @click="handleRemoveHeroImage(path)" />
+                </div>
+            </div>
+            <p v-else class="text-sm text-gray-400 italic">
+                Belum ada gambar - slider hero pakai gambar bawaan sementara.
+            </p>
+
+            <div>
+                <input ref="heroFileInputRef" type="file" accept="image/*" class="hidden" @change="handleAddHeroImage" />
+                <UButton color="primary" variant="soft" icon="i-lucide-plus" :loading="addingHeroImage"
+                    @click="heroFileInputRef?.click()">
+                    Tambah Gambar
                 </UButton>
             </div>
         </div>
@@ -137,7 +182,80 @@ const schema = z.object({
 });
 
 const toast = useToast();
-const { settings, pending, error, refresh, isSubmitting, getSettingValue, saveAllSettings, updateSetting } = useSettings();
+const {
+    settings, pending, error, refresh, isSubmitting, getSettingValue, saveAllSettings,
+    updateSetting, uploadSettingImage, heroImagePaths, addHeroImage, removeHeroImage,
+} = useSettings();
+
+// ── Upload gambar (logo/favicon) ────────────────────────────────────────────
+const fileUrl = useFileUrl();
+const previewSrc = (value: string) => (value?.startsWith("/storage/") ? fileUrl(value) : value);
+
+const fileInputs: Record<string, HTMLInputElement | null> = {};
+const setFileInputRef = (key: string, el: HTMLInputElement | null) => { fileInputs[key] = el; };
+const triggerFileInput = (key: string) => fileInputs[key]?.click();
+
+const uploadingKey = ref<string | null>(null);
+const handleImageUpload = async (key: string, event: Event) => {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    uploadingKey.value = key;
+    try {
+        form[key] = await uploadSettingImage(key, file);
+        toast.add({
+            title: "Tersimpan!",
+            description: `${key === "logo_url" ? "Logo" : "Favicon"} berhasil diunggah.`,
+            color: "success",
+            icon: "i-lucide-circle-check",
+        });
+    } catch (err: any) {
+        toast.add({
+            title: "Gagal Mengunggah",
+            description: err.data?.message || err.message || "Gagal mengunggah gambar.",
+            color: "error",
+            icon: "i-lucide-alert-triangle",
+        });
+    } finally {
+        uploadingKey.value = null;
+        input.value = "";
+    }
+};
+
+// ── Gambar hero section (nambah/hapus, terpisah dari form umum) ────────────
+const heroFileInputRef = ref<HTMLInputElement | null>(null);
+const addingHeroImage = ref(false);
+const removingHeroPath = ref<string | null>(null);
+
+const handleAddHeroImage = async (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    addingHeroImage.value = true;
+    try {
+        await addHeroImage(file);
+        toast.add({ title: "Tersimpan!", description: "Gambar hero berhasil ditambahkan.", color: "success", icon: "i-lucide-circle-check" });
+    } catch (err: any) {
+        toast.add({ title: "Gagal Menambahkan", description: err.data?.message || err.message || "Gagal menambahkan gambar.", color: "error", icon: "i-lucide-alert-triangle" });
+    } finally {
+        addingHeroImage.value = false;
+        input.value = "";
+    }
+};
+
+const handleRemoveHeroImage = async (path: string) => {
+    removingHeroPath.value = path;
+    try {
+        await removeHeroImage(path);
+        toast.add({ title: "Terhapus!", description: "Gambar hero berhasil dihapus.", color: "success", icon: "i-lucide-circle-check" });
+    } catch (err: any) {
+        toast.add({ title: "Gagal Menghapus", description: err.data?.message || err.message || "Gagal menghapus gambar.", color: "error", icon: "i-lucide-alert-triangle" });
+    } finally {
+        removingHeroPath.value = null;
+    }
+};
 
 // ── Keamanan: gerbang passcode /login (terpisah dari form umum di atas) ────
 const client = useSanctumClient();
@@ -196,8 +314,8 @@ const tabs: Tab[] = [
             { key: "tagline", label: "Slogan / Tagline", placeholder: "Membangun Generasi Hafizh Berakhlak Mulia", icon: "i-lucide-quote", full: true, help: "Tampil di bawah nama di footer." },
             { key: "site_description", label: "Deskripsi Singkat", placeholder: "Deskripsi singkat yayasan...", type: "textarea", rows: 2, full: true, help: "Tampil sebagai bio singkat di footer." },
             { key: "meta_description", label: "Deskripsi SEO", placeholder: "Deskripsi untuk mesin pencari Google...", type: "textarea", rows: 2, full: true, help: "Tampil di hasil pencarian Google (<head>). Maks. ~160 karakter." },
-            { key: "logo_url", label: "URL Logo", placeholder: "https://.../logo.png", icon: "i-lucide-image", full: true, help: "Logo utama (header & footer)." },
-            { key: "favicon_url", label: "URL Favicon", placeholder: "https://.../favicon.ico", icon: "i-lucide-app-window", full: true, help: "Ikon kecil di tab browser." },
+            { key: "logo_url", label: "Logo", type: "file", full: true, help: "Logo utama (header & footer)." },
+            { key: "favicon_url", label: "Favicon", type: "file", full: true, help: "Ikon kecil di tab browser." },
         ],
     },
     {

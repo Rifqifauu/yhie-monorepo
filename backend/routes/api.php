@@ -147,6 +147,9 @@ Route::middleware("auth:sanctum")->group(function () {
             "index",
         ]);
         Route::post("settings-bulk", [SettingController::class, "bulkUpdate"]);
+        Route::post("settings/{key}/upload", [SettingController::class, "uploadImage"]);
+        Route::post("settings/hero-images", [SettingController::class, "addHeroImage"]);
+        Route::delete("settings/hero-images", [SettingController::class, "removeHeroImage"]);
         Route::apiResource("settings", SettingController::class)->except([
             "show",
             "index",

@@ -364,7 +364,7 @@ const isGroupActive = (items: NavLeaf[]) =>
 const isMobileMenuOpen = ref(false);
 const isScrolled = ref(false);
 const isRotated = ref(false);
-const colorMode = useColorMode();
+const { colorMode, toggleTheme: toggleThemeMode } = useThemeMode();
 
 // Helper functions
 const goToHome = () => {
@@ -385,7 +385,7 @@ const handleScroll = () => {
 
 const toggleTheme = () => {
     isRotated.value = !isRotated.value;
-    colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
+    toggleThemeMode();
 };
 
 // Observers & Lifecycle

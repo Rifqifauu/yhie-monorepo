@@ -229,7 +229,7 @@ const jadwalSholat = ref({
     isya: "--:--",
 });
 
-const imageItems = ["/quran.webp", "/tejasari.webp"];
+const { heroImages: imageItems } = useSettings();
 
 const toggleJadwal = () => {
     showJadwal.value = !showJadwal.value;
